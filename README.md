@@ -1,4 +1,4 @@
-# ipns
+# IPNS
 
 [![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://protocol.ai)
 [![](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io/)
@@ -36,7 +36,7 @@ This module contains all the necessary code for creating, understanding and vali
 #### Create record
 
 ```js
-const ipns = require('./ipns')
+const ipns = require('ipns')
 
 ipns.create(privateKey, value, seqNumber, eol, (err, entryData) => {
   // your code goes here
@@ -46,7 +46,7 @@ ipns.create(privateKey, value, seqNumber, eol, (err, entryData) => {
 #### Validate record
 
 ```js
-const ipns = require('./ipns')
+const ipns = require('ipns')
 
 ipns.validate(publicKey, ipnsEntry, (err) => {
   // your code goes here
@@ -65,7 +65,7 @@ ipns.validate(publicKey, ipnsEntry, (err) => {
 #### Datastore key
 
 ```js
-const ipns = require('./ipns')
+const ipns = require('ipns')
 
 ipns.getDatastoreKey(peerId);
 ```

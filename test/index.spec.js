@@ -18,6 +18,8 @@ const ipns = require('../src')
 const df = DaemonFactory.create({ type: 'proc', exec: ipfs })
 
 describe('ipns', function () {
+  this.timeout(20 * 1000)
+
   const cid = 'QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq'
 
   let ipfs = null

@@ -9,7 +9,7 @@ const ipnsEntryProto = require('./pb/ipns.proto')
 const ERRORS = require('./errors')
 
 /**
- * Create creates a new ipns entry and signs it with the given private key.
+ * Creates a new ipns entry and signs it with the given private key.
  * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
  *
  * @param {Object} privateKey private key for signing the record.
