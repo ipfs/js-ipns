@@ -1,0 +1,53 @@
+{
+  "name": "ipns",
+  "version": "0.1.0",
+  "description": "ipns record definitions",
+  "leadMaintainer": "Vasco Santos <vasco.santos@moxy.studio>",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "aegir build",
+    "lint": "aegir lint",
+    "release": "aegir release",
+    "release-minor": "aegir release --type minor",
+    "release-major": "aegir release --type major",
+    "test": "aegir test",
+    "test:browser": "aegir test -t browser -t webworker",
+    "test:node": "aegir test -t node"
+  },
+  "pre-push": [
+    "lint",
+    "test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipfs/js-ipns.git"
+  },
+  "keywords": [
+    "ipfs",
+    "ipns"
+  ],
+  "author": "Vasco Santos <vasco.santos@moxy.studio>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ipfs/js-ipns/issues"
+  },
+  "homepage": "https://github.com/ipfs/js-ipns#readme",
+  "dependencies": {
+    "base32-encode": "^1.0.0",
+    "debug": "^3.1.0",
+    "protons": "^1.0.1"
+  },
+  "devDependencies": {
+    "aegir": "^13.1.0",
+    "chai": "^4.1.2",
+    "chai-string": "^1.4.0",
+    "dirty-chai": "^2.0.1",
+    "ipfs": "^0.28.2",
+    "ipfsd-ctl": "^0.36.0",
+    "libp2p-crypto": "^0.13.0",
+    "multihashes": "^0.4.13"
+  },
+  "contributors": [
+    "Vasco Santos <vasco.santos@moxy.studio>"
+  ]
+}
