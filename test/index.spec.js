@@ -35,7 +35,7 @@ describe('ipns', function () {
 
       ipfs.id((err, id) => {
         if (err) {
-          throw err
+          return cb(err)
         }
 
         ipfsId = id
@@ -54,40 +54,64 @@ describe('ipns', function () {
   })
 
   after(function (done) {
-    ipfsd.stop(() => done())
+    if (ipfsd) {
+      ipfsd.stop(() => done())
+    } else {
+      done()
+    }
   })
 
-  it('should create an ipns record correctly', () => {
+  it('should create an ipns record correctly', (done) => {
     const sequence = 0
-    const eol = new Date(Date.now())
+    const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, eol, (err, entry) => {
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
       expect(err).to.not.exist()
       expect(entry).to.deep.include({
         value: cid,
-        sequence: sequence,
-        validity: eol
+        sequence: sequence
       })
+      expect(entry).to.have.a.property('validity')
       expect(entry).to.have.a.property('signature')
       expect(entry).to.have.a.property('validityType')
+
+      done()
     })
   })
 
-  it('should create an ipns record and validate it correctly', () => {
+  it('should create an ipns record and validate it correctly', (done) => {
     const sequence = 0
-    const eol = new Date(Date.now())
+    const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, eol, (err, entry) => {
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
       expect(err).to.not.exist()
 
       ipns.validate(rsa.public, entry, (err, res) => {
         expect(err).to.not.exist()
+
+        done()
       })
     })
   })
 
+  it('should create an ipns record with a validity of 1 nanosecond correctly and it should not be valid 1ms later', (done) => {
+    const sequence = 0
+    const validity = 0.00001
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      setTimeout(() => {
+        ipns.validate(rsa.public, entry, (err, res) => {
+          expect(err).to.exist()
+          done()
+        })
+      }, 1)
+    })
+  })
+
   it('should get datastore key correctly', () => {
-    const datastoreKey = ipns.getDatastoreKey(fromB58String(ipfsId.id))
+    const datastoreKey = ipns.getLocalKey(fromB58String(ipfsId.id))
 
     expect(datastoreKey).to.exist()
     expect(datastoreKey).to.startsWith('/ipns/')

@@ -38,7 +38,7 @@ This module contains all the necessary code for creating, understanding and vali
 ```js
 const ipns = require('ipns')
 
-ipns.create(privateKey, value, seqNumber, eol, (err, entryData) => {
+ipns.create(privateKey, value, sequenceNumber, lifetime, (err, entryData) => {
   // your code goes here
 });
 ```
@@ -67,14 +67,38 @@ ipns.validate(publicKey, ipnsEntry, (err) => {
 ```js
 const ipns = require('ipns')
 
-ipns.getDatastoreKey(peerId);
+ipns.getLocalKey(peerId);
 ```
 
-Returns a key to be used for storing the ipns entry in the datastore according to the specs, that is:
+Returns a key to be used for storing the ipns entry locally, that is:
 
 ```
 /ipns/${base32(<HASH>)}
 ```
+
+#### Marshal data with proto buffer
+
+```js
+const ipns = require('ipns')
+
+ipns.create(privateKey, value, sequenceNumber, lifetime, (err, entryData) => {
+  // ...
+  const marshalledData = ipns.marshal(entryData)
+  // ...
+});
+```
+
+Returns the entry data serialized.
+
+#### Unmarshal data from proto buffer
+
+```js
+const ipns = require('ipns')
+
+const data = ipns.unmarshal(storedData)
+```
+
+Returns the entry data structure after being serialized.
 
 ## API
 
@@ -82,29 +106,43 @@ Returns a key to be used for storing the ipns entry in the datastore according t
 
 ```js
 
-ipns.create(privateKey, value, sequenceNumber, eol, callback);
+ipns.create(privateKey, value, sequenceNumber, lifetime, [callback]);
 ```
 
 Create an IPNS record for being stored in a protocol buffer.
 
-- `privateKey` (`PrivKey` RSA Instance): key to be used for cryptographic operations.
+- `privateKey` (`PrivKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
 - `value` (string): ipfs path of the object to be published.
-- `sequenceNumber` (Number): sequence number of the record.
-- `eol` (string): end of life datetime of the record (according to RFC3339).
+- `sequenceNumber` (Number): number representing the current version of the record.
+- `lifetime` (string): lifetime of the record (in milliseconds).
 - `callback` (function): operation result.
 
-#### Create record
+`callback` must follow `function (err, ipnsEntry) {}` signature, where `err` is an error if the operation was not successful. `ipnsEntry` is an object that contains the entry's properties, such as:
+  
+```js
+{
+  value: '/ipfs/QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq',
+  signature: Buffer,
+  validityType: 0,
+  validity: '2018-06-27T14:49:14.074000000Z',
+  sequence: 2
+}
+```
+
+#### Validate record
 
 ```js
 
-ipns.validate(publicKey, ipnsEntry, callback);
+ipns.validate(publicKey, ipnsEntry, [callback]);
 ```
 
-Create an IPNS record for being stored in a protocol buffer.
+Validate an IPNS record previously stored in a protocol buffer.
 
-- `publicKey` (`PubKey` RSA Instance): key to be used for cryptographic operations.
+- `publicKey` (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
 - `ipnsEntry` (Object): ipns entry record (obtained using the create function).
-- `callback` (function): operation result (if no error, validation successful).
+- `callback` (function): operation result.
+
+`callback` must follow `function (err) {}` signature, where `err` is an error if the operation was not successful. This way, if no error, the validation was successful.
 
 #### Datastore key
 
@@ -116,6 +154,27 @@ Get a key for storing the ipns entry in the datastore.
 
 - `peerId` (`Uint8Array`): peer identifier.
 
+#### Marshal data with proto buffer
+
+```js
+const marshalledData = ipns.marshal(entryData)
+});
+```
+
+Returns the entry data serialized.
+
+- `entryData` (Object): ipns entry record (obtained using the create function).
+
+#### Unmarshal data from proto buffer
+
+```js
+const data = ipns.unmarshal(storedData)
+```
+
+Returns the entry data structure after being serialized.
+
+- `storedData` (Buffer): ipns entry record serialized.
+
 ## Contribute
 
 Feel free to join in. All welcome. Open an [issue](https://github.com/ipfs/js-ipns/issues)!
@@ -126,4 +185,4 @@ This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/c
 
 ## License
 
-[MIT](LICENSE)
+Copyright (c) Protocol Labs, Inc. under the **MIT**. See [MIT](./LICENSE) for details.

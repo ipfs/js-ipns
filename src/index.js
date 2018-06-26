@@ -1,39 +1,51 @@
 'use strict'
 
 const base32Encode = require('base32-encode')
+const Big = require('big.js')
+const NanoDate = require('nano-date').default
+
 const debug = require('debug')
 const log = debug('jsipns')
 log.error = debug('jsipns:error')
 
 const ipnsEntryProto = require('./pb/ipns.proto')
+const { parseRFC3339 } = require('./utils')
 const ERRORS = require('./errors')
 
 /**
  * Creates a new ipns entry and signs it with the given private key.
+ * The ipns entry validity should follow the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
  *
  * @param {Object} privateKey private key for signing the record.
  * @param {string} value value to be stored in the record.
- * @param {number} seq sequence number of the record.
- * @param {string} eol end of life datetime of the record.
- * @param {function(Error)} [callback]
- * @returns {Promise|void}
+ * @param {number} seq number representing the current version of the record.
+ * @param {string} lifetime lifetime of the record (in milliseconds).
+ * @param {function(Error, entry)} [callback]
+ * @returns {function(Error, entry)} callback
  */
-const create = (privateKey, value, seq, eol, callback) => {
-  const validity = eol.toISOString()
+const create = (privateKey, value, seq, lifetime, callback) => {
+  // Calculate eol with nanoseconds precision
+  const bnLifetime = new Big(lifetime)
+  const bnCurrentDate = new Big(new NanoDate())
+  const bnEol = bnCurrentDate.plus(bnLifetime).times('10e+6')
+  const nanoDateEol = new NanoDate(bnEol.toString())
+
+  // Validity in ISOString with nanoseconds precision and validity type EOL
+  const isoValidity = nanoDateEol.toISOStringFull()
   const validityType = ipnsEntryProto.ValidityType.EOL
 
-  sign(privateKey, value, validityType, validity, (error, signature) => {
+  sign(privateKey, value, validityType, isoValidity, (error, signature) => {
     if (error) {
-      log.error(error)
-      return callback(error)
+      log.error('record signature creation failed')
+      return callback(Object.assign(new Error('record signature verification failed'), { code: ERRORS.ERR_SIGNATURE_CREATION }))
     }
 
     const entry = {
       value: value,
       signature: signature, // TODO confirm format compliance with go-ipfs
       validityType: validityType,
-      validity: validity,
+      validity: isoValidity,
       sequence: seq
     }
 
@@ -48,7 +60,7 @@ const create = (privateKey, value, seq, eol, callback) => {
  * @param {Object} publicKey public key for validating the record.
  * @param {Object} entry ipns entry record.
  * @param {function(Error)} [callback]
- * @returns {Promise|void}
+ * @returns {function(Error)} callback
  */
 const validate = (publicKey, entry, callback) => {
   const { value, validityType, validity } = entry
@@ -63,7 +75,14 @@ const validate = (publicKey, entry, callback) => {
 
     // Validate according to the validity type
     if (validityType === ipnsEntryProto.ValidityType.EOL) {
-      const validityDate = Date.parse(validity.toString())
+      let validityDate
+
+      try {
+        validityDate = parseRFC3339(validity.toString())
+      } catch (e) {
+        log.error('unrecognized validity format (not an rfc3339 format)')
+        return callback(Object.assign(new Error('unrecognized validity format (not an rfc3339 format)'), { code: ERRORS.ERR_UNRECOGNIZED_FORMAT }))
+      }
 
       if (validityDate < Date.now()) {
         log.error('record has expired')
@@ -85,10 +104,10 @@ const validate = (publicKey, entry, callback) => {
  * @param {Object} publicKey public key for validating the record.
  * @param {Object} entry ipns entry record.
  * @param {function(Error)} [callback]
- * @returns {Promise|void}
+ * @return {Void}
  */
 const embedPublicKey = (publicKey, entry, callback) => {
-  return callback(new Error('not implemented yet'))
+  callback(new Error('not implemented yet'))
 }
 
 /**
@@ -97,33 +116,30 @@ const embedPublicKey = (publicKey, entry, callback) => {
  * @param {Object} peerId peer identifier object.
  * @param {Object} entry ipns entry record.
  * @param {function(Error)} [callback]
- * @returns {Promise|void}
+ * @return {Void}
  */
 const extractPublicKey = (peerId, entry, callback) => {
-  return callback(new Error('not implemented yet'))
+  callback(new Error('not implemented yet'))
 }
 
-// rawStdEncoding as go
-// TODO Remove once resolved
-// Created PR for allowing this inside base32-encode https://github.com/LinusU/base32-encode/issues/2
-const regex = new RegExp('=', 'g')
-const rawStdEncoding = (key) => base32Encode(key, 'RFC4648').replace(regex, '')
+// rawStdEncoding with RFC4648
+const rawStdEncoding = (key) => base32Encode(key, 'RFC4648', { padding: false })
 
 /**
- * Get key for storing the record in the datastore.
+ * Get key for storing the record locally.
  * Format: /ipns/${base32(<HASH>)}
  *
  * @param {Buffer} key peer identifier object.
  * @returns {string}
  */
-const getDatastoreKey = (key) => `/ipns/${rawStdEncoding(key)}`
+const getLocalKey = (key) => `/ipns/${rawStdEncoding(key)}`
 
 /**
  * Get key for sharing the record in the routing mechanism.
  * Format: ${base32(/ipns/<HASH>)}, ${base32(/pk/<HASH>)}
  *
  * @param {Buffer} key peer identifier object.
- * @returns {string}
+ * @returns {Object} containgin the `nameKey` and the `ipnsKey`.
  */
 const getIdKeys = (key) => {
   const pkBuffer = Buffer.from('/pk/')
@@ -165,8 +181,8 @@ module.exports = {
   embedPublicKey,
   // extract public key from the record
   extractPublicKey,
-  // get key for datastore
-  getDatastoreKey,
+  // get key for storing the entry locally
+  getLocalKey,
   // get keys for routing
   getIdKeys,
   // marshal
