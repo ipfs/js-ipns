@@ -3,9 +3,11 @@
 
 const chai = require('chai')
 const dirtyChai = require('dirty-chai')
+const chaiBytes = require('chai-bytes')
 const chaiString = require('chai-string')
 const expect = chai.expect
 chai.use(dirtyChai)
+chai.use(chaiBytes)
 chai.use(chaiString)
 
 const ipfs = require('ipfs')
@@ -107,6 +109,30 @@ describe('ipns', function () {
           done()
         })
       }, 1)
+    })
+  })
+
+  it('should create an ipns record, marshal and unmarshal it, as well as validate it correctly', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entryDataCreated) => {
+      expect(err).to.not.exist()
+
+      const marshalledData = ipns.marshal(entryDataCreated)
+      const unmarshalledData = ipns.unmarshal(marshalledData)
+
+      expect(entryDataCreated.value).to.equal(unmarshalledData.value.toString())
+      expect(entryDataCreated.validity).to.equal(unmarshalledData.validity.toString())
+      expect(entryDataCreated.validityType).to.equal(unmarshalledData.validityType)
+      expect(entryDataCreated.signature).to.equalBytes(unmarshalledData.signature)
+      expect(entryDataCreated.sequence).to.equal(unmarshalledData.sequence)
+
+      ipns.validate(rsa.public, unmarshalledData, (err, res) => {
+        expect(err).to.not.exist()
+
+        done()
+      })
     })
   })
 

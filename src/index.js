@@ -22,7 +22,7 @@ const ERRORS = require('./errors')
  * @param {number} seq number representing the current version of the record.
  * @param {string} lifetime lifetime of the record (in milliseconds).
  * @param {function(Error, entry)} [callback]
- * @returns {function(Error, entry)} callback
+ * @return {Void}
  */
 const create = (privateKey, value, seq, lifetime, callback) => {
   // Calculate eol with nanoseconds precision
@@ -60,7 +60,7 @@ const create = (privateKey, value, seq, lifetime, callback) => {
  * @param {Object} publicKey public key for validating the record.
  * @param {Object} entry ipns entry record.
  * @param {function(Error)} [callback]
- * @returns {function(Error)} callback
+ * @return {Void}
  */
 const validate = (publicKey, entry, callback) => {
   const { value, validityType, validity } = entry
@@ -139,7 +139,7 @@ const getLocalKey = (key) => `/ipns/${rawStdEncoding(key)}`
  * Format: ${base32(/ipns/<HASH>)}, ${base32(/pk/<HASH>)}
  *
  * @param {Buffer} key peer identifier object.
- * @returns {Object} containgin the `nameKey` and the `ipnsKey`.
+ * @returns {Object} containing the `nameKey` and the `ipnsKey`.
  */
 const getIdKeys = (key) => {
   const pkBuffer = Buffer.from('/pk/')
