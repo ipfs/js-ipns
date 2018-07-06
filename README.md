@@ -158,7 +158,6 @@ Get a key for storing the ipns entry in the datastore.
 
 ```js
 const marshalledData = ipns.marshal(entryData)
-});
 ```
 
 Returns the entry data serialized.
