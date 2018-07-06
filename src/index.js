@@ -3,6 +3,7 @@
 const base32Encode = require('base32-encode')
 const Big = require('big.js')
 const NanoDate = require('nano-date').default
+const { Key } = require('interface-datastore')
 
 const debug = require('debug')
 const log = debug('jsipns')
@@ -132,7 +133,7 @@ const rawStdEncoding = (key) => base32Encode(key, 'RFC4648', { padding: false })
  * @param {Buffer} key peer identifier object.
  * @returns {string}
  */
-const getLocalKey = (key) => `/ipns/${rawStdEncoding(key)}`
+const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
 
 /**
  * Get key for sharing the record in the routing mechanism.
