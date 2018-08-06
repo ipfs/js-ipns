@@ -146,9 +146,45 @@ describe('ipns', function () {
     const idKeys = ipns.getIdKeys(fromB58String(ipfsId.id))
 
     expect(idKeys).to.exist()
-    expect(idKeys).to.have.a.property('nameKey')
+    expect(idKeys).to.have.a.property('pkKey')
     expect(idKeys).to.have.a.property('ipnsKey')
-    expect(idKeys.nameKey).to.not.startsWith('/pk/')
+    expect(idKeys.pkKey).to.not.startsWith('/pk/')
     expect(idKeys.ipnsKey).to.not.startsWith('/ipns/')
+  })
+
+  it('should be able to embed a public key in an ipns record', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      ipns.embedPublicKey(rsa.public, entry, (err, entry) => {
+        expect(err).to.not.exist()
+        expect(entry).to.deep.include({
+          pubKey: rsa.public.bytes
+        })
+        done()
+      })
+    })
+  })
+
+  it('should be able to export a previously embed public key from an ipns record', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      ipns.embedPublicKey(rsa.public, entry, (err, entry) => {
+        expect(err).to.not.exist()
+
+        ipns.extractPublicKey(ipfsId, entry, (err, publicKey) => {
+          expect(err).to.not.exist()
+          expect(publicKey.bytes).to.equalBytes(rsa.public.bytes)
+          done()
+        })
+      })
+    })
   })
 })

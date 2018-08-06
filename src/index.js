@@ -4,6 +4,9 @@ const base32Encode = require('base32-encode')
 const Big = require('big.js')
 const NanoDate = require('nano-date').default
 const { Key } = require('interface-datastore')
+const crypto = require('libp2p-crypto')
+const peerId = require('peer-id')
+const multihash = require('multihashes')
 
 const debug = require('debug')
 const log = debug('jsipns')
@@ -13,6 +16,7 @@ const ipnsEntryProto = require('./pb/ipns.proto')
 const { parseRFC3339 } = require('./utils')
 const ERRORS = require('./errors')
 
+const ID_MULTIHASH_CODE = 0
 /**
  * Creates a new ipns entry and signs it with the given private key.
  * The ipns entry validity should follow the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
@@ -100,15 +104,48 @@ const validate = (publicKey, entry, callback) => {
 }
 
 /**
- * Validates the given ipns entry against the given public key.
+ * Embed the given public key in the given entry. While not strictly required,
+ * some nodes (eg. DHT servers) may reject IPNS entries that don't embed their
+ * public keys as they may not be able to validate them efficiently.
+ * As a consequence of nodes needing to validade a record upon receipt, they need
+ * the public key associated with it. For olde RSA keys, it is easier if we just
+ * send this as part of the record itself. For newer ed25519 keys, the public key
+ * can be embedded in the peerId.
  *
- * @param {Object} publicKey public key for validating the record.
+ * @param {Object} publicKey public key for embed.
  * @param {Object} entry ipns entry record.
  * @param {function(Error)} [callback]
  * @return {Void}
  */
 const embedPublicKey = (publicKey, entry, callback) => {
-  callback(new Error('not implemented yet'))
+  // Create a peer id from the public key.
+  peerId.createFromPubKey(publicKey.bytes, (err, peerIdResult) => {
+    if (err) {
+      const error = 'cannot create peer id from the public key'
+
+      log.error(error)
+      return callback(Object.assign(new Error(error), { code: ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY }))
+    }
+
+    // Try to extract the public key from the ID. If we can, no need to embed it
+    let extractedPublicKey
+    try {
+      extractedPublicKey = extractPublicKeyFromId(peerIdResult)
+    } catch (err) {
+      const error = 'cannot get public key from the peer id'
+
+      log.error(error)
+      return callback(Object.assign(new Error(error), { code: ERRORS.ERR_PUBLICK_KEY_FROM_ID }))
+    }
+
+    if (extractedPublicKey) {
+      return callback(null, null)
+    }
+
+    // If we vailed to extract the public key from the peer ID, embed it in the record.
+    entry.pubKey = crypto.keys.marshalPublicKey(publicKey)
+    return callback(null, entry)
+  })
 }
 
 /**
@@ -120,7 +157,13 @@ const embedPublicKey = (publicKey, entry, callback) => {
  * @return {Void}
  */
 const extractPublicKey = (peerId, entry, callback) => {
-  callback(new Error('not implemented yet'))
+  if (entry.pubKey) {
+    const pubKey = crypto.keys.unmarshalPublicKey(entry.pubKey)
+
+    return callback(null, pubKey)
+  } else {
+    return callback(null, peerId.pubKey)
+  }
 }
 
 // rawStdEncoding with RFC4648
@@ -139,16 +182,16 @@ const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
  * Get key for sharing the record in the routing mechanism.
  * Format: ${base32(/ipns/<HASH>)}, ${base32(/pk/<HASH>)}
  *
- * @param {Buffer} key peer identifier object.
+ * @param {Buffer} pid peer identifier object.
  * @returns {Object} containing the `nameKey` and the `ipnsKey`.
  */
-const getIdKeys = (key) => {
+const getIdKeys = (pid) => {
   const pkBuffer = Buffer.from('/pk/')
   const ipnsBuffer = Buffer.from('/ipns/')
 
   return {
-    nameKey: rawStdEncoding(Buffer.concat([pkBuffer, key])),
-    ipnsKey: rawStdEncoding(Buffer.concat([ipnsBuffer, key]))
+    pkKey: new Key(rawStdEncoding(Buffer.concat([pkBuffer, pid]))),
+    ipnsKey: new Key(rawStdEncoding(Buffer.concat([ipnsBuffer, pid])))
   }
 }
 
@@ -164,13 +207,34 @@ const sign = (privateKey, value, validityType, validity, callback) => {
   })
 }
 
-// Create record data for being signed
-const ipnsEntryDataForSig = (value, validityType, eol) => {
-  const valueBuffer = Buffer.from(value)
-  const validityTypeBuffer = Buffer.from(validityType.toString())
-  const eolBuffer = Buffer.from(eol)
+// Utility for getting the validity type code name of a validity
+const getValidityType = (validityType) => {
+  if (validityType.toString() === '0') {
+    return 'EOL'
+  } else {
+    log.error('unrecognized validity type')
+    throw Object.assign(new Error('unrecognized validity type'), { code: ERRORS.ERR_UNRECOGNIZED_VALIDITY })
+  }
+}
 
-  return Buffer.concat([valueBuffer, validityTypeBuffer, eolBuffer])
+// Utility for creating the record data for being signed
+const ipnsEntryDataForSig = (value, validityType, validity) => {
+  const valueBuffer = Buffer.from(value)
+  const validityTypeBuffer = Buffer.from(getValidityType(validityType))
+  const validityBuffer = Buffer.from(validity)
+
+  return Buffer.concat([valueBuffer, validityBuffer, validityTypeBuffer])
+}
+
+// Utility for extracting the public key from a peer-id
+const extractPublicKeyFromId = (peerIdResult) => {
+  const decodedId = multihash.decode(peerIdResult.id)
+
+  if (decodedId.code !== ID_MULTIHASH_CODE) {
+    return null
+  }
+
+  return crypto.keys.unmarshalPublicKey(decodedId.digest)
 }
 
 module.exports = {
