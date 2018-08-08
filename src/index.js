@@ -5,7 +5,7 @@ const Big = require('big.js')
 const NanoDate = require('nano-date').default
 const { Key } = require('interface-datastore')
 const crypto = require('libp2p-crypto')
-const peerId = require('peer-id')
+const PeerId = require('peer-id')
 const multihash = require('multihashes')
 
 const debug = require('debug')
@@ -16,7 +16,7 @@ const ipnsEntryProto = require('./pb/ipns.proto')
 const { parseRFC3339 } = require('./utils')
 const ERRORS = require('./errors')
 
-const ID_MULTIHASH_CODE = 0
+const ID_MULTIHASH_CODE = multihash.names.id
 /**
  * Creates a new ipns entry and signs it with the given private key.
  * The ipns entry validity should follow the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
@@ -72,7 +72,7 @@ const validate = (publicKey, entry, callback) => {
   const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
 
   // Validate Signature
-  publicKey.verify(dataForSignature, entry.signature, (err, result) => {
+  publicKey.verify(dataForSignature, entry.signature, (err) => {
     if (err) {
       log.error('record signature verification failed')
       return callback(Object.assign(new Error('record signature verification failed'), { code: ERRORS.ERR_SIGNATURE_VERIFICATION }))
@@ -119,32 +119,28 @@ const validate = (publicKey, entry, callback) => {
  */
 const embedPublicKey = (publicKey, entry, callback) => {
   // Create a peer id from the public key.
-  peerId.createFromPubKey(publicKey.bytes, (err, peerIdResult) => {
+  PeerId.createFromPubKey(publicKey.bytes, (err, peerId) => {
     if (err) {
-      const error = 'cannot create peer id from the public key'
-
-      log.error(error)
-      return callback(Object.assign(new Error(error), { code: ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY }))
+      log.error(err)
+      return callback(Object.assign(new Error(err), { code: ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY }))
     }
 
     // Try to extract the public key from the ID. If we can, no need to embed it
     let extractedPublicKey
     try {
-      extractedPublicKey = extractPublicKeyFromId(peerIdResult)
+      extractedPublicKey = extractPublicKeyFromId(peerId)
     } catch (err) {
-      const error = 'cannot get public key from the peer id'
-
-      log.error(error)
-      return callback(Object.assign(new Error(error), { code: ERRORS.ERR_PUBLICK_KEY_FROM_ID }))
+      log.error(err)
+      return callback(Object.assign(new Error(err), { code: ERRORS.ERR_PUBLIC_KEY_FROM_ID }))
     }
 
     if (extractedPublicKey) {
       return callback(null, null)
     }
 
-    // If we vailed to extract the public key from the peer ID, embed it in the record.
+    // If we failed to extract the public key from the peer ID, embed it in the record.
     entry.pubKey = crypto.keys.marshalPublicKey(publicKey)
-    return callback(null, entry)
+    callback(null, entry)
   })
 }
 
@@ -158,12 +154,16 @@ const embedPublicKey = (publicKey, entry, callback) => {
  */
 const extractPublicKey = (peerId, entry, callback) => {
   if (entry.pubKey) {
-    const pubKey = crypto.keys.unmarshalPublicKey(entry.pubKey)
+    try {
+      const pubKey = crypto.keys.unmarshalPublicKey(entry.pubKey)
 
-    return callback(null, pubKey)
-  } else {
-    return callback(null, peerId.pubKey)
+      return callback(null, pubKey)
+    } catch (err) {
+      log.error(err)
+      return callback(err)
+    }
   }
+  callback(null, peerId.pubKey)
 }
 
 // rawStdEncoding with RFC4648
@@ -182,7 +182,7 @@ const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
  * Get key for sharing the record in the routing mechanism.
  * Format: ${base32(/ipns/<HASH>)}, ${base32(/pk/<HASH>)}
  *
- * @param {Buffer} pid peer identifier object.
+ * @param {Buffer} pid peer identifier represented by the multihash of the public key as Buffer.
  * @returns {Object} containing the `nameKey` and the `ipnsKey`.
  */
 const getIdKeys = (pid) => {
@@ -212,8 +212,9 @@ const getValidityType = (validityType) => {
   if (validityType.toString() === '0') {
     return 'EOL'
   } else {
-    log.error('unrecognized validity type')
-    throw Object.assign(new Error('unrecognized validity type'), { code: ERRORS.ERR_UNRECOGNIZED_VALIDITY })
+    const error = `unrecognized validity type ${validityType.toString()}`
+    log.error(error)
+    throw Object.assign(new Error(error), { code: ERRORS.ERR_UNRECOGNIZED_VALIDITY })
   }
 }
 
@@ -227,8 +228,8 @@ const ipnsEntryDataForSig = (value, validityType, validity) => {
 }
 
 // Utility for extracting the public key from a peer-id
-const extractPublicKeyFromId = (peerIdResult) => {
-  const decodedId = multihash.decode(peerIdResult.id)
+const extractPublicKeyFromId = (peerId) => {
+  const decodedId = multihash.decode(peerId.id)
 
   if (decodedId.code !== ID_MULTIHASH_CODE) {
     return null
