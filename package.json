@@ -54,6 +54,9 @@
     "ipfsd-ctl": "^0.36.0"
   },
   "contributors": [
-    "Vasco Santos <vasco.santos@ua.pt>"
+    "Diogo Silva <fsdiogo@gmail.com>",
+    "Rob Brackett <rob@robbrackett.com>",
+    "Vasco Santos <vasco.santos@ua.pt>",
+    "Vasco Santos <vasco.santos@moxy.studio>"
   ]
 }
