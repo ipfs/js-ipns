@@ -40,7 +40,7 @@ const ipns = require('ipns')
 
 ipns.create(privateKey, value, sequenceNumber, lifetime, (err, entryData) => {
   // your code goes here
-});
+})
 ```
 
 #### Validate record
@@ -51,23 +51,35 @@ const ipns = require('ipns')
 ipns.validate(publicKey, ipnsEntry, (err) => {
   // your code goes here
   // if no error, the record is valid
-});
+})
 ```
 
 #### Embed public key to record
 
-> Not available yet
+```js
+const ipns = require('ipns')
+
+ipns.embedPublicKey(publicKey, ipnsEntry, (err, ipnsEntryWithEmbedPublicKey) => {
+  // your code goes here
+})
+```
 
 #### Extract public key from record
 
-> Not available yet
+```js
+const ipns = require('ipns')
+
+ipns.extractPublicKey(peerId, ipnsEntry, (err, publicKey) => {
+  // your code goes here
+})
+```
 
 #### Datastore key
 
 ```js
 const ipns = require('ipns')
 
-ipns.getLocalKey(peerId);
+ipns.getLocalKey(peerId)
 ```
 
 Returns a key to be used for storing the ipns entry locally, that is:
@@ -85,7 +97,7 @@ ipns.create(privateKey, value, sequenceNumber, lifetime, (err, entryData) => {
   // ...
   const marshalledData = ipns.marshal(entryData)
   // ...
-});
+})
 ```
 
 Returns the entry data serialized.
@@ -106,7 +118,7 @@ Returns the entry data structure after being serialized.
 
 ```js
 
-ipns.create(privateKey, value, sequenceNumber, lifetime, [callback]);
+ipns.create(privateKey, value, sequenceNumber, lifetime, [callback])
 ```
 
 Create an IPNS record for being stored in a protocol buffer.
@@ -133,7 +145,7 @@ Create an IPNS record for being stored in a protocol buffer.
 
 ```js
 
-ipns.validate(publicKey, ipnsEntry, [callback]);
+ipns.validate(publicKey, ipnsEntry, [callback])
 ```
 
 Validate an IPNS record previously stored in a protocol buffer.
@@ -147,7 +159,7 @@ Validate an IPNS record previously stored in a protocol buffer.
 #### Datastore key
 
 ```js
-ipns.getDatastoreKey(peerId);
+ipns.getDatastoreKey(peerId)
 ```
 
 Get a key for storing the ipns entry in the datastore.
@@ -173,6 +185,34 @@ const data = ipns.unmarshal(storedData)
 Returns the entry data structure after being serialized.
 
 - `storedData` (Buffer): ipns entry record serialized.
+
+#### Embed public key to record
+
+```js
+ipns.embedPublicKey(publicKey, ipnsEntry, [callback])
+```
+
+Embed a public key in an IPNS entry. If it is possible to extract the public key from the `peer-id`, there is no need to embed.
+
+- `publicKey` (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
+- `ipnsEntry` (Object): ipns entry record (obtained using the create function).
+- `callback` (function): operation result.
+
+`callback` must follow `function (err, resultEntry) {}` signature, where `err` is an error if the operation was not successful. This way, if no error, the operation was successful. If the `resultEntry` is also null, the `peer-id` allows to extract the public key from the `peer-id` and there is no need in extracting it.
+
+#### Extract public key from record
+
+```js
+ipns.extractPublicKey(peerId, ipnsEntry, [callback])
+```
+
+Extract a public key from an IPNS entry.
+
+- `peerId` (`PeerId` [Instance](https://github.com/libp2p/js-peer-id)): peer identifier object.
+- `ipnsEntry` (Object): ipns entry record (obtained using the create function).
+- `callback` (function): operation result.
+
+`callback` must follow `function (err, publicKey) {}` signature, where `err` is an error if the operation was not successful. This way, if no error, the validation was successful. The public key (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): may be used for cryptographic operations.
 
 ## Contribute
 

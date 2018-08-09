@@ -146,9 +146,70 @@ describe('ipns', function () {
     const idKeys = ipns.getIdKeys(fromB58String(ipfsId.id))
 
     expect(idKeys).to.exist()
-    expect(idKeys).to.have.a.property('nameKey')
+    expect(idKeys).to.have.a.property('pkKey')
     expect(idKeys).to.have.a.property('ipnsKey')
-    expect(idKeys.nameKey).to.not.startsWith('/pk/')
+    expect(idKeys.pkKey).to.not.startsWith('/pk/')
     expect(idKeys.ipnsKey).to.not.startsWith('/ipns/')
+  })
+
+  it('should be able to embed a public key in an ipns record', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      ipns.embedPublicKey(rsa.public, entry, (err, entry) => {
+        expect(err).to.not.exist()
+        expect(entry).to.deep.include({
+          pubKey: rsa.public.bytes
+        })
+        done()
+      })
+    })
+  })
+
+  // It should have a public key embeded for newer ed25519 keys
+  // https://github.com/ipfs/go-ipns/blob/d51115b4b14ed7fcca5472aadff0fee6772aca8c/ipns.go#L81
+  // https://github.com/ipfs/go-ipns/blob/d51115b4b14ed7fcca5472aadff0fee6772aca8c/ipns_test.go
+  // https://github.com/libp2p/go-libp2p-peer/blob/7f219a1e70011a258c5d3e502aef6896c60d03ce/peer.go#L80
+  // IDFromEd25519PublicKey is not currently implement on js-libp2p-peer
+  // https://github.com/libp2p/go-libp2p-peer/pull/30
+  it.skip('should be able to extract a public key directly from the peer', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    crypto.keys.generateKeyPair('ed25519', 2048, (err, ed25519) => {
+      expect(err).to.not.exist()
+
+      ipns.create(ed25519, cid, sequence, validity, (err, entry) => {
+        expect(err).to.not.exist()
+
+        ipns.embedPublicKey(ed25519.public, entry, (err, entry) => {
+          expect(err).to.not.exist()
+          expect(entry).to.not.exist() // Should be null
+          done()
+        })
+      })
+    })
+  })
+
+  it('should be able to export a previously embed public key from an ipns record', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      ipns.embedPublicKey(rsa.public, entry, (err, entry) => {
+        expect(err).to.not.exist()
+
+        ipns.extractPublicKey(ipfsId, entry, (err, publicKey) => {
+          expect(err).to.not.exist()
+          expect(publicKey.bytes).to.equalBytes(rsa.public.bytes)
+          done()
+        })
+      })
+    })
   })
 })
