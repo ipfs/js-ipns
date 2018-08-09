@@ -48,7 +48,7 @@ const create = (privateKey, value, seq, lifetime, callback) => {
 
     const entry = {
       value: value,
-      signature: signature, // TODO confirm format compliance with go-ipfs
+      signature: signature,
       validityType: validityType,
       validity: isoValidity,
       sequence: seq
@@ -118,6 +118,13 @@ const validate = (publicKey, entry, callback) => {
  * @return {Void}
  */
 const embedPublicKey = (publicKey, entry, callback) => {
+  if (!publicKey || !publicKey.bytes || !entry) {
+    const error = 'one or more of the provided parameters are not defined'
+
+    log.error(error)
+    return callback(Object.assign(new Error(error), { code: ERRORS.ERR_UNDEFINED_PARAMETER }))
+  }
+
   // Create a peer id from the public key.
   PeerId.createFromPubKey(publicKey.bytes, (err, peerId) => {
     if (err) {
@@ -139,7 +146,12 @@ const embedPublicKey = (publicKey, entry, callback) => {
     }
 
     // If we failed to extract the public key from the peer ID, embed it in the record.
-    entry.pubKey = crypto.keys.marshalPublicKey(publicKey)
+    try {
+      entry.pubKey = crypto.keys.marshalPublicKey(publicKey)
+    } catch (err) {
+      log.error(err)
+      return callback(err)
+    }
     callback(null, entry)
   })
 }
@@ -153,15 +165,22 @@ const embedPublicKey = (publicKey, entry, callback) => {
  * @return {Void}
  */
 const extractPublicKey = (peerId, entry, callback) => {
-  if (entry.pubKey) {
-    try {
-      const pubKey = crypto.keys.unmarshalPublicKey(entry.pubKey)
+  if (!entry || !peerId) {
+    const error = 'one or more of the provided parameters are not defined'
 
-      return callback(null, pubKey)
+    log.error(error)
+    return callback(Object.assign(new Error(error), { code: ERRORS.ERR_UNDEFINED_PARAMETER }))
+  }
+
+  if (entry.pubKey) {
+    let pubKey
+    try {
+      pubKey = crypto.keys.unmarshalPublicKey(entry.pubKey)
     } catch (err) {
       log.error(err)
       return callback(err)
     }
+    return callback(null, pubKey)
   }
   callback(null, peerId.pubKey)
 }

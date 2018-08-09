@@ -173,6 +173,8 @@ describe('ipns', function () {
   // https://github.com/ipfs/go-ipns/blob/d51115b4b14ed7fcca5472aadff0fee6772aca8c/ipns.go#L81
   // https://github.com/ipfs/go-ipns/blob/d51115b4b14ed7fcca5472aadff0fee6772aca8c/ipns_test.go
   // https://github.com/libp2p/go-libp2p-peer/blob/7f219a1e70011a258c5d3e502aef6896c60d03ce/peer.go#L80
+  // IDFromEd25519PublicKey is not currently implement on js-libp2p-peer
+  // https://github.com/libp2p/go-libp2p-peer/pull/30
   it.skip('should be able to extract a public key directly from the peer', (done) => {
     const sequence = 0
     const validity = 1000000
