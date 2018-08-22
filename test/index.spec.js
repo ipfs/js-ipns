@@ -16,6 +16,7 @@ const crypto = require('libp2p-crypto')
 const { fromB58String } = require('multihashes')
 
 const ipns = require('../src')
+const ERRORS = require('../src/errors')
 
 const df = DaemonFactory.create({ type: 'proc', exec: ipfs })
 
@@ -88,8 +89,29 @@ describe('ipns', function () {
     ipns.create(rsa, cid, sequence, validity, (err, entry) => {
       expect(err).to.not.exist()
 
-      ipns.validate(rsa.public, entry, (err, res) => {
+      ipns.validate(rsa.public, entry, (err) => {
         expect(err).to.not.exist()
+
+        done()
+      })
+    })
+  })
+
+  it('should fail to validate a bad record', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      // corrupt the record by changing the value to random bytes
+      entry.value = crypto.randomBytes(46).toString()
+
+      ipns.validate(rsa.public, entry, (err) => {
+        expect(err).to.exist()
+        expect(err).to.include({
+          code: ERRORS.ERR_SIGNATURE_VERIFICATION
+        })
 
         done()
       })
