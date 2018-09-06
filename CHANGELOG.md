@@ -1,3 +1,13 @@
+<a name="0.1.5"></a>
+## [0.1.5](https://github.com/ipfs/js-ipns/compare/v0.1.4...v0.1.5) (2018-09-06)
+
+
+### Bug Fixes
+
+* routing key format ([#7](https://github.com/ipfs/js-ipns/issues/7)) ([70036af](https://github.com/ipfs/js-ipns/commit/70036af))
+
+
+
 <a name="0.1.4"></a>
 ## [0.1.4](https://github.com/ipfs/js-ipns/compare/v0.1.2...v0.1.4) (2018-09-06)
 
