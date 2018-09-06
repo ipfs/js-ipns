@@ -170,8 +170,10 @@ describe('ipns', function () {
     expect(idKeys).to.exist()
     expect(idKeys).to.have.a.property('pkKey')
     expect(idKeys).to.have.a.property('ipnsKey')
+    expect(idKeys).to.have.a.property('routingKey')
     expect(idKeys.pkKey).to.not.startsWith('/pk/')
     expect(idKeys.ipnsKey).to.not.startsWith('/ipns/')
+    expect(idKeys.routingKey).to.not.startsWith('/ipns/')
   })
 
   it('should be able to embed a public key in an ipns record', (done) => {
