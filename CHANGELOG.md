@@ -1,3 +1,19 @@
+<a name="0.1.4"></a>
+## [0.1.4](https://github.com/ipfs/js-ipns/compare/v0.1.2...v0.1.4) (2018-09-06)
+
+
+### Bug Fixes
+
+* **security:** ensure validate is properly checking verify status ([33684e3](https://github.com/ipfs/js-ipns/commit/33684e3))
+
+
+### Features
+
+* add libp2p id key ([#6](https://github.com/ipfs/js-ipns/issues/6)) ([3d868fe](https://github.com/ipfs/js-ipns/commit/3d868fe))
+* add records validator ([#5](https://github.com/ipfs/js-ipns/issues/5)) ([34468e1](https://github.com/ipfs/js-ipns/commit/34468e1))
+
+
+
 <a name="0.1.3"></a>
 ## [0.1.3](https://github.com/ipfs/js-ipns/compare/v0.1.2...v0.1.3) (2018-08-23)
 
