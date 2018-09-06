@@ -234,4 +234,91 @@ describe('ipns', function () {
       })
     })
   })
+
+  it('should use validator.validate to validate a record', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      ipns.embedPublicKey(rsa.public, entry, (err, entry) => {
+        expect(err).to.not.exist()
+
+        const marshalledData = ipns.marshal(entry)
+
+        ipns.validator.validate(marshalledData, ipfsId, (err, valid) => {
+          expect(err).to.not.exist()
+          expect(valid).to.equal(true)
+          done()
+        })
+      })
+    })
+  })
+
+  it('should use validator.validate to verify that a record is not valid', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      ipns.embedPublicKey(rsa.public, entry, (err, entry) => {
+        expect(err).to.not.exist()
+
+        // corrupt the record by changing the value to random bytes
+        entry.value = crypto.randomBytes(46).toString()
+        const marshalledData = ipns.marshal(entry)
+
+        ipns.validator.validate(marshalledData, ipfsId, (err) => {
+          expect(err).to.exist() // failed validation
+          done()
+        })
+      })
+    })
+  })
+
+  it('should use validator.select to select the newer record returning 0 if it is the first parameter', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      ipns.create(rsa, cid, (sequence + 1), validity, (err, newEntry) => {
+        expect(err).to.not.exist()
+
+        const marshalledData = ipns.marshal(entry)
+        const marshalledNewData = ipns.marshal(newEntry)
+
+        ipns.validator.select(marshalledNewData, marshalledData, (err, valid) => {
+          expect(err).to.not.exist()
+          expect(valid).to.equal(0) // new data is the selected one
+          done()
+        })
+      })
+    })
+  })
+
+  it('should use validator.select to select the newer record returning 1 if it is the second parameter', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence + 1, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      ipns.create(rsa, cid, (sequence), validity, (err, newEntry) => {
+        expect(err).to.not.exist()
+
+        const marshalledData = ipns.marshal(entry)
+        const marshalledNewData = ipns.marshal(newEntry)
+
+        ipns.validator.select(marshalledNewData, marshalledData, (err, valid) => {
+          expect(err).to.not.exist()
+          expect(valid).to.equal(1) // old data is the selected one
+          done()
+        })
+      })
+    })
+  })
 })

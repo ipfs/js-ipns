@@ -257,6 +257,38 @@ const extractPublicKeyFromId = (peerId) => {
   return crypto.keys.unmarshalPublicKey(decodedId.digest)
 }
 
+const marshal = ipnsEntryProto.encode
+
+const unmarshal = ipnsEntryProto.decode
+
+const validator = {
+  validate: (marshalledData, peerId, callback) => {
+    const receivedEntry = unmarshal(marshalledData)
+
+    // extract public key
+    extractPublicKey(peerId, receivedEntry, (err, pubKey) => {
+      if (err) {
+        return callback(err)
+      }
+
+      // Record validation
+      validate(pubKey, receivedEntry, (err) => {
+        if (err) {
+          return callback(err)
+        }
+
+        callback(null, true)
+      })
+    })
+  },
+  select: (dataA, dataB, callback) => {
+    const entryA = unmarshal(dataA)
+    const entryB = unmarshal(dataB)
+
+    callback(null, entryA.sequence > entryB.sequence ? 0 : 1)
+  }
+}
+
 module.exports = {
   // create ipns entry record
   create,
@@ -271,7 +303,9 @@ module.exports = {
   // get keys for routing
   getIdKeys,
   // marshal
-  marshal: ipnsEntryProto.encode,
+  marshal,
   // unmarshal
-  unmarshal: ipnsEntryProto.decode
+  unmarshal,
+  // validator
+  validator
 }
