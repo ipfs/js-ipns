@@ -278,7 +278,7 @@ describe('ipns', function () {
     })
   })
 
-  it('should use validator.select to select the newer record returning 0 if it is the first parameter', (done) => {
+  it('should use validator.select to select the first record because it is newer', (done) => {
     const sequence = 0
     const validity = 1000000
 
@@ -300,7 +300,7 @@ describe('ipns', function () {
     })
   })
 
-  it('should use validator.select to select the newer record returning 1 if it is the second parameter', (done) => {
+  it('should use validator.select to select the second record because it is newer', (done) => {
     const sequence = 0
     const validity = 1000000
 
