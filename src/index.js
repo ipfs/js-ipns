@@ -210,7 +210,7 @@ const getIdKeys = (pid) => {
 
   return {
     pkKey: new Key(rawStdEncoding(Buffer.concat([pkBuffer, pid]))),
-    routingKey: new Key(`/ipns/${pid}`), // Added on https://github.com/ipfs/js-ipns/pull/6#issue-213631461 (ipnsKey will be deprecated in a future release)
+    routingKey: new Key(Buffer.concat([ipnsBuffer, pid])), // Added on https://github.com/ipfs/js-ipns/pull/6#issue-213631461 (ipnsKey will be deprecated in a future release)
     ipnsKey: new Key(rawStdEncoding(Buffer.concat([ipnsBuffer, pid])))
   }
 }
