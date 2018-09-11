@@ -39,7 +39,26 @@ const create = (privateKey, value, seq, lifetime, callback) => {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const isoValidity = nanoDateEol.toISOStringFull()
   const validityType = ipnsEntryProto.ValidityType.EOL
+  _create(privateKey, value, seq, isoValidity, validityType, callback)
+}
 
+/**
+ * Same as create(), but instead of generating a new Date, it receives the intended expiration time
+ * WARNING: nano precision is not standard, make sure the value in seconds is 9 orders of magnitude lesser than the one provided.
+ * @param {Object} privateKey private key for signing the record.
+ * @param {string} value value to be stored in the record.
+ * @param {number} seq number representing the current version of the record.
+ * @param {string} expiration expiration time of the record (in nanoseconds).
+ * @param {function(Error, entry)} [callback]
+ * @return {Void}
+ */
+const createWithExpiration = (privateKey, value, seq, expiration, callback) => {
+  const bnExpiration = new NanoDate(new Big(expiration).toString()).toISOStringFull()
+  const validityType = ipnsEntryProto.ValidityType.EOL
+  _create(privateKey, value, seq, bnExpiration, validityType, callback)
+}
+
+const _create = (privateKey, value, seq, isoValidity, validityType, callback) => {
   sign(privateKey, value, validityType, isoValidity, (error, signature) => {
     if (error) {
       log.error('record signature creation failed')
@@ -294,6 +313,8 @@ const validator = {
 module.exports = {
   // create ipns entry record
   create,
+  // create ipns entry record specifying the expiration time
+  createWithExpiration,
   // validate ipns entry record
   validate,
   // embed public key in the record
