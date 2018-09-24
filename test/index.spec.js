@@ -82,6 +82,23 @@ describe('ipns', function () {
     })
   })
 
+  it('should be able to create a record with a fixed expiration', (done) => {
+    const sequence = 0
+    // 2033-05-18T03:33:20.000000000Z
+    const expiration = 2000000000 * 1000000000
+
+    ipns.createWithExpiration(rsa, cid, sequence, expiration, (err, entry) => {
+      expect(err).to.not.exist()
+
+      ipns.validate(rsa.public, entry, (err) => {
+        expect(err).to.not.exist()
+        expect(entry).to.have.a.property('validity')
+        expect(entry.validity).to.equal('2033-05-18T03:33:20.000000000Z')
+        done()
+      })
+    })
+  })
+
   it('should create an ipns record and validate it correctly', (done) => {
     const sequence = 0
     const validity = 1000000
