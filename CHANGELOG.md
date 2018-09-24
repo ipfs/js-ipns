@@ -1,3 +1,13 @@
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/ipfs/js-ipns/compare/v0.2.0...v0.2.1) (2018-09-24)
+
+
+### Features
+
+* add creatWithExpiration function ([#9](https://github.com/ipfs/js-ipns/issues/9)) ([576bc1a](https://github.com/ipfs/js-ipns/commit/576bc1a))
+
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/ipfs/js-ipns/compare/v0.1.6...v0.2.0) (2018-09-20)
 
