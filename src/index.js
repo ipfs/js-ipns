@@ -283,8 +283,16 @@ const marshal = ipnsEntryProto.encode
 const unmarshal = ipnsEntryProto.decode
 
 const validator = {
-  validate: (marshalledData, peerId, callback) => {
+  validate: (marshalledData, key, callback) => {
     const receivedEntry = unmarshal(marshalledData)
+    const bufferId = key.slice('/ipns/'.length)
+    let peerId
+
+    try {
+      peerId = PeerId.createFromBytes(bufferId)
+    } catch (err) {
+      return callback(err)
+    }
 
     // extract public key
     extractPublicKey(peerId, receivedEntry, (err, pubKey) => {
