@@ -267,8 +267,9 @@ describe('ipns', function () {
         expect(err).to.not.exist()
 
         const marshalledData = ipns.marshal(entry)
+        const key = Buffer.from(`/ipns/${ipfsId.id}`)
 
-        ipns.validator.validate(marshalledData, ipfsId, (err, valid) => {
+        ipns.validator.validate(marshalledData, key, (err, valid) => {
           expect(err).to.not.exist()
           expect(valid).to.equal(true)
           done()
@@ -290,8 +291,9 @@ describe('ipns', function () {
         // corrupt the record by changing the value to random bytes
         entry.value = crypto.randomBytes(46).toString()
         const marshalledData = ipns.marshal(entry)
+        const key = Buffer.from(`/ipns/${ipfsId.id}`)
 
-        ipns.validator.validate(marshalledData, ipfsId, (err) => {
+        ipns.validator.validate(marshalledData, key, (err) => {
           expect(err).to.exist() // failed validation
           done()
         })
