@@ -1,3 +1,18 @@
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/ipfs/js-ipns/compare/v0.3.0...v0.4.0) (2018-11-16)
+
+
+### Bug Fixes
+
+* validator should create peer id ([#13](https://github.com/ipfs/js-ipns/issues/13)) ([e1c1332](https://github.com/ipfs/js-ipns/commit/e1c1332))
+
+
+### BREAKING CHANGES
+
+* having the libp2p-record protobuf definition compliant with go-libp2p-record. Author and signature were removed.
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/ipfs/js-ipns/compare/v0.2.2...v0.3.0) (2018-10-26)
 
