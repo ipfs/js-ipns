@@ -34,24 +34,24 @@
   "homepage": "https://github.com/ipfs/js-ipns#readme",
   "dependencies": {
     "base32-encode": "^1.1.0",
-    "big.js": "^5.1.2",
-    "debug": "^3.1.0",
+    "big.js": "^5.2.2",
+    "debug": "^4.1.0",
     "interface-datastore": "~0.6.0",
     "left-pad": "^1.3.0",
-    "libp2p-crypto": "~0.13.0",
+    "libp2p-crypto": "~0.14.1",
     "multihashes": "~0.4.14",
-    "nano-date": "^2.1.0",
-    "peer-id": "~0.11.0",
+    "nano-date": "^3.0.0",
+    "peer-id": "~0.12.0",
     "protons": "^1.0.1"
   },
   "devDependencies": {
-    "aegir": "^15.3.0",
-    "chai": "^4.1.2",
+    "aegir": "^17.1.1",
+    "chai": "^4.2.0",
     "chai-bytes": "~0.1.1",
-    "chai-string": "^1.4.0",
+    "chai-string": "^1.5.0",
     "dirty-chai": "^2.0.1",
-    "ipfs": "~0.31.0",
-    "ipfsd-ctl": "~0.39.3"
+    "ipfs": "~0.33.1",
+    "ipfsd-ctl": "~0.40.0"
   },
   "contributors": [
     "Diogo Silva <fsdiogo@gmail.com>",

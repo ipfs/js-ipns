@@ -27,7 +27,6 @@ const ID_MULTIHASH_CODE = multihash.names.id
  * @param {number} seq number representing the current version of the record.
  * @param {string} lifetime lifetime of the record (in milliseconds).
  * @param {function(Error, entry)} [callback]
- * @return {Void}
  */
 const create = (privateKey, value, seq, lifetime, callback) => {
   // Calculate eol with nanoseconds precision
@@ -50,7 +49,6 @@ const create = (privateKey, value, seq, lifetime, callback) => {
  * @param {number} seq number representing the current version of the record.
  * @param {string} expiration expiration time of the record (in nanoseconds).
  * @param {function(Error, entry)} [callback]
- * @return {Void}
  */
 const createWithExpiration = (privateKey, value, seq, expiration, callback) => {
   const bnExpiration = new NanoDate(new Big(expiration).toString()).toISOStringFull()
@@ -84,7 +82,6 @@ const _create = (privateKey, value, seq, isoValidity, validityType, callback) =>
  * @param {Object} publicKey public key for validating the record.
  * @param {Object} entry ipns entry record.
  * @param {function(Error)} [callback]
- * @return {Void}
  */
 const validate = (publicKey, entry, callback) => {
   const { value, validityType, validity } = entry
