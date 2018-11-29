@@ -323,6 +323,27 @@ describe('ipns', function () {
     })
   })
 
+  it('should use validator.select to select the first record because it is newer without using callback', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      ipns.create(rsa, cid, (sequence + 1), validity, (err, newEntry) => {
+        expect(err).to.not.exist()
+
+        const marshalledData = ipns.marshal(entry)
+        const marshalledNewData = ipns.marshal(newEntry)
+
+        const valid = ipns.validator.select(marshalledNewData, marshalledData)
+
+        expect(valid).to.equal(0) // new data is the selected one
+        done()
+      })
+    })
+  })
+
   it('should use validator.select to select the second record because it is newer', (done) => {
     const sequence = 0
     const validity = 1000000
