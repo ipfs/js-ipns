@@ -1,3 +1,13 @@
+<a name="0.4.2"></a>
+## [0.4.2](https://github.com/ipfs/js-ipns/compare/v0.4.1...v0.4.2) (2018-11-29)
+
+
+### Bug Fixes
+
+* validator select should return if no callback ([#15](https://github.com/ipfs/js-ipns/issues/15)) ([0845877](https://github.com/ipfs/js-ipns/commit/0845877))
+
+
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://github.com/ipfs/js-ipns/compare/v0.4.0...v0.4.1) (2018-11-26)
 
