@@ -120,11 +120,11 @@ const ipns = require('ipns')
 const validator = ipns.validator
 ```
 
-Contains an object with `validate (marshalledData, key, callback)` and `select (dataA, dataB, callback)` functions.
+Contains an object with `validate (marshalledData, key, callback)` and `select (dataA, dataB, [callback])` functions.
 
 The `validate` function aims to verify if an IPNS record is valid. First the record is unmarshalled, then the public key is obtained and finally the record is validated (signature and validity are verified).
 
-The `select` function is responsible for deciding which ipns record is the best (newer) between two records. Both records are unmarshalled and their sequence numbers are compared. If the first record provided is the newer, the operation result will be `0`, otherwise the operation result will be `1`.
+The `select` function is responsible for deciding which ipns record is the best (newer) between two records. Both records are unmarshalled and their sequence numbers are compared. If the first record provided is the newer, the operation result will be `0`, otherwise the operation result will be `1`. If a callback is not provided, the response is returned.
 
 ## API
 

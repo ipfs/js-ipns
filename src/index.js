@@ -311,7 +311,13 @@ const validator = {
     const entryA = unmarshal(dataA)
     const entryB = unmarshal(dataB)
 
-    callback(null, entryA.sequence > entryB.sequence ? 0 : 1)
+    const index = entryA.sequence > entryB.sequence ? 0 : 1
+
+    if (typeof callback !== 'function') {
+      return index
+    }
+
+    callback(null, index)
   }
 }
 
