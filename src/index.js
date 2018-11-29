@@ -313,7 +313,7 @@ const validator = {
 
     const index = entryA.sequence > entryB.sequence ? 0 : 1
 
-    if (!callback) {
+    if (typeof callback !== 'function') {
       return index
     }
 
