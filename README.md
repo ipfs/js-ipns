@@ -228,6 +228,22 @@ Extract a public key from an IPNS entry.
 
 `callback` must follow `function (err, publicKey) {}` signature, where `err` is an error if the operation was not successful. This way, if no error, the validation was successful. The public key (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): may be used for cryptographic operations.
 
+#### Namespace
+
+Namespace constants for records.
+
+```js
+ipns.namespace
+
+// '/ipns/'
+```
+
+```js
+ipns.namespaceLength
+
+// 6
+```
+
 ## Contribute
 
 Feel free to join in. All welcome. Open an [issue](https://github.com/ipfs/js-ipns/issues)!
