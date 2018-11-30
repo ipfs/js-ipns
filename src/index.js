@@ -17,6 +17,9 @@ const { parseRFC3339 } = require('./utils')
 const ERRORS = require('./errors')
 
 const ID_MULTIHASH_CODE = multihash.names.id
+
+const namespace = '/ipns/'
+
 /**
  * Creates a new ipns entry and signs it with the given private key.
  * The ipns entry validity should follow the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
@@ -341,5 +344,8 @@ module.exports = {
   // unmarshal
   unmarshal,
   // validator
-  validator
+  validator,
+  // namespace
+  namespace,
+  namespaceLength: namespace.length
 }
