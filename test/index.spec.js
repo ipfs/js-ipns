@@ -85,7 +85,7 @@ describe('ipns', function () {
   it('should be able to create a record with a fixed expiration', (done) => {
     const sequence = 0
     // 2033-05-18T03:33:20.000000000Z
-    const expiration = 2000000000 * 1000000000
+    const expiration = '2033-05-18T03:33:20.000000000Z'
 
     ipns.createWithExpiration(rsa, cid, sequence, expiration, (err, entry) => {
       expect(err).to.not.exist()
