@@ -1,8 +1,7 @@
 'use strict'
 
 const base32Encode = require('base32-encode')
-const Big = require('big.js')
-const NanoDate = require('nano-date').default
+const NanoDate = require('timestamp-nano')
 const { Key } = require('interface-datastore')
 const crypto = require('libp2p-crypto')
 const PeerId = require('peer-id')
@@ -28,18 +27,12 @@ const namespace = '/ipns/'
  * @param {Object} privateKey private key for signing the record.
  * @param {string} value value to be stored in the record.
  * @param {number} seq number representing the current version of the record.
- * @param {string} lifetime lifetime of the record (in milliseconds).
+ * @param {number|string} lifetime lifetime of the record (in milliseconds).
  * @param {function(Error, entry)} [callback]
  */
 const create = (privateKey, value, seq, lifetime, callback) => {
-  // Calculate eol with nanoseconds precision
-  const bnLifetime = new Big(lifetime)
-  const bnCurrentDate = new Big(new NanoDate())
-  const bnEol = bnCurrentDate.plus(bnLifetime).times('10e+6')
-  const nanoDateEol = new NanoDate(bnEol.toString())
-
   // Validity in ISOString with nanoseconds precision and validity type EOL
-  const isoValidity = nanoDateEol.toISOStringFull()
+  const isoValidity = new NanoDate(Date.now() + Number(lifetime)).toString()
   const validityType = ipnsEntryProto.ValidityType.EOL
   _create(privateKey, value, seq, isoValidity, validityType, callback)
 }
@@ -50,13 +43,12 @@ const create = (privateKey, value, seq, lifetime, callback) => {
  * @param {Object} privateKey private key for signing the record.
  * @param {string} value value to be stored in the record.
  * @param {number} seq number representing the current version of the record.
- * @param {string} expiration expiration time of the record (in nanoseconds).
+ * @param {string} expiration expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * @param {function(Error, entry)} [callback]
  */
 const createWithExpiration = (privateKey, value, seq, expiration, callback) => {
-  const bnExpiration = new NanoDate(new Big(expiration).toString()).toISOStringFull()
   const validityType = ipnsEntryProto.ValidityType.EOL
-  _create(privateKey, value, seq, bnExpiration, validityType, callback)
+  _create(privateKey, value, seq, expiration, validityType, callback)
 }
 
 const _create = (privateKey, value, seq, isoValidity, validityType, callback) => {
