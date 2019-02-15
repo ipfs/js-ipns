@@ -28,13 +28,13 @@ const namespace = '/ipns/'
  * @param {string} value value to be stored in the record.
  * @param {number} seq number representing the current version of the record.
  * @param {number|string} lifetime lifetime of the record (in milliseconds).
- * @param {function(Error, entry)} [callback]
+ * @returns {Object} entry
  */
-const create = (privateKey, value, seq, lifetime, callback) => {
+const create = (privateKey, value, seq, lifetime) => {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const isoValidity = new NanoDate(Date.now() + Number(lifetime)).toString()
   const validityType = ipnsEntryProto.ValidityType.EOL
-  _create(privateKey, value, seq, isoValidity, validityType, callback)
+  return _create(privateKey, value, seq, isoValidity, validityType)
 }
 
 /**
@@ -44,19 +44,16 @@ const create = (privateKey, value, seq, lifetime, callback) => {
  * @param {string} value value to be stored in the record.
  * @param {number} seq number representing the current version of the record.
  * @param {string} expiration expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
- * @param {function(Error, entry)} [callback]
+ * @returns {Object} entry
  */
-const createWithExpiration = (privateKey, value, seq, expiration, callback) => {
+const createWithExpiration = (privateKey, value, seq, expiration) => {
   const validityType = ipnsEntryProto.ValidityType.EOL
-  _create(privateKey, value, seq, expiration, validityType, callback)
+  return _create(privateKey, value, seq, expiration, validityType)
 }
 
-const _create = (privateKey, value, seq, isoValidity, validityType, callback) => {
-  sign(privateKey, value, validityType, isoValidity, (error, signature) => {
-    if (error) {
-      log.error('record signature creation failed')
-      return callback(Object.assign(new Error('record signature verification failed'), { code: ERRORS.ERR_SIGNATURE_CREATION }))
-    }
+const _create = async (privateKey, value, seq, isoValidity, validityType) => {
+  try {
+    const signature = await sign(privateKey, value, validityType, isoValidity)
 
     const entry = {
       value: value,
@@ -67,8 +64,11 @@ const _create = (privateKey, value, seq, isoValidity, validityType, callback) =>
     }
 
     log(`ipns entry for ${value} created`)
-    return callback(null, entry)
-  })
+    return entry
+  } catch (error) {
+    log.error('record signature creation failed')
+    throw errorWithCode('record signature verification failed', ERRORS.ERR_SIGNATURE_CREATION)
+  }
 }
 
 /**
@@ -76,41 +76,43 @@ const _create = (privateKey, value, seq, isoValidity, validityType, callback) =>
  *
  * @param {Object} publicKey public key for validating the record.
  * @param {Object} entry ipns entry record.
- * @param {function(Error)} [callback]
+ * @returns {Promise} the promise will reject if the entry is invalid.
  */
-const validate = (publicKey, entry, callback) => {
+const validate = (publicKey, entry) => {
   const { value, validityType, validity } = entry
   const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
 
-  // Validate Signature
-  publicKey.verify(dataForSignature, entry.signature, (err, isValid) => {
-    if (err || !isValid) {
-      log.error('record signature verification failed')
-      return callback(Object.assign(new Error('record signature verification failed'), { code: ERRORS.ERR_SIGNATURE_VERIFICATION }))
-    }
-
-    // Validate according to the validity type
-    if (validityType === ipnsEntryProto.ValidityType.EOL) {
-      let validityDate
-
-      try {
-        validityDate = parseRFC3339(validity.toString())
-      } catch (e) {
-        log.error('unrecognized validity format (not an rfc3339 format)')
-        return callback(Object.assign(new Error('unrecognized validity format (not an rfc3339 format)'), { code: ERRORS.ERR_UNRECOGNIZED_FORMAT }))
+  return new Promise((resolve, reject) => {
+    // Validate Signature
+    publicKey.verify(dataForSignature, entry.signature, (err, isValid) => {
+      if (err || !isValid) {
+        log.error('record signature verification failed')
+        return reject(errorWithCode('record signature verification failed', ERRORS.ERR_SIGNATURE_VERIFICATION))
       }
 
-      if (validityDate < Date.now()) {
-        log.error('record has expired')
-        return callback(Object.assign(new Error('record has expired'), { code: ERRORS.ERR_IPNS_EXPIRED_RECORD }))
-      }
-    } else if (validityType) {
-      log.error('unrecognized validity type')
-      return callback(Object.assign(new Error('unrecognized validity type'), { code: ERRORS.ERR_UNRECOGNIZED_VALIDITY }))
-    }
+      // Validate according to the validity type
+      if (validityType === ipnsEntryProto.ValidityType.EOL) {
+        let validityDate
 
-    log(`ipns entry for ${value} is valid`)
-    return callback(null, null)
+        try {
+          validityDate = parseRFC3339(validity.toString())
+        } catch (e) {
+          log.error('unrecognized validity format (not an rfc3339 format)')
+          return reject(errorWithCode('unrecognized validity format (not an rfc3339 format)', ERRORS.ERR_UNRECOGNIZED_FORMAT))
+        }
+
+        if (validityDate < Date.now()) {
+          log.error('record has expired')
+          return reject(errorWithCode('record has expired', ERRORS.ERR_IPNS_EXPIRED_RECORD))
+        }
+      } else if (validityType) {
+        log.error('unrecognized validity type')
+        return reject(errorWithCode('unrecognized validity type', ERRORS.ERR_UNRECOGNIZED_VALIDITY))
+      }
+
+      log(`ipns entry for ${value} is valid`)
+      resolve()
+    })
   })
 }
 
@@ -125,45 +127,46 @@ const validate = (publicKey, entry, callback) => {
  *
  * @param {Object} publicKey public key to embed.
  * @param {Object} entry ipns entry record.
- * @param {function(Error)} [callback]
- * @return {Void}
+ * @return {Object} entry with public key embedded
  */
-const embedPublicKey = (publicKey, entry, callback) => {
+const embedPublicKey = async (publicKey, entry) => {
   if (!publicKey || !publicKey.bytes || !entry) {
     const error = 'one or more of the provided parameters are not defined'
 
     log.error(error)
-    return callback(Object.assign(new Error(error), { code: ERRORS.ERR_UNDEFINED_PARAMETER }))
+    throw Object.assign(new Error(error), { code: ERRORS.ERR_UNDEFINED_PARAMETER })
   }
 
-  // Create a peer id from the public key.
-  PeerId.createFromPubKey(publicKey.bytes, (err, peerId) => {
-    if (err) {
-      log.error(err)
-      return callback(Object.assign(new Error(err), { code: ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY }))
-    }
+  return new Promise((resolve, reject) => {
+    // Create a peer id from the public key.
+    PeerId.createFromPubKey(publicKey.bytes, (err, peerId) => {
+      if (err) {
+        log.error(err)
+        reject(Object.assign(new Error(err), { code: ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY }))
+      }
 
-    // Try to extract the public key from the ID. If we can, no need to embed it
-    let extractedPublicKey
-    try {
-      extractedPublicKey = extractPublicKeyFromId(peerId)
-    } catch (err) {
-      log.error(err)
-      return callback(Object.assign(new Error(err), { code: ERRORS.ERR_PUBLIC_KEY_FROM_ID }))
-    }
+      // Try to extract the public key from the ID. If we can, no need to embed it
+      let extractedPublicKey
+      try {
+        extractedPublicKey = extractPublicKeyFromId(peerId)
+      } catch (err) {
+        log.error(err)
+        reject(Object.assign(new Error(err), { code: ERRORS.ERR_PUBLIC_KEY_FROM_ID }))
+      }
 
-    if (extractedPublicKey) {
-      return callback(null, null)
-    }
+      if (extractedPublicKey) {
+        return resolve(null)
+      }
 
-    // If we failed to extract the public key from the peer ID, embed it in the record.
-    try {
-      entry.pubKey = crypto.keys.marshalPublicKey(publicKey)
-    } catch (err) {
-      log.error(err)
-      return callback(err)
-    }
-    callback(null, entry)
+      // If we failed to extract the public key from the peer ID, embed it in the record.
+      try {
+        entry.pubKey = crypto.keys.marshalPublicKey(publicKey)
+      } catch (err) {
+        log.error(err)
+        reject(err)
+      }
+      resolve(entry)
+    })
   })
 }
 
@@ -172,15 +175,14 @@ const embedPublicKey = (publicKey, entry, callback) => {
  *
  * @param {Object} peerId peer identifier object.
  * @param {Object} entry ipns entry record.
- * @param {function(Error)} [callback]
- * @return {Void}
+ * @returns {Object} the public key
  */
-const extractPublicKey = (peerId, entry, callback) => {
+const extractPublicKey = (peerId, entry) => {
   if (!entry || !peerId) {
     const error = 'one or more of the provided parameters are not defined'
 
     log.error(error)
-    return callback(Object.assign(new Error(error), { code: ERRORS.ERR_UNDEFINED_PARAMETER }))
+    throw Object.assign(new Error(error), { code: ERRORS.ERR_UNDEFINED_PARAMETER })
   }
 
   if (entry.pubKey) {
@@ -189,16 +191,15 @@ const extractPublicKey = (peerId, entry, callback) => {
       pubKey = crypto.keys.unmarshalPublicKey(entry.pubKey)
     } catch (err) {
       log.error(err)
-      return callback(err)
+      throw err
     }
-    return callback(null, pubKey)
+    return pubKey
   }
 
   if (peerId.pubKey) {
-    callback(null, peerId.pubKey)
-  } else {
-    callback(Object.assign(new Error('no public key is available'), { code: ERRORS.ERR_UNDEFINED_PARAMETER }))
+    return peerId.pubKey
   }
+  throw Object.assign(new Error('no public key is available'), { code: ERRORS.ERR_UNDEFINED_PARAMETER })
 }
 
 // rawStdEncoding with RFC4648
@@ -233,14 +234,11 @@ const getIdKeys = (pid) => {
 }
 
 // Sign ipns record data
-const sign = (privateKey, value, validityType, validity, callback) => {
+const sign = (privateKey, value, validityType, validity) => {
   const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
 
-  privateKey.sign(dataForSignature, (err, signature) => {
-    if (err) {
-      return callback(err)
-    }
-    return callback(null, signature)
+  return new Promise((resolve, reject) => {
+    privateKey.sign(dataForSignature, (err, signature) => err ? reject(err) : resolve(signature))
   })
 }
 
@@ -275,49 +273,32 @@ const extractPublicKeyFromId = (peerId) => {
   return crypto.keys.unmarshalPublicKey(decodedId.digest)
 }
 
+const errorWithCode = (err, code) => Object.assign(new Error(err), { code })
+
 const marshal = ipnsEntryProto.encode
 
 const unmarshal = ipnsEntryProto.decode
 
 const validator = {
-  validate: (marshalledData, key, callback) => {
+  validate: async (marshalledData, key) => {
     const receivedEntry = unmarshal(marshalledData)
     const bufferId = key.slice('/ipns/'.length)
     let peerId
 
-    try {
-      peerId = PeerId.createFromBytes(bufferId)
-    } catch (err) {
-      return callback(err)
-    }
+    peerId = PeerId.createFromBytes(bufferId)
 
     // extract public key
-    extractPublicKey(peerId, receivedEntry, (err, pubKey) => {
-      if (err) {
-        return callback(err)
-      }
+    const pubKey = extractPublicKey(peerId, receivedEntry)
 
-      // Record validation
-      validate(pubKey, receivedEntry, (err) => {
-        if (err) {
-          return callback(err)
-        }
-
-        callback(null, true)
-      })
-    })
+    // Record validation
+    await validate(pubKey, receivedEntry)
+    return true
   },
-  select: (dataA, dataB, callback) => {
+  select: (dataA, dataB) => {
     const entryA = unmarshal(dataA)
     const entryB = unmarshal(dataB)
 
-    const index = entryA.sequence > entryB.sequence ? 0 : 1
-
-    if (typeof callback !== 'function') {
-      return index
-    }
-
-    callback(null, index)
+    return entryA.sequence > entryB.sequence ? 0 : 1
   }
 }
 

@@ -64,115 +64,92 @@ describe('ipns', function () {
     }
   })
 
-  it('should create an ipns record correctly', (done) => {
+  it('should create an ipns record correctly', async () => {
     const sequence = 0
     const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
-      expect(entry).to.deep.include({
-        value: cid,
-        sequence: sequence
-      })
-      expect(entry).to.have.a.property('validity')
-      expect(entry).to.have.a.property('signature')
-      expect(entry).to.have.a.property('validityType')
-
-      done()
+    const entry = await ipns.create(rsa, cid, sequence, validity)
+    expect(entry).to.deep.include({
+      value: cid,
+      sequence: sequence
     })
+    expect(entry).to.have.a.property('validity')
+    expect(entry).to.have.a.property('signature')
+    expect(entry).to.have.a.property('validityType')
   })
 
-  it('should be able to create a record with a fixed expiration', (done) => {
+  it('should be able to create a record with a fixed expiration', async () => {
     const sequence = 0
     // 2033-05-18T03:33:20.000000000Z
     const expiration = '2033-05-18T03:33:20.000000000Z'
 
-    ipns.createWithExpiration(rsa, cid, sequence, expiration, (err, entry) => {
-      expect(err).to.not.exist()
+    const entry = await ipns.createWithExpiration(rsa, cid, sequence, expiration)
 
-      ipns.validate(rsa.public, entry, (err) => {
-        expect(err).to.not.exist()
-        expect(entry).to.have.a.property('validity')
-        expect(entry.validity).to.equal('2033-05-18T03:33:20.000000000Z')
-        done()
-      })
-    })
+    await ipns.validate(rsa.public, entry)
+    expect(entry).to.have.a.property('validity')
+    expect(entry.validity).to.equal('2033-05-18T03:33:20.000000000Z')
   })
 
-  it('should create an ipns record and validate it correctly', (done) => {
+  it('should create an ipns record and validate it correctly', async () => {
     const sequence = 0
     const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
-
-      ipns.validate(rsa.public, entry, (err) => {
-        expect(err).to.not.exist()
-
-        done()
-      })
-    })
+    const entry = await ipns.create(rsa, cid, sequence, validity)
+    return ipns.validate(rsa.public, entry)
   })
 
-  it('should fail to validate a bad record', (done) => {
+  it('should fail to validate a bad record', async () => {
     const sequence = 0
     const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
+    const entry = await ipns.create(rsa, cid, sequence, validity)
 
-      // corrupt the record by changing the value to random bytes
-      entry.value = crypto.randomBytes(46).toString()
+    // corrupt the record by changing the value to random bytes
+    entry.value = crypto.randomBytes(46).toString()
 
-      ipns.validate(rsa.public, entry, (err) => {
-        expect(err).to.exist()
-        expect(err).to.include({
-          code: ERRORS.ERR_SIGNATURE_VERIFICATION
-        })
-
-        done()
+    try {
+      await ipns.validate(rsa.public, entry)
+    } catch (err) {
+      expect(err).to.exist()
+      expect(err).to.include({
+        code: ERRORS.ERR_SIGNATURE_VERIFICATION
       })
-    })
+    }
   })
 
-  it('should create an ipns record with a validity of 1 nanosecond correctly and it should not be valid 1ms later', (done) => {
+  it('should create an ipns record with a validity of 1 nanosecond correctly and it should not be valid 1ms later', async () => {
     const sequence = 0
     const validity = 0.00001
 
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
+    const entry = await ipns.create(rsa, cid, sequence, validity)
 
-      setTimeout(() => {
-        ipns.validate(rsa.public, entry, (err, res) => {
-          expect(err).to.exist()
-          done()
-        })
-      }, 1)
-    })
+    await new Promise(resolve => setTimeout(resolve, 1))
+    try {
+      await ipns.validate(rsa.public, entry)
+    } catch (err) {
+      expect(err).to.exist()
+      expect(err).to.include({
+        code: ERRORS.ERR_IPNS_EXPIRED_RECORD
+      })
+    }
   })
 
-  it('should create an ipns record, marshal and unmarshal it, as well as validate it correctly', (done) => {
+  it('should create an ipns record, marshal and unmarshal it, as well as validate it correctly', async () => {
     const sequence = 0
     const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, validity, (err, entryDataCreated) => {
-      expect(err).to.not.exist()
+    const entryDataCreated = await ipns.create(rsa, cid, sequence, validity)
 
-      const marshalledData = ipns.marshal(entryDataCreated)
-      const unmarshalledData = ipns.unmarshal(marshalledData)
+    const marshalledData = ipns.marshal(entryDataCreated)
+    const unmarshalledData = ipns.unmarshal(marshalledData)
 
-      expect(entryDataCreated.value).to.equal(unmarshalledData.value.toString())
-      expect(entryDataCreated.validity).to.equal(unmarshalledData.validity.toString())
-      expect(entryDataCreated.validityType).to.equal(unmarshalledData.validityType)
-      expect(entryDataCreated.signature).to.equalBytes(unmarshalledData.signature)
-      expect(entryDataCreated.sequence).to.equal(unmarshalledData.sequence)
+    expect(entryDataCreated.value).to.equal(unmarshalledData.value.toString())
+    expect(entryDataCreated.validity).to.equal(unmarshalledData.validity.toString())
+    expect(entryDataCreated.validityType).to.equal(unmarshalledData.validityType)
+    expect(entryDataCreated.signature).to.equalBytes(unmarshalledData.signature)
+    expect(entryDataCreated.sequence).to.equal(unmarshalledData.sequence)
 
-      ipns.validate(rsa.public, unmarshalledData, (err, res) => {
-        expect(err).to.not.exist()
-
-        done()
-      })
-    })
+    return ipns.validate(rsa.public, unmarshalledData)
   })
 
   it('should get datastore key correctly', () => {
@@ -195,20 +172,14 @@ describe('ipns', function () {
     expect(idKeys.routingKey).to.not.startsWith('/ipns/')
   })
 
-  it('should be able to embed a public key in an ipns record', (done) => {
+  it('should be able to embed a public key in an ipns record', async () => {
     const sequence = 0
     const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
-
-      ipns.embedPublicKey(rsa.public, entry, (err, entry) => {
-        expect(err).to.not.exist()
-        expect(entry).to.deep.include({
-          pubKey: rsa.public.bytes
-        })
-        done()
-      })
+    const entry = await ipns.create(rsa, cid, sequence, validity)
+    const entryWithKey = await ipns.embedPublicKey(rsa.public, entry)
+    expect(entryWithKey).to.deep.include({
+      pubKey: rsa.public.bytes
     })
   })
 
@@ -222,166 +193,93 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    crypto.keys.generateKeyPair('ed25519', 2048, (err, ed25519) => {
+    crypto.keys.generateKeyPair('ed25519', 2048, async (err, ed25519) => {
       expect(err).to.not.exist()
 
-      ipns.create(ed25519, cid, sequence, validity, (err, entry) => {
-        expect(err).to.not.exist()
-
-        ipns.embedPublicKey(ed25519.public, entry, (err, entry) => {
-          expect(err).to.not.exist()
-          expect(entry).to.not.exist() // Should be null
-          done()
-        })
-      })
+      const entry = await ipns.create(ed25519, cid, sequence, validity)
+      const entryWithKey = ipns.embedPublicKey(ed25519.public, entry)
+      expect(entryWithKey).to.not.exist() // Should be null
     })
   })
 
-  it('should be able to export a previously embed public key from an ipns record', (done) => {
+  it('validator with no valid public key should error', async () => {
     const sequence = 0
     const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
+    const entry = await ipns.create(rsa, cid, sequence, validity)
 
-      ipns.embedPublicKey(rsa.public, entry, (err, entry) => {
-        expect(err).to.not.exist()
+    const marshalledData = ipns.marshal(entry)
+    const key = Buffer.from(`/ipns/${ipfsId.id}`)
 
-        ipns.extractPublicKey(ipfsId, entry, (err, publicKey) => {
-          expect(err).to.not.exist()
-          expect(publicKey.bytes).to.equalBytes(rsa.public.bytes)
-          done()
-        })
-      })
-    })
+    try {
+      await ipns.validator.validate(marshalledData, key)
+    } catch (err) {
+      expect(err.code).to.eql(ERRORS.ERR_UNDEFINED_PARAMETER)
+      return
+    }
+    expect.fail('Expected ERR_UNDEFINED_PARAMETER')
   })
 
-  it('validator with no valid public key should error', (done) => {
+  it('should be able to export a previously embed public key from an ipns record', async () => {
     const sequence = 0
     const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
-
-      const marshalledData = ipns.marshal(entry)
-      const key = Buffer.from(`/ipns/${ipfsId.id}`)
-
-      ipns.validator.validate(marshalledData, key, (err, valid) => {
-        expect(err).to.exist()
-        expect(err.code).to.eql(ERRORS.ERR_UNDEFINED_PARAMETER)
-        expect(valid).to.not.exist()
-        done()
-      })
-    })
+    const entry = await ipns.create(rsa, cid, sequence, validity)
+    await ipns.embedPublicKey(rsa.public, entry)
+    const publicKey = ipns.extractPublicKey(ipfsId, entry)
+    expect(publicKey.bytes).to.equalBytes(rsa.public.bytes)
   })
 
-  it('should use validator.validate to validate a record', (done) => {
+  it('should use validator.validate to validate a record', async () => {
     const sequence = 0
     const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
+    const entry = await ipns.create(rsa, cid, sequence, validity)
+    await ipns.embedPublicKey(rsa.public, entry)
 
-      ipns.embedPublicKey(rsa.public, entry, (err, entry) => {
-        expect(err).to.not.exist()
+    const marshalledData = ipns.marshal(entry)
+    const key = Buffer.from(`/ipns/${ipfsId.id}`)
 
-        const marshalledData = ipns.marshal(entry)
-        const key = Buffer.from(`/ipns/${ipfsId.id}`)
-
-        ipns.validator.validate(marshalledData, key, (err, valid) => {
-          expect(err).to.not.exist()
-          expect(valid).to.equal(true)
-          done()
-        })
-      })
-    })
+    const valid = await ipns.validator.validate(marshalledData, key)
+    expect(valid).to.equal(true)
   })
 
-  it('should use validator.validate to verify that a record is not valid', (done) => {
+  it('should use validator.validate to verify that a record is not valid', async () => {
     const sequence = 0
     const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
+    const entry = await ipns.create(rsa, cid, sequence, validity)
+    await ipns.embedPublicKey(rsa.public, entry)
 
-      ipns.embedPublicKey(rsa.public, entry, (err, entry) => {
-        expect(err).to.not.exist()
+    // corrupt the record by changing the value to random bytes
+    entry.value = crypto.randomBytes(46).toString()
+    const marshalledData = ipns.marshal(entry)
+    const key = Buffer.from(`/ipns/${ipfsId.id}`)
 
-        // corrupt the record by changing the value to random bytes
-        entry.value = crypto.randomBytes(46).toString()
-        const marshalledData = ipns.marshal(entry)
-        const key = Buffer.from(`/ipns/${ipfsId.id}`)
-
-        ipns.validator.validate(marshalledData, key, (err) => {
-          expect(err).to.exist() // failed validation
-          done()
-        })
+    try {
+      await ipns.validator.validate(marshalledData, key)
+    } catch (err) {
+      expect(err).to.exist()
+      expect(err).to.include({
+        code: ERRORS.ERR_SIGNATURE_VERIFICATION
       })
-    })
+    }
   })
 
-  it('should use validator.select to select the first record because it is newer', (done) => {
+  it('should use validator.select to select the record with the highest sequence number', async () => {
     const sequence = 0
     const validity = 1000000
 
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
+    const entry = await ipns.create(rsa, cid, sequence, validity)
+    const newEntry = await ipns.create(rsa, cid, (sequence + 1), validity)
 
-      ipns.create(rsa, cid, (sequence + 1), validity, (err, newEntry) => {
-        expect(err).to.not.exist()
+    const marshalledData = ipns.marshal(entry)
+    const marshalledNewData = ipns.marshal(newEntry)
 
-        const marshalledData = ipns.marshal(entry)
-        const marshalledNewData = ipns.marshal(newEntry)
+    let valid = ipns.validator.select(marshalledNewData, marshalledData)
+    expect(valid).to.equal(0) // new data is the selected one
 
-        ipns.validator.select(marshalledNewData, marshalledData, (err, valid) => {
-          expect(err).to.not.exist()
-          expect(valid).to.equal(0) // new data is the selected one
-          done()
-        })
-      })
-    })
-  })
-
-  it('should use validator.select to select the first record because it is newer without using callback', (done) => {
-    const sequence = 0
-    const validity = 1000000
-
-    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
-      expect(err).to.not.exist()
-
-      ipns.create(rsa, cid, (sequence + 1), validity, (err, newEntry) => {
-        expect(err).to.not.exist()
-
-        const marshalledData = ipns.marshal(entry)
-        const marshalledNewData = ipns.marshal(newEntry)
-
-        const valid = ipns.validator.select(marshalledNewData, marshalledData)
-
-        expect(valid).to.equal(0) // new data is the selected one
-        done()
-      })
-    })
-  })
-
-  it('should use validator.select to select the second record because it is newer', (done) => {
-    const sequence = 0
-    const validity = 1000000
-
-    ipns.create(rsa, cid, sequence + 1, validity, (err, entry) => {
-      expect(err).to.not.exist()
-
-      ipns.create(rsa, cid, (sequence), validity, (err, newEntry) => {
-        expect(err).to.not.exist()
-
-        const marshalledData = ipns.marshal(entry)
-        const marshalledNewData = ipns.marshal(newEntry)
-
-        ipns.validator.select(marshalledNewData, marshalledData, (err, valid) => {
-          expect(err).to.not.exist()
-          expect(valid).to.equal(1) // old data is the selected one
-          done()
-        })
-      })
-    })
+    valid = ipns.validator.select(marshalledData, marshalledNewData)
+    expect(valid).to.equal(1) // new data is the selected one
   })
 })
