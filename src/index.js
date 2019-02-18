@@ -6,6 +6,7 @@ const { Key } = require('interface-datastore')
 const crypto = require('libp2p-crypto')
 const PeerId = require('peer-id')
 const multihash = require('multihashes')
+const errCode = require('err-code')
 
 const debug = require('debug')
 const log = debug('jsipns')
@@ -67,7 +68,7 @@ const _create = async (privateKey, value, seq, isoValidity, validityType) => {
     return entry
   } catch (error) {
     log.error('record signature creation failed')
-    throw errorWithCode('record signature verification failed', ERRORS.ERR_SIGNATURE_CREATION)
+    throw errCode('record signature verification failed', ERRORS.ERR_SIGNATURE_CREATION)
   }
 }
 
@@ -90,7 +91,7 @@ const validate = async (publicKey, entry) => {
   }
   if (!isValid) {
     log.error('record signature verification failed')
-    throw errorWithCode('record signature verification failed', ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw errCode('record signature verification failed', ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
   // Validate according to the validity type
@@ -101,16 +102,16 @@ const validate = async (publicKey, entry) => {
       validityDate = parseRFC3339(validity.toString())
     } catch (e) {
       log.error('unrecognized validity format (not an rfc3339 format)')
-      throw errorWithCode('unrecognized validity format (not an rfc3339 format)', ERRORS.ERR_UNRECOGNIZED_FORMAT)
+      throw errCode('unrecognized validity format (not an rfc3339 format)', ERRORS.ERR_UNRECOGNIZED_FORMAT)
     }
 
     if (validityDate < Date.now()) {
       log.error('record has expired')
-      throw errorWithCode('record has expired', ERRORS.ERR_IPNS_EXPIRED_RECORD)
+      throw errCode('record has expired', ERRORS.ERR_IPNS_EXPIRED_RECORD)
     }
   } else if (validityType) {
     log.error('unrecognized validity type')
-    throw errorWithCode('unrecognized validity type', ERRORS.ERR_UNRECOGNIZED_VALIDITY)
+    throw errCode('unrecognized validity type', ERRORS.ERR_UNRECOGNIZED_VALIDITY)
   }
 
   log(`ipns entry for ${value} is valid`)
@@ -133,7 +134,7 @@ const embedPublicKey = async (publicKey, entry) => {
   if (!publicKey || !publicKey.bytes || !entry) {
     const error = 'one or more of the provided parameters are not defined'
     log.error(error)
-    throw Object.assign(new Error(error), { code: ERRORS.ERR_UNDEFINED_PARAMETER })
+    throw errCode(error, ERRORS.ERR_UNDEFINED_PARAMETER)
   }
 
   // Create a peer id from the public key.
@@ -141,7 +142,7 @@ const embedPublicKey = async (publicKey, entry) => {
   try {
     peerId = await PeerId.createFromPubKey(publicKey.bytes)
   } catch (err) {
-    throw Object.assign(new Error(err), { code: ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY })
+    throw errCode(err, ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY)
   }
 
   // Try to extract the public key from the ID. If we can, no need to embed it
@@ -150,7 +151,7 @@ const embedPublicKey = async (publicKey, entry) => {
     extractedPublicKey = extractPublicKeyFromId(peerId)
   } catch (err) {
     log.error(err)
-    throw Object.assign(new Error(err), { code: ERRORS.ERR_PUBLIC_KEY_FROM_ID })
+    throw errCode(err, ERRORS.ERR_PUBLIC_KEY_FROM_ID)
   }
 
   if (extractedPublicKey) {
@@ -179,7 +180,7 @@ const extractPublicKey = (peerId, entry) => {
     const error = 'one or more of the provided parameters are not defined'
 
     log.error(error)
-    throw Object.assign(new Error(error), { code: ERRORS.ERR_UNDEFINED_PARAMETER })
+    throw errCode(error, ERRORS.ERR_UNDEFINED_PARAMETER)
   }
 
   if (entry.pubKey) {
@@ -244,7 +245,7 @@ const getValidityType = (validityType) => {
 
   const error = `unrecognized validity type ${validityType.toString()}`
   log.error(error)
-  throw Object.assign(new Error(error), { code: ERRORS.ERR_UNRECOGNIZED_VALIDITY })
+  throw errCode(error, ERRORS.ERR_UNRECOGNIZED_VALIDITY)
 }
 
 // Utility for creating the record data for being signed
@@ -266,8 +267,6 @@ const extractPublicKeyFromId = (peerId) => {
 
   return crypto.keys.unmarshalPublicKey(decodedId.digest)
 }
-
-const errorWithCode = (err, code) => Object.assign(new Error(err), { code })
 
 const marshal = ipnsEntryProto.encode
 
