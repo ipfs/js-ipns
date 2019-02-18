@@ -76,44 +76,44 @@ const _create = async (privateKey, value, seq, isoValidity, validityType) => {
  *
  * @param {Object} publicKey public key for validating the record.
  * @param {Object} entry ipns entry record.
- * @returns {Promise} the promise will reject if the entry is invalid.
  */
-const validate = (publicKey, entry) => {
+const validate = async (publicKey, entry) => {
   const { value, validityType, validity } = entry
   const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
 
-  return new Promise((resolve, reject) => {
-    // Validate Signature
-    publicKey.verify(dataForSignature, entry.signature, (err, isValid) => {
-      if (err || !isValid) {
-        log.error('record signature verification failed')
-        return reject(errorWithCode('record signature verification failed', ERRORS.ERR_SIGNATURE_VERIFICATION))
-      }
+  // Validate Signature
+  let isValid
+  try {
+    isValid = await publicKey.verify(dataForSignature, entry.signature)
+  } catch (err) {
+    isValid = false
+  }
+  if (!isValid) {
+    log.error('record signature verification failed')
+    throw errorWithCode('record signature verification failed', ERRORS.ERR_SIGNATURE_VERIFICATION)
+  }
 
-      // Validate according to the validity type
-      if (validityType === ipnsEntryProto.ValidityType.EOL) {
-        let validityDate
+  // Validate according to the validity type
+  if (validityType === ipnsEntryProto.ValidityType.EOL) {
+    let validityDate
 
-        try {
-          validityDate = parseRFC3339(validity.toString())
-        } catch (e) {
-          log.error('unrecognized validity format (not an rfc3339 format)')
-          return reject(errorWithCode('unrecognized validity format (not an rfc3339 format)', ERRORS.ERR_UNRECOGNIZED_FORMAT))
-        }
+    try {
+      validityDate = parseRFC3339(validity.toString())
+    } catch (e) {
+      log.error('unrecognized validity format (not an rfc3339 format)')
+      throw errorWithCode('unrecognized validity format (not an rfc3339 format)', ERRORS.ERR_UNRECOGNIZED_FORMAT)
+    }
 
-        if (validityDate < Date.now()) {
-          log.error('record has expired')
-          return reject(errorWithCode('record has expired', ERRORS.ERR_IPNS_EXPIRED_RECORD))
-        }
-      } else if (validityType) {
-        log.error('unrecognized validity type')
-        return reject(errorWithCode('unrecognized validity type', ERRORS.ERR_UNRECOGNIZED_VALIDITY))
-      }
+    if (validityDate < Date.now()) {
+      log.error('record has expired')
+      throw errorWithCode('record has expired', ERRORS.ERR_IPNS_EXPIRED_RECORD)
+    }
+  } else if (validityType) {
+    log.error('unrecognized validity type')
+    throw errorWithCode('unrecognized validity type', ERRORS.ERR_UNRECOGNIZED_VALIDITY)
+  }
 
-      log(`ipns entry for ${value} is valid`)
-      resolve()
-    })
-  })
+  log(`ipns entry for ${value} is valid`)
 }
 
 /**
@@ -132,42 +132,39 @@ const validate = (publicKey, entry) => {
 const embedPublicKey = async (publicKey, entry) => {
   if (!publicKey || !publicKey.bytes || !entry) {
     const error = 'one or more of the provided parameters are not defined'
-
     log.error(error)
     throw Object.assign(new Error(error), { code: ERRORS.ERR_UNDEFINED_PARAMETER })
   }
 
-  return new Promise((resolve, reject) => {
-    // Create a peer id from the public key.
-    PeerId.createFromPubKey(publicKey.bytes, (err, peerId) => {
-      if (err) {
-        log.error(err)
-        reject(Object.assign(new Error(err), { code: ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY }))
-      }
+  // Create a peer id from the public key.
+  let peerId
+  try {
+    peerId = await PeerId.createFromPubKey(publicKey.bytes)
+  } catch (err) {
+    throw Object.assign(new Error(err), { code: ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY })
+  }
 
-      // Try to extract the public key from the ID. If we can, no need to embed it
-      let extractedPublicKey
-      try {
-        extractedPublicKey = extractPublicKeyFromId(peerId)
-      } catch (err) {
-        log.error(err)
-        reject(Object.assign(new Error(err), { code: ERRORS.ERR_PUBLIC_KEY_FROM_ID }))
-      }
+  // Try to extract the public key from the ID. If we can, no need to embed it
+  let extractedPublicKey
+  try {
+    extractedPublicKey = extractPublicKeyFromId(peerId)
+  } catch (err) {
+    log.error(err)
+    throw Object.assign(new Error(err), { code: ERRORS.ERR_PUBLIC_KEY_FROM_ID })
+  }
 
-      if (extractedPublicKey) {
-        return resolve(null)
-      }
+  if (extractedPublicKey) {
+    return null
+  }
 
-      // If we failed to extract the public key from the peer ID, embed it in the record.
-      try {
-        entry.pubKey = crypto.keys.marshalPublicKey(publicKey)
-      } catch (err) {
-        log.error(err)
-        reject(err)
-      }
-      resolve(entry)
-    })
-  })
+  // If we failed to extract the public key from the peer ID, embed it in the record.
+  try {
+    entry.pubKey = crypto.keys.marshalPublicKey(publicKey)
+  } catch (err) {
+    log.error(err)
+    throw err
+  }
+  return entry
 }
 
 /**
@@ -236,21 +233,18 @@ const getIdKeys = (pid) => {
 // Sign ipns record data
 const sign = (privateKey, value, validityType, validity) => {
   const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
-
-  return new Promise((resolve, reject) => {
-    privateKey.sign(dataForSignature, (err, signature) => err ? reject(err) : resolve(signature))
-  })
+  return privateKey.sign(dataForSignature)
 }
 
 // Utility for getting the validity type code name of a validity
 const getValidityType = (validityType) => {
   if (validityType.toString() === '0') {
     return 'EOL'
-  } else {
-    const error = `unrecognized validity type ${validityType.toString()}`
-    log.error(error)
-    throw Object.assign(new Error(error), { code: ERRORS.ERR_UNRECOGNIZED_VALIDITY })
   }
+
+  const error = `unrecognized validity type ${validityType.toString()}`
+  log.error(error)
+  throw Object.assign(new Error(error), { code: ERRORS.ERR_UNRECOGNIZED_VALIDITY })
 }
 
 // Utility for creating the record data for being signed

@@ -47,13 +47,9 @@ describe('ipns', function () {
     })
   }
 
-  before(function (done) {
-    crypto.keys.generateKeyPair('RSA', 2048, (err, keypair) => {
-      expect(err).to.not.exist()
-      rsa = keypair
-
-      spawnDaemon(done)
-    })
+  before(async () => {
+    rsa = await crypto.keys.generateKeyPair('RSA', 2048)
+    return new Promise((resolve, reject) => spawnDaemon(err => err ? reject(err) : resolve()))
   })
 
   after(function (done) {
