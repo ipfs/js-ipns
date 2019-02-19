@@ -30,26 +30,28 @@ describe('ipns', function () {
   let ipfsId = null
   let rsa = null
 
-  const spawnDaemon = (cb) => {
-    df.spawn({ initOptions: { bits: 512 } }, (err, _ipfsd) => {
-      expect(err).to.not.exist()
-      ipfsd = _ipfsd
-      ipfs = ipfsd.api
+  const spawnDaemon = () => {
+    return new Promise((resolve, reject) => {
+      df.spawn({ initOptions: { bits: 512 } }, (err, _ipfsd) => {
+        expect(err).to.not.exist()
+        ipfsd = _ipfsd
+        ipfs = ipfsd.api
 
-      ipfs.id((err, id) => {
-        if (err) {
-          return cb(err)
-        }
+        ipfs.id((err, id) => {
+          if (err) {
+            return reject(err)
+          }
 
-        ipfsId = id
-        cb()
+          ipfsId = id
+          resolve()
+        })
       })
     })
   }
 
   before(async () => {
     rsa = await crypto.keys.generateKeyPair('RSA', 2048)
-    return new Promise((resolve, reject) => spawnDaemon(err => err ? reject(err) : resolve()))
+    return spawnDaemon()
   })
 
   after(function (done) {
@@ -185,17 +187,14 @@ describe('ipns', function () {
   // https://github.com/libp2p/go-libp2p-peer/blob/7f219a1e70011a258c5d3e502aef6896c60d03ce/peer.go#L80
   // IDFromEd25519PublicKey is not currently implement on js-libp2p-peer
   // https://github.com/libp2p/go-libp2p-peer/pull/30
-  it.skip('should be able to extract a public key directly from the peer', (done) => {
+  it.skip('should be able to extract a public key directly from the peer', async () => {
     const sequence = 0
     const validity = 1000000
 
-    crypto.keys.generateKeyPair('ed25519', 2048, async (err, ed25519) => {
-      expect(err).to.not.exist()
-
-      const entry = await ipns.create(ed25519, cid, sequence, validity)
-      const entryWithKey = ipns.embedPublicKey(ed25519.public, entry)
-      expect(entryWithKey).to.not.exist() // Should be null
-    })
+    const ed25519 = await crypto.keys.generateKeyPair('ed25519', 2048)
+    const entry = await ipns.create(ed25519, cid, sequence, validity)
+    const entryWithKey = ipns.embedPublicKey(ed25519.public, entry)
+    expect(entryWithKey).to.not.exist() // Should be null
   })
 
   it('validator with no valid public key should error', async () => {

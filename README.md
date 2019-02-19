@@ -39,7 +39,6 @@ This module contains all the necessary code for creating, understanding and vali
 const ipns = require('ipns')
 
 const entryData = await ipns.create(privateKey, value, sequenceNumber, lifetime)
-// your code goes here
 ```
 
 #### Validate record
@@ -48,7 +47,6 @@ const entryData = await ipns.create(privateKey, value, sequenceNumber, lifetime)
 const ipns = require('ipns')
 
 await ipns.validate(publicKey, ipnsEntry)
-// your code goes here
 // if no error thrown, the record is valid
 ```
 
@@ -58,7 +56,6 @@ await ipns.validate(publicKey, ipnsEntry)
 const ipns = require('ipns')
 
 const ipnsEntryWithEmbedPublicKey = await ipns.embedPublicKey(publicKey, ipnsEntry)
-// your code goes here
 ```
 
 #### Extract public key from record
@@ -67,7 +64,6 @@ const ipnsEntryWithEmbedPublicKey = await ipns.embedPublicKey(publicKey, ipnsEnt
 const ipns = require('ipns')
 
 const publicKey = ipns.extractPublicKey(peerId, ipnsEntry)
-// your code goes here
 ```
 
 #### Datastore key
@@ -89,7 +85,7 @@ Returns a key to be used for storing the ipns entry locally, that is:
 ```js
 const ipns = require('ipns')
 
-const entryData = ipns.create(privateKey, value, sequenceNumber, lifetime)
+const entryData = await ipns.create(privateKey, value, sequenceNumber, lifetime)
 // ...
 const marshalledData = ipns.marshal(entryData)
 // ...
@@ -117,7 +113,7 @@ const validator = ipns.validator
 
 Contains an object with `validate (marshalledData, key)` and `select (dataA, dataB)` functions.
 
-The `validate` function aims to verify if an IPNS record is valid. First the record is unmarshalled, then the public key is obtained and finally the record is validated (signature and validity are verified).
+The `validate` async function aims to verify if an IPNS record is valid. First the record is unmarshalled, then the public key is obtained and finally the record is validated (signature and validity are verified).
 
 The `select` function is responsible for deciding which ipns record is the best (newer) between two records. Both records are unmarshalled and their sequence numbers are compared. If the first record provided is the newer, the operation result will be `0`, otherwise the operation result will be `1`.
 
@@ -161,7 +157,7 @@ Validate an IPNS record previously stored in a protocol buffer.
 - `publicKey` (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
 - `ipnsEntry` (Object): ipns entry record (obtained using the create function).
 
-Throws an error if the validation was not successful.
+Returns a `Promise`, which may be rejected if the validation was not successful.
 
 #### Datastore key
 
@@ -196,7 +192,7 @@ Returns the entry data structure after being serialized.
 #### Embed public key to record
 
 ```js
-ipns.embedPublicKey(publicKey, ipnsEntry)
+const recordWithPublicKey = await ipns.embedPublicKey(publicKey, ipnsEntry)
 ```
 
 Embed a public key in an IPNS entry. If it is possible to extract the public key from the `peer-id`, there is no need to embed.

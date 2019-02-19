@@ -21,6 +21,16 @@ const ID_MULTIHASH_CODE = multihash.names.id
 const namespace = '/ipns/'
 
 /**
+ * IPNS entry
+ * @typedef {Object} IpnsEntry
+ * @property {string} value - value to be stored in the record
+ * @property {Buffer} signature - signature of the record
+ * @property {number} validityType - Type of validation being used
+ * @property {string} validity - expiration datetime for the record in RFC3339 format
+ * @property {number} sequence - number representing the version of the record
+ */
+
+/**
  * Creates a new ipns entry and signs it with the given private key.
  * The ipns entry validity should follow the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
@@ -29,7 +39,7 @@ const namespace = '/ipns/'
  * @param {string} value value to be stored in the record.
  * @param {number} seq number representing the current version of the record.
  * @param {number|string} lifetime lifetime of the record (in milliseconds).
- * @returns {Object} entry
+ * @returns {Promise<IpnsEntry>} entry
  */
 const create = (privateKey, value, seq, lifetime) => {
   // Validity in ISOString with nanoseconds precision and validity type EOL
@@ -45,7 +55,7 @@ const create = (privateKey, value, seq, lifetime) => {
  * @param {string} value value to be stored in the record.
  * @param {number} seq number representing the current version of the record.
  * @param {string} expiration expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
- * @returns {Object} entry
+ * @returns {Promise<IpnsEntry>} entry
  */
 const createWithExpiration = (privateKey, value, seq, expiration) => {
   const validityType = ipnsEntryProto.ValidityType.EOL
@@ -53,30 +63,26 @@ const createWithExpiration = (privateKey, value, seq, expiration) => {
 }
 
 const _create = async (privateKey, value, seq, isoValidity, validityType) => {
-  try {
-    const signature = await sign(privateKey, value, validityType, isoValidity)
+  const signature = await sign(privateKey, value, validityType, isoValidity)
 
-    const entry = {
-      value: value,
-      signature: signature,
-      validityType: validityType,
-      validity: isoValidity,
-      sequence: seq
-    }
-
-    log(`ipns entry for ${value} created`)
-    return entry
-  } catch (error) {
-    log.error('record signature creation failed')
-    throw errCode('record signature verification failed', ERRORS.ERR_SIGNATURE_CREATION)
+  const entry = {
+    value: value,
+    signature: signature,
+    validityType: validityType,
+    validity: isoValidity,
+    sequence: seq
   }
+
+  log(`ipns entry for ${value} created`)
+  return entry
 }
 
 /**
  * Validates the given ipns entry against the given public key.
  *
  * @param {Object} publicKey public key for validating the record.
- * @param {Object} entry ipns entry record.
+ * @param {IpnsEntry} entry ipns entry record.
+ * @returns {Promise}
  */
 const validate = async (publicKey, entry) => {
   const { value, validityType, validity } = entry
@@ -128,7 +134,7 @@ const validate = async (publicKey, entry) => {
  *
  * @param {Object} publicKey public key to embed.
  * @param {Object} entry ipns entry record.
- * @return {Object} entry with public key embedded
+ * @return {IpnsEntry} entry with public key embedded
  */
 const embedPublicKey = async (publicKey, entry) => {
   if (!publicKey || !publicKey.bytes || !entry) {
@@ -172,7 +178,7 @@ const embedPublicKey = async (publicKey, entry) => {
  * Extracts a public key matching `pid` from the ipns record.
  *
  * @param {Object} peerId peer identifier object.
- * @param {Object} entry ipns entry record.
+ * @param {IpnsEntry} entry ipns entry record.
  * @returns {Object} the public key
  */
 const extractPublicKey = (peerId, entry) => {
@@ -233,8 +239,13 @@ const getIdKeys = (pid) => {
 
 // Sign ipns record data
 const sign = (privateKey, value, validityType, validity) => {
-  const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
-  return privateKey.sign(dataForSignature)
+  try {
+    const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
+    return privateKey.sign(dataForSignature)
+  } catch (error) {
+    log.error('record signature creation failed')
+    throw errCode('record signature creation failed: ' + error.message, ERRORS.ERR_SIGNATURE_CREATION)
+  }
 }
 
 // Utility for getting the validity type code name of a validity
