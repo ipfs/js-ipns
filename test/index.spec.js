@@ -256,6 +256,25 @@ describe('ipns', function () {
     })
   })
 
+  it('validator with no valid public key should error', (done) => {
+    const sequence = 0
+    const validity = 1000000
+
+    ipns.create(rsa, cid, sequence, validity, (err, entry) => {
+      expect(err).to.not.exist()
+
+      const marshalledData = ipns.marshal(entry)
+        const key = Buffer.from(`/ipns/${ipfsId.id}`)
+
+        ipns.validator.validate(marshalledData, key, (err, valid) => {
+          expect(err).to.exist()
+          expect(err.code).to.eql(ERRORS.ERR_UNDEFINED_PARAMETER)
+          expect(valid).to.not.exist()
+          done()
+        })
+    })
+  })
+
   it('should use validator.validate to validate a record', (done) => {
     const sequence = 0
     const validity = 1000000
