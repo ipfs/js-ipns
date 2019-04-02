@@ -264,14 +264,14 @@ describe('ipns', function () {
       expect(err).to.not.exist()
 
       const marshalledData = ipns.marshal(entry)
-        const key = Buffer.from(`/ipns/${ipfsId.id}`)
+      const key = Buffer.from(`/ipns/${ipfsId.id}`)
 
-        ipns.validator.validate(marshalledData, key, (err, valid) => {
-          expect(err).to.exist()
-          expect(err.code).to.eql(ERRORS.ERR_UNDEFINED_PARAMETER)
-          expect(valid).to.not.exist()
-          done()
-        })
+      ipns.validator.validate(marshalledData, key, (err, valid) => {
+        expect(err).to.exist()
+        expect(err.code).to.eql(ERRORS.ERR_UNDEFINED_PARAMETER)
+        expect(valid).to.not.exist()
+        done()
+      })
     })
   })
 
