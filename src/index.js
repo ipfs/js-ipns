@@ -193,7 +193,12 @@ const extractPublicKey = (peerId, entry, callback) => {
     }
     return callback(null, pubKey)
   }
-  callback(null, peerId.pubKey)
+
+  if (peerId.pubKey) {
+    callback(null, peerId.pubKey)
+  } else {
+    callback(Object.assign(new Error('no public key is available'), { code: ERRORS.ERR_UNDEFINED_PARAMETER }))
+  }
 }
 
 // rawStdEncoding with RFC4648
