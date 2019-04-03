@@ -1,3 +1,21 @@
+<a name="0.5.1"></a>
+## [0.5.1](https://github.com/ipfs/js-ipns/compare/v0.4.4...v0.5.1) (2019-04-03)
+
+
+### Bug Fixes
+
+* reduce bundle size ([#17](https://github.com/ipfs/js-ipns/issues/17)) ([a978c7d](https://github.com/ipfs/js-ipns/commit/a978c7d))
+* verify public key exists in validator ([#21](https://github.com/ipfs/js-ipns/issues/21)) ([602e27f](https://github.com/ipfs/js-ipns/commit/602e27f))
+
+
+### BREAKING CHANGES
+
+* method createWithExpiration signature changed
+
+expiration param changed from time of the record (in nanoseconds) to datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision
+
+
+
 <a name="0.5.0"></a>
 ## [0.5.0](https://github.com/ipfs/js-ipns/compare/v0.4.4...v0.5.0) (2019-01-10)
 
