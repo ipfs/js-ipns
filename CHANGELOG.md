@@ -1,3 +1,14 @@
+<a name="0.5.2"></a>
+## [0.5.2](https://github.com/ipfs/js-ipns/compare/v0.5.1...v0.5.2) (2019-05-23)
+
+
+### Bug Fixes
+
+* month in RFC3339 util ([94bd20d](https://github.com/ipfs/js-ipns/commit/94bd20d))
+* remove leftpad ([#22](https://github.com/ipfs/js-ipns/issues/22)) ([e04babc](https://github.com/ipfs/js-ipns/commit/e04babc))
+
+
+
 <a name="0.5.1"></a>
 ## [0.5.1](https://github.com/ipfs/js-ipns/compare/v0.4.4...v0.5.1) (2019-04-03)
 
