@@ -9,7 +9,7 @@
  */
 module.exports.toRFC3339 = (time) => {
   const year = time.getUTCFullYear()
-  const month = String(time.getUTCMinutes() + 1).padStart(2, '0')
+  const month = String(time.getUTCMonth() + 1).padStart(2, '0')
   const day = String(time.getUTCDate()).padStart(2, '0')
   const hour = String(time.getUTCHours()).padStart(2, '0')
   const minute = String(time.getUTCMinutes()).padStart(2, '0')
