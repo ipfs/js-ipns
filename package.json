@@ -1,6 +1,6 @@
 {
   "name": "ipns",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "ipns record definitions",
   "leadMaintainer": "Vasco Santos <vasco.santos@moxy.studio>",
   "main": "src/index.js",
@@ -54,10 +54,11 @@
   "contributors": [
     "Diogo Silva <fsdiogo@gmail.com>",
     "Esteban Ordano <eordano@gmail.com>",
+    "Hugo Dias <hugomrdias@gmail.com>",
     "Hugo Dias <mail@hugodias.me>",
     "Jacob Heun <jacobheun@gmail.com>",
     "Rob Brackett <rob@robbrackett.com>",
-    "Vasco Santos <vasco.santos@ua.pt>",
-    "Vasco Santos <vasco.santos@moxy.studio>"
+    "Vasco Santos <vasco.santos@moxy.studio>",
+    "Vasco Santos <vasco.santos@ua.pt>"
   ]
 }
