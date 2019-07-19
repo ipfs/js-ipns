@@ -1,3 +1,18 @@
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/ipfs/js-ipns/compare/v0.5.2...v0.6.0) (2019-07-19)
+
+
+### Chores
+
+* convert from callbacks to async ([#19](https://github.com/ipfs/js-ipns/issues/19)) ([89e9903](https://github.com/ipfs/js-ipns/commit/89e9903))
+
+
+### BREAKING CHANGES
+
+* All places in the API that used callbacks are now replaced with async/await
+
+
+
 <a name="0.5.2"></a>
 ## [0.5.2](https://github.com/ipfs/js-ipns/compare/v0.5.1...v0.5.2) (2019-05-23)
 
