@@ -11,14 +11,20 @@ chai.use(chaiBytes)
 chai.use(chaiString)
 
 const ipfs = require('ipfs')
+const ipfsHttpClient = require('ipfs-http-client')
 const DaemonFactory = require('ipfsd-ctl')
 const crypto = require('libp2p-crypto')
 const { fromB58String } = require('multihashes')
+const promisify = require('promisify-es6')
 
 const ipns = require('../src')
 const ERRORS = require('../src/errors')
 
-const df = DaemonFactory.create({ type: 'proc', exec: ipfs })
+const df = DaemonFactory.create({
+  type: 'proc',
+  exec: ipfs,
+  IpfsClient: ipfsHttpClient
+})
 
 describe('ipns', function () {
   this.timeout(20 * 1000)
@@ -30,35 +36,18 @@ describe('ipns', function () {
   let ipfsId = null
   let rsa = null
 
-  const spawnDaemon = () => {
-    return new Promise((resolve, reject) => {
-      df.spawn({ initOptions: { bits: 512 } }, (err, _ipfsd) => {
-        expect(err).to.not.exist()
-        ipfsd = _ipfsd
-        ipfs = ipfsd.api
-
-        ipfs.id((err, id) => {
-          if (err) {
-            return reject(err)
-          }
-
-          ipfsId = id
-          resolve()
-        })
-      })
-    })
-  }
-
   before(async () => {
-    rsa = await crypto.keys.generateKeyPair('RSA', 2048)
-    return spawnDaemon()
+    rsa = await promisify(crypto.keys.generateKeyPair, {
+      context: crypto.keys
+    })('RSA', 2048)
+    ipfsd = await df.spawn({ initOptions: { bits: 512 } })
+    ipfs = ipfsd.api
+    ipfsId = await ipfs.id()
   })
 
-  after(function (done) {
+  after(async () => {
     if (ipfsd) {
-      ipfsd.stop(() => done())
-    } else {
-      done()
+      await ipfsd.stop()
     }
   })
 
@@ -191,7 +180,9 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const ed25519 = await crypto.keys.generateKeyPair('ed25519', 2048)
+    const ed25519 = await promisify(crypto.keys.generateKeyPair, {
+      context: crypto.keys
+    })('ed25519', 2048)
     const entry = await ipns.create(ed25519, cid, sequence, validity)
     const entryWithKey = ipns.embedPublicKey(ed25519.public, entry)
     expect(entryWithKey).to.not.exist() // Should be null
