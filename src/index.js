@@ -7,6 +7,7 @@ const crypto = require('libp2p-crypto')
 const PeerId = require('peer-id')
 const multihash = require('multihashes')
 const errCode = require('err-code')
+const promisify = require('promisify-es6')
 
 const debug = require('debug')
 const log = debug('jsipns')
@@ -91,13 +92,15 @@ const validate = async (publicKey, entry) => {
   // Validate Signature
   let isValid
   try {
-    isValid = await publicKey.verify(dataForSignature, entry.signature)
+    isValid = await promisify(publicKey.verify, {
+      context: publicKey
+    })(dataForSignature, entry.signature)
   } catch (err) {
     isValid = false
   }
   if (!isValid) {
     log.error('record signature verification failed')
-    throw errCode('record signature verification failed', ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw errCode(new Error('record signature verification failed'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
   // Validate according to the validity type
@@ -108,16 +111,16 @@ const validate = async (publicKey, entry) => {
       validityDate = parseRFC3339(validity.toString())
     } catch (e) {
       log.error('unrecognized validity format (not an rfc3339 format)')
-      throw errCode('unrecognized validity format (not an rfc3339 format)', ERRORS.ERR_UNRECOGNIZED_FORMAT)
+      throw errCode(new Error('unrecognized validity format (not an rfc3339 format)'), ERRORS.ERR_UNRECOGNIZED_FORMAT)
     }
 
     if (validityDate < Date.now()) {
       log.error('record has expired')
-      throw errCode('record has expired', ERRORS.ERR_IPNS_EXPIRED_RECORD)
+      throw errCode(new Error('record has expired'), ERRORS.ERR_IPNS_EXPIRED_RECORD)
     }
   } else if (validityType) {
     log.error('unrecognized validity type')
-    throw errCode('unrecognized validity type', ERRORS.ERR_UNRECOGNIZED_VALIDITY)
+    throw errCode(new Error('unrecognized validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
   }
 
   log(`ipns entry for ${value} is valid`)
@@ -138,7 +141,7 @@ const validate = async (publicKey, entry) => {
  */
 const embedPublicKey = async (publicKey, entry) => {
   if (!publicKey || !publicKey.bytes || !entry) {
-    const error = 'one or more of the provided parameters are not defined'
+    const error = new Error('one or more of the provided parameters are not defined')
     log.error(error)
     throw errCode(error, ERRORS.ERR_UNDEFINED_PARAMETER)
   }
@@ -146,7 +149,7 @@ const embedPublicKey = async (publicKey, entry) => {
   // Create a peer id from the public key.
   let peerId
   try {
-    peerId = await PeerId.createFromPubKey(publicKey.bytes)
+    peerId = await promisify(PeerId.createFromPubKey)(publicKey.bytes)
   } catch (err) {
     throw errCode(err, ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY)
   }
@@ -183,7 +186,7 @@ const embedPublicKey = async (publicKey, entry) => {
  */
 const extractPublicKey = (peerId, entry) => {
   if (!entry || !peerId) {
-    const error = 'one or more of the provided parameters are not defined'
+    const error = new Error('one or more of the provided parameters are not defined')
 
     log.error(error)
     throw errCode(error, ERRORS.ERR_UNDEFINED_PARAMETER)
@@ -241,10 +244,13 @@ const getIdKeys = (pid) => {
 const sign = (privateKey, value, validityType, validity) => {
   try {
     const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
-    return privateKey.sign(dataForSignature)
+
+    return promisify(privateKey.sign, {
+      context: privateKey
+    })(dataForSignature)
   } catch (error) {
     log.error('record signature creation failed')
-    throw errCode('record signature creation failed: ' + error.message, ERRORS.ERR_SIGNATURE_CREATION)
+    throw errCode(new Error('record signature creation failed: ' + error.message), ERRORS.ERR_SIGNATURE_CREATION)
   }
 }
 
@@ -254,7 +260,7 @@ const getValidityType = (validityType) => {
     return 'EOL'
   }
 
-  const error = `unrecognized validity type ${validityType.toString()}`
+  const error = new Error(`unrecognized validity type ${validityType.toString()}`)
   log.error(error)
   throw errCode(error, ERRORS.ERR_UNRECOGNIZED_VALIDITY)
 }
@@ -287,9 +293,7 @@ const validator = {
   validate: async (marshalledData, key) => {
     const receivedEntry = unmarshal(marshalledData)
     const bufferId = key.slice('/ipns/'.length)
-    let peerId
-
-    peerId = PeerId.createFromBytes(bufferId)
+    const peerId = PeerId.createFromBytes(bufferId)
 
     // extract public key
     const pubKey = extractPublicKey(peerId, receivedEntry)
