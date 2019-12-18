@@ -195,7 +195,6 @@ describe('ipns', function () {
     try {
       await ipns.validator.validate(marshalledData, key)
     } catch (err) {
-      console.log(err)
       expect(err.code).to.eql(ERRORS.ERR_UNDEFINED_PARAMETER)
       return
     }

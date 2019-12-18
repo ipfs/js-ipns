@@ -39,7 +39,7 @@
     "interface-datastore": "^0.8.0",
     "libp2p-crypto": "^0.17.1",
     "multihashes": "~0.4.14",
-    "peer-id": "^0.13.5",
+    "peer-id": "^0.13.6",
     "protons": "^1.0.1",
     "timestamp-nano": "^1.0.0"
   },
