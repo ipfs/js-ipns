@@ -1,3 +1,13 @@
+<a name="0.7.0"></a>
+# [0.7.0](https://github.com/ipfs/js-ipns/compare/v0.6.1...v0.7.0) (2019-12-18)
+
+
+### Bug Fixes
+
+* remove unused left-pad ([#30](https://github.com/ipfs/js-ipns/issues/30)) ([2ab0fbd](https://github.com/ipfs/js-ipns/commit/2ab0fbd))
+
+
+
 <a name="0.6.1"></a>
 ## [0.6.1](https://github.com/ipfs/js-ipns/compare/v0.6.0...v0.6.1) (2019-09-25)
 
