@@ -15,7 +15,6 @@ const ipfsHttpClient = require('ipfs-http-client')
 const DaemonFactory = require('ipfsd-ctl')
 const crypto = require('libp2p-crypto')
 const { fromB58String } = require('multihashes')
-const promisify = require('promisify-es6')
 
 const ipns = require('../src')
 const ERRORS = require('../src/errors')
@@ -37,9 +36,7 @@ describe('ipns', function () {
   let rsa = null
 
   before(async () => {
-    rsa = await promisify(crypto.keys.generateKeyPair, {
-      context: crypto.keys
-    })('RSA', 2048)
+    rsa = await crypto.keys.generateKeyPair('RSA', 2048)
     ipfsd = await df.spawn({ initOptions: { bits: 512 } })
     ipfs = ipfsd.api
     ipfsId = await ipfs.id()
@@ -180,9 +177,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const ed25519 = await promisify(crypto.keys.generateKeyPair, {
-      context: crypto.keys
-    })('ed25519', 2048)
+    const ed25519 = await crypto.keys.generateKeyPair('ed25519', 2048)
     const entry = await ipns.create(ed25519, cid, sequence, validity)
     const entryWithKey = ipns.embedPublicKey(ed25519.public, entry)
     expect(entryWithKey).to.not.exist() // Should be null

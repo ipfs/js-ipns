@@ -7,7 +7,6 @@ const crypto = require('libp2p-crypto')
 const PeerId = require('peer-id')
 const multihash = require('multihashes')
 const errCode = require('err-code')
-const promisify = require('promisify-es6')
 
 const debug = require('debug')
 const log = debug('jsipns')
@@ -92,9 +91,7 @@ const validate = async (publicKey, entry) => {
   // Validate Signature
   let isValid
   try {
-    isValid = await promisify(publicKey.verify, {
-      context: publicKey
-    })(dataForSignature, entry.signature)
+    isValid = await publicKey.verify(dataForSignature, entry.signature)
   } catch (err) {
     isValid = false
   }
@@ -149,7 +146,7 @@ const embedPublicKey = async (publicKey, entry) => {
   // Create a peer id from the public key.
   let peerId
   try {
-    peerId = await promisify(PeerId.createFromPubKey)(publicKey.bytes)
+    peerId = await PeerId.createFromPubKey(publicKey.bytes)
   } catch (err) {
     throw errCode(err, ERRORS.ERR_PEER_ID_FROM_PUBLIC_KEY)
   }
@@ -245,9 +242,7 @@ const sign = (privateKey, value, validityType, validity) => {
   try {
     const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
 
-    return promisify(privateKey.sign, {
-      context: privateKey
-    })(dataForSignature)
+    return privateKey.sign(dataForSignature)
   } catch (error) {
     log.error('record signature creation failed')
     throw errCode(new Error('record signature creation failed: ' + error.message), ERRORS.ERR_SIGNATURE_CREATION)
