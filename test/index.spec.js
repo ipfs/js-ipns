@@ -5,6 +5,7 @@ const chai = require('chai')
 const dirtyChai = require('dirty-chai')
 const chaiBytes = require('chai-bytes')
 const chaiString = require('chai-string')
+const { Buffer } = require('buffer')
 const expect = chai.expect
 chai.use(dirtyChai)
 chai.use(chaiBytes)
@@ -12,17 +13,17 @@ chai.use(chaiString)
 
 const ipfs = require('ipfs')
 const ipfsHttpClient = require('ipfs-http-client')
-const DaemonFactory = require('ipfsd-ctl')
+const { createFactory } = require('ipfsd-ctl')
 const crypto = require('libp2p-crypto')
 const { fromB58String } = require('multihashes')
 
 const ipns = require('../src')
 const ERRORS = require('../src/errors')
 
-const df = DaemonFactory.create({
+const ctl = createFactory({
   type: 'proc',
-  exec: ipfs,
-  IpfsClient: ipfsHttpClient
+  ipfsHttpModule: ipfsHttpClient,
+  ipfsModule: ipfs
 })
 
 describe('ipns', function () {
@@ -37,7 +38,7 @@ describe('ipns', function () {
 
   before(async () => {
     rsa = await crypto.keys.generateKeyPair('RSA', 2048)
-    ipfsd = await df.spawn({ initOptions: { bits: 512 } })
+    ipfsd = await ctl.spawn()
     ipfs = ipfsd.api
     ipfsId = await ipfs.id()
   })

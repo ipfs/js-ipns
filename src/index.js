@@ -1,12 +1,13 @@
 'use strict'
 
-const base32Encode = require('base32-encode')
 const NanoDate = require('timestamp-nano')
 const { Key } = require('interface-datastore')
 const crypto = require('libp2p-crypto')
 const PeerId = require('peer-id')
 const multihash = require('multihashes')
 const errCode = require('err-code')
+const { Buffer } = require('buffer')
+const multibase = require('multibase')
 
 const debug = require('debug')
 const log = debug('jsipns')
@@ -207,7 +208,7 @@ const extractPublicKey = (peerId, entry) => {
 }
 
 // rawStdEncoding with RFC4648
-const rawStdEncoding = (key) => base32Encode(key, 'RFC4648', { padding: false })
+const rawStdEncoding = (key) => multibase.encode('base32', key).toString().slice(1).toUpperCase()
 
 /**
  * Get key for storing the record locally.
