@@ -1,3 +1,13 @@
+<a name="0.7.1"></a>
+## [0.7.1](https://github.com/ipfs/js-ipns/compare/v0.7.0...v0.7.1) (2020-04-24)
+
+
+### Bug Fixes
+
+* add buffer and use multibase ([#34](https://github.com/ipfs/js-ipns/issues/34)) ([26eec66](https://github.com/ipfs/js-ipns/commit/26eec66))
+
+
+
 <a name="0.7.0"></a>
 # [0.7.0](https://github.com/ipfs/js-ipns/compare/v0.6.1...v0.7.0) (2019-12-18)
 
