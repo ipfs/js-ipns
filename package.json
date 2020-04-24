@@ -33,25 +33,26 @@
   },
   "homepage": "https://github.com/ipfs/js-ipns#readme",
   "dependencies": {
-    "base32-encode": "^1.1.0",
+    "buffer": "^5.6.0",
     "debug": "^4.1.1",
     "err-code": "^2.0.0",
     "interface-datastore": "^0.8.0",
     "libp2p-crypto": "^0.17.1",
+    "multibase": "^0.7.0",
     "multihashes": "~0.4.14",
     "peer-id": "^0.13.6",
     "protons": "^1.0.1",
     "timestamp-nano": "^1.0.0"
   },
   "devDependencies": {
-    "aegir": "^20.3.1",
+    "aegir": "^21.9.0",
     "chai": "^4.2.0",
     "chai-bytes": "~0.1.2",
     "chai-string": "^1.5.0",
     "dirty-chai": "^2.0.1",
-    "ipfs": "^0.37.1",
-    "ipfs-http-client": "^33.1.1",
-    "ipfsd-ctl": "^0.47.2"
+    "ipfs": "^0.43.0",
+    "ipfs-http-client": "^44.0.0",
+    "ipfsd-ctl": "^4.0.1"
   },
   "contributors": [
     "Alan Shaw <alan.shaw@protocol.ai>",
