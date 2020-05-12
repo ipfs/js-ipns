@@ -45,7 +45,7 @@
     "timestamp-nano": "^1.0.0"
   },
   "devDependencies": {
-    "aegir": "^21.9.0",
+    "aegir": "^22.0.0",
     "chai": "^4.2.0",
     "chai-bytes": "~0.1.2",
     "chai-string": "^1.5.0",
