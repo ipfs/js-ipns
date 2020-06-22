@@ -38,8 +38,8 @@
     "err-code": "^2.0.0",
     "interface-datastore": "^1.0.2",
     "libp2p-crypto": "^0.17.1",
-    "multibase": "^0.7.0",
-    "multihashes": "~0.4.14",
+    "multibase": "^1.0.1",
+    "multihashes": "^1.0.1",
     "peer-id": "^0.13.6",
     "protons": "^1.0.1",
     "timestamp-nano": "^1.0.0"
