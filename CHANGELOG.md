@@ -1,3 +1,13 @@
+<a name="0.7.3"></a>
+## [0.7.3](https://github.com/ipfs/js-ipns/compare/v0.7.2...v0.7.3) (2020-06-22)
+
+
+### Bug Fixes
+
+* key encoding ([#48](https://github.com/ipfs/js-ipns/issues/48)) ([7c6c672](https://github.com/ipfs/js-ipns/commit/7c6c672)), closes [ipfs/js-ipfs#2930](https://github.com/ipfs/js-ipfs/issues/2930)
+
+
+
 <a name="0.7.2"></a>
 ## [0.7.2](https://github.com/ipfs/js-ipns/compare/v0.7.1...v0.7.2) (2020-05-12)
 
