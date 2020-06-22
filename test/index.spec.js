@@ -10,6 +10,7 @@ const expect = chai.expect
 chai.use(dirtyChai)
 chai.use(chaiBytes)
 chai.use(chaiString)
+const { toB58String } = require('multihashes')
 
 const ipfs = require('ipfs')
 const ipfsHttpClient = require('ipfs-http-client')
@@ -155,6 +156,20 @@ describe('ipns', function () {
     expect(idKeys.pkKey).to.not.startsWith('/pk/')
     expect(idKeys.ipnsKey).to.not.startsWith('/ipns/')
     expect(idKeys.routingKey).to.not.startsWith('/ipns/')
+  })
+
+  it('should be able to turn routing key back into id', () => {
+    const keys = [
+      'QmQd5Enz5tzP8u5wHur8ADuJMbcNhEf86CkWkqRzoWUhst',
+      'QmW6mcoqDKJRch2oph2FmvZhPLJn6wPU648Vv9iMyMtmtG'
+    ]
+
+    keys.forEach(key => {
+      const { routingKey } = ipns.getIdKeys(fromB58String(key))
+      const id = toB58String(routingKey.toBuffer().slice(ipns.namespaceLength))
+
+      expect(id).to.equal(key)
+    })
   })
 
   it('should be able to embed a public key in an ipns record', async () => {
