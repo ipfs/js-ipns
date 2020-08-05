@@ -38,7 +38,7 @@
     "err-code": "^2.0.0",
     "interface-datastore": "^1.0.2",
     "libp2p-crypto": "^0.17.1",
-    "multibase": "^1.0.1",
+    "multibase": "^3.0.0",
     "multihashes": "^1.0.1",
     "peer-id": "^0.13.6",
     "protons": "^1.0.1",
