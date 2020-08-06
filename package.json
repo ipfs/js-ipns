@@ -41,7 +41,7 @@
     "multibase": "^3.0.0",
     "multihashes": "^3.0.1",
     "peer-id": "^0.13.6",
-    "protons": "^1.0.1",
+    "protons": "^2.0.0",
     "timestamp-nano": "^1.0.0"
   },
   "devDependencies": {
