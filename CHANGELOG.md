@@ -1,3 +1,8 @@
+<a name="0.7.4"></a>
+## [0.7.4](https://github.com/ipfs/js-ipns/compare/v0.7.3...v0.7.4) (2020-08-06)
+
+
+
 <a name="0.7.3"></a>
 ## [0.7.3](https://github.com/ipfs/js-ipns/compare/v0.7.2...v0.7.3) (2020-06-22)
 
