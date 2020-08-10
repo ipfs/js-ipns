@@ -40,7 +40,7 @@
     "libp2p-crypto": "^0.17.1",
     "multibase": "^3.0.0",
     "multihashes": "^3.0.1",
-    "peer-id": "^0.13.6",
+    "peer-id": "^0.14.0",
     "protons": "^1.0.1",
     "timestamp-nano": "^1.0.0"
   },
