@@ -33,26 +33,26 @@
   },
   "homepage": "https://github.com/ipfs/js-ipns#readme",
   "dependencies": {
-    "buffer": "^5.6.0",
     "debug": "^4.1.1",
     "err-code": "^2.0.0",
-    "interface-datastore": "^1.0.2",
+    "interface-datastore": "^2.0.0",
     "libp2p-crypto": "^0.17.1",
     "multibase": "^3.0.0",
     "multihashes": "^3.0.1",
-    "peer-id": "^0.13.6",
-    "protons": "^1.0.1",
-    "timestamp-nano": "^1.0.0"
+    "peer-id": "^0.14.0",
+    "protons": "^2.0.0",
+    "timestamp-nano": "^1.0.0",
+    "uint8arrays": "^1.1.0"
   },
   "devDependencies": {
-    "aegir": "^23.0.0",
+    "aegir": "^25.1.0",
     "chai": "^4.2.0",
     "chai-bytes": "~0.1.2",
     "chai-string": "^1.5.0",
     "dirty-chai": "^2.0.1",
     "ipfs": "^0.49.0",
     "ipfs-http-client": "^46.0.0",
-    "ipfsd-ctl": "^4.0.1"
+    "ipfsd-ctl": "^6.0.0"
   },
   "contributors": [
     "Vasco Santos <vasco.santos@moxy.studio>",

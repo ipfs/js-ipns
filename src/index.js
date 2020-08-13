@@ -8,6 +8,9 @@ const multihash = require('multihashes')
 const errCode = require('err-code')
 const { Buffer } = require('buffer')
 const multibase = require('multibase')
+const uint8ArrayFromString = require('uint8arrays/from-string')
+const uint8ArrayToString = require('uint8arrays/to-string')
+const uint8ArrayConcat = require('uint8arrays/concat')
 
 const debug = require('debug')
 const log = debug('jsipns')
@@ -25,7 +28,7 @@ const namespace = '/ipns/'
  * IPNS entry
  * @typedef {Object} IpnsEntry
  * @property {string} value - value to be stored in the record
- * @property {Buffer} signature - signature of the record
+ * @property {Uint8Array} signature - signature of the record
  * @property {number} validityType - Type of validation being used
  * @property {string} validity - expiration datetime for the record in RFC3339 format
  * @property {number} sequence - number representing the version of the record
@@ -67,10 +70,10 @@ const _create = async (privateKey, value, seq, isoValidity, validityType) => {
   const signature = await sign(privateKey, value, validityType, isoValidity)
 
   const entry = {
-    value: value,
+    value: uint8ArrayFromString(value),
     signature: signature,
     validityType: validityType,
-    validity: isoValidity,
+    validity: uint8ArrayFromString(isoValidity),
     sequence: seq
   }
 
@@ -106,7 +109,7 @@ const validate = async (publicKey, entry) => {
     let validityDate
 
     try {
-      validityDate = parseRFC3339(validity.toString())
+      validityDate = parseRFC3339(uint8ArrayToString(validity))
     } catch (e) {
       log.error('unrecognized validity format (not an rfc3339 format)')
       throw errCode(new Error('unrecognized validity format (not an rfc3339 format)'), ERRORS.ERR_UNRECOGNIZED_FORMAT)
@@ -193,7 +196,7 @@ const extractPublicKey = (peerId, entry) => {
   if (entry.pubKey) {
     let pubKey
     try {
-      pubKey = crypto.keys.unmarshalPublicKey(entry.pubKey)
+      pubKey = crypto.keys.unmarshalPublicKey(Buffer.from(entry.pubKey))
     } catch (err) {
       log.error(err)
       throw err
@@ -214,7 +217,7 @@ const rawStdEncoding = (key) => multibase.encode('base32', key).toString().slice
  * Get key for storing the record locally.
  * Format: /ipns/${base32(<HASH>)}
  *
- * @param {Buffer} key peer identifier object.
+ * @param {Uint8Array} key peer identifier object.
  * @returns {string}
  */
 const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
@@ -223,18 +226,18 @@ const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
  * Get key for sharing the record in the routing mechanism.
  * Format: ${base32(/ipns/<HASH>)}, ${base32(/pk/<HASH>)}
  *
- * @param {Buffer} pid peer identifier represented by the multihash of the public key as Buffer.
+ * @param {Uint8Array} pid peer identifier represented by the multihash of the public key as Uint8Array.
  * @returns {Object} containing the `nameKey` and the `ipnsKey`.
  */
 const getIdKeys = (pid) => {
-  const pkBuffer = Buffer.from('/pk/')
-  const ipnsBuffer = Buffer.from('/ipns/')
+  const pkBuffer = uint8ArrayFromString('/pk/')
+  const ipnsBuffer = uint8ArrayFromString('/ipns/')
 
   return {
-    routingPubKey: new Key(Buffer.concat([pkBuffer, pid]), false), // Added on https://github.com/ipfs/js-ipns/pull/8#issue-213857876 (pkKey will be deprecated in a future release)
-    pkKey: new Key(rawStdEncoding(Buffer.concat([pkBuffer, pid]))),
-    routingKey: new Key(Buffer.concat([ipnsBuffer, pid]), false), // Added on https://github.com/ipfs/js-ipns/pull/6#issue-213631461 (ipnsKey will be deprecated in a future release)
-    ipnsKey: new Key(rawStdEncoding(Buffer.concat([ipnsBuffer, pid])))
+    routingPubKey: new Key(uint8ArrayConcat([pkBuffer, pid]), false), // Added on https://github.com/ipfs/js-ipns/pull/8#issue-213857876 (pkKey will be deprecated in a future release)
+    pkKey: new Key(rawStdEncoding(uint8ArrayConcat([pkBuffer, pid]))),
+    routingKey: new Key(uint8ArrayConcat([ipnsBuffer, pid]), false), // Added on https://github.com/ipfs/js-ipns/pull/6#issue-213631461 (ipnsKey will be deprecated in a future release)
+    ipnsKey: new Key(rawStdEncoding(uint8ArrayConcat([ipnsBuffer, pid])))
   }
 }
 
@@ -263,11 +266,17 @@ const getValidityType = (validityType) => {
 
 // Utility for creating the record data for being signed
 const ipnsEntryDataForSig = (value, validityType, validity) => {
-  const valueBuffer = Buffer.from(value)
-  const validityTypeBuffer = Buffer.from(getValidityType(validityType))
-  const validityBuffer = Buffer.from(validity)
+  if (!(value instanceof Uint8Array)) {
+    value = uint8ArrayFromString(value)
+  }
 
-  return Buffer.concat([valueBuffer, validityBuffer, validityTypeBuffer])
+  if (!(validity instanceof Uint8Array)) {
+    validity = uint8ArrayFromString(validity)
+  }
+
+  const validityTypeBuffer = uint8ArrayFromString(getValidityType(validityType))
+
+  return uint8ArrayConcat([value, validity, validityTypeBuffer])
 }
 
 // Utility for extracting the public key from a peer-id

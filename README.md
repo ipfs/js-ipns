@@ -1,4 +1,4 @@
-# IPNS
+# IPNS <!-- omit in toc -->
 
 [![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://protocol.ai)
 [![](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io/)
@@ -12,20 +12,30 @@
 
 This module contains all the necessary code for creating, understanding and validating IPNS records.
 
-## Lead Maintainer
+## Lead Maintainer <!-- omit in toc -->
 
 [Vasco Santos](https://github.com/vasco-santos).
 
-## Table of Contents
+## Table of Contents <!-- omit in toc -->
 
-- [Install](#install)
 - [Usage](#usage)
-  - [Create Record](#create-record)
-  - [Validate Record](#validate-record)
-  - [Embed public key to record](#embed-public-key-to-record)
-  - [Extract public key from record](#extract-public-key-from-record)
-  - [Datastore key](#datastore-key)
+    - [Create record](#create-record)
+    - [Validate record](#validate-record)
+    - [Embed public key to record](#embed-public-key-to-record)
+    - [Extract public key from record](#extract-public-key-from-record)
+    - [Datastore key](#datastore-key)
+    - [Marshal data with proto buffer](#marshal-data-with-proto-buffer)
+    - [Unmarshal data from proto buffer](#unmarshal-data-from-proto-buffer)
+    - [Validator](#validator)
 - [API](#api)
+    - [Create record](#create-record-1)
+    - [Validate record](#validate-record-1)
+    - [Datastore key](#datastore-key-1)
+    - [Marshal data with proto buffer](#marshal-data-with-proto-buffer-1)
+    - [Unmarshal data from proto buffer](#unmarshal-data-from-proto-buffer-1)
+    - [Embed public key to record](#embed-public-key-to-record-1)
+    - [Extract public key from record](#extract-public-key-from-record-1)
+    - [Namespace](#namespace)
 - [Contribute](#contribute)
 - [License](#license)
 
@@ -136,13 +146,13 @@ Create an IPNS record for being stored in a protocol buffer.
 - `lifetime` (string): lifetime of the record (in milliseconds).
 
 Returns a `Promise` that resolves to an object with the entry's properties eg:
-  
+
 ```js
 {
-  value: '/ipfs/QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq',
-  signature: Buffer,
+  value: Uint8Array,
+  signature: Uint8Array,
   validityType: 0,
-  validity: '2018-06-27T14:49:14.074000000Z',
+  validity: Uint8Array,
   sequence: 2
 }
 ```
@@ -189,7 +199,7 @@ const data = ipns.unmarshal(storedData)
 
 Returns the entry data structure after being serialized.
 
-- `storedData` (Buffer): ipns entry record serialized.
+- `storedData` (Uint8Array): ipns entry record serialized.
 
 #### Embed public key to record
 
