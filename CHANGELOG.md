@@ -1,3 +1,20 @@
+<a name="0.8.0"></a>
+# [0.8.0](https://github.com/ipfs/js-ipns/compare/v0.7.4...v0.8.0) (2020-08-14)
+
+
+### Bug Fixes
+
+* replace node buffers with uint8arrays ([#67](https://github.com/ipfs/js-ipns/issues/67)) ([06ee535](https://github.com/ipfs/js-ipns/commit/06ee535))
+
+
+### BREAKING CHANGES
+
+* - All deps of this module use Uint8Arrays instead of Buffers
+- value and validity fields of IPNSEntries are now Uint8Arrays instead
+  of Strings as they are `bytes` in the protobuf definition
+
+
+
 <a name="0.7.4"></a>
 ## [0.7.4](https://github.com/ipfs/js-ipns/compare/v0.7.3...v0.7.4) (2020-08-06)
 
