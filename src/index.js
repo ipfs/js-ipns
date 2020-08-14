@@ -6,7 +6,6 @@ const crypto = require('libp2p-crypto')
 const PeerId = require('peer-id')
 const multihash = require('multihashes')
 const errCode = require('err-code')
-const { Buffer } = require('buffer')
 const multibase = require('multibase')
 const uint8ArrayFromString = require('uint8arrays/from-string')
 const uint8ArrayToString = require('uint8arrays/to-string')
@@ -196,7 +195,7 @@ const extractPublicKey = (peerId, entry) => {
   if (entry.pubKey) {
     let pubKey
     try {
-      pubKey = crypto.keys.unmarshalPublicKey(Buffer.from(entry.pubKey))
+      pubKey = crypto.keys.unmarshalPublicKey(entry.pubKey)
     } catch (err) {
       log.error(err)
       throw err
