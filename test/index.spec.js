@@ -5,12 +5,12 @@ const chai = require('chai')
 const dirtyChai = require('dirty-chai')
 const chaiBytes = require('chai-bytes')
 const chaiString = require('chai-string')
-const { Buffer } = require('buffer')
 const expect = chai.expect
 chai.use(dirtyChai)
 chai.use(chaiBytes)
 chai.use(chaiString)
 const { toB58String } = require('multihashes')
+const uint8ArrayFromString = require('uint8arrays/from-string')
 
 const ipfs = require('ipfs')
 const ipfsHttpClient = require('ipfs-http-client')
@@ -56,7 +56,7 @@ describe('ipns', function () {
 
     const entry = await ipns.create(rsa, cid, sequence, validity)
     expect(entry).to.deep.include({
-      value: cid,
+      value: uint8ArrayFromString(cid),
       sequence: sequence
     })
     expect(entry).to.have.a.property('validity')
@@ -73,7 +73,7 @@ describe('ipns', function () {
 
     await ipns.validate(rsa.public, entry)
     expect(entry).to.have.a.property('validity')
-    expect(entry.validity).to.equal('2033-05-18T03:33:20.000000000Z')
+    expect(entry.validity).to.equalBytes(uint8ArrayFromString('2033-05-18T03:33:20.000000000Z'))
   })
 
   it('should create an ipns record and validate it correctly', async () => {
@@ -129,8 +129,8 @@ describe('ipns', function () {
     const marshalledData = ipns.marshal(entryDataCreated)
     const unmarshalledData = ipns.unmarshal(marshalledData)
 
-    expect(entryDataCreated.value).to.equal(unmarshalledData.value.toString())
-    expect(entryDataCreated.validity).to.equal(unmarshalledData.validity.toString())
+    expect(entryDataCreated.value).to.equalBytes(unmarshalledData.value)
+    expect(entryDataCreated.validity).to.equalBytes(unmarshalledData.validity)
     expect(entryDataCreated.validityType).to.equal(unmarshalledData.validityType)
     expect(entryDataCreated.signature).to.equalBytes(unmarshalledData.signature)
     expect(entryDataCreated.sequence).to.equal(unmarshalledData.sequence)
@@ -166,7 +166,7 @@ describe('ipns', function () {
 
     keys.forEach(key => {
       const { routingKey } = ipns.getIdKeys(fromB58String(key))
-      const id = toB58String(routingKey.toBuffer().slice(ipns.namespaceLength))
+      const id = toB58String(routingKey.uint8Array().subarray(ipns.namespaceLength))
 
       expect(id).to.equal(key)
     })
@@ -206,7 +206,7 @@ describe('ipns', function () {
     const entry = await ipns.create(rsa, cid, sequence, validity)
 
     const marshalledData = ipns.marshal(entry)
-    const key = Buffer.from(`/ipns/${ipfsId.id}`)
+    const key = uint8ArrayFromString(`/ipns/${ipfsId.id}`)
 
     try {
       await ipns.validator.validate(marshalledData, key)
@@ -235,7 +235,7 @@ describe('ipns', function () {
     await ipns.embedPublicKey(rsa.public, entry)
 
     const marshalledData = ipns.marshal(entry)
-    const key = Buffer.from(`/ipns/${ipfsId.id}`)
+    const key = uint8ArrayFromString(`/ipns/${ipfsId.id}`)
 
     const valid = await ipns.validator.validate(marshalledData, key)
     expect(valid).to.equal(true)
@@ -249,9 +249,9 @@ describe('ipns', function () {
     await ipns.embedPublicKey(rsa.public, entry)
 
     // corrupt the record by changing the value to random bytes
-    entry.value = crypto.randomBytes(46).toString()
+    entry.value = crypto.randomBytes(46)
     const marshalledData = ipns.marshal(entry)
-    const key = Buffer.from(`/ipns/${ipfsId.id}`)
+    const key = uint8ArrayFromString(`/ipns/${ipfsId.id}`)
 
     try {
       await ipns.validator.validate(marshalledData, key)
