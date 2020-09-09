@@ -45,7 +45,7 @@
     "uint8arrays": "^1.1.0"
   },
   "devDependencies": {
-    "aegir": "^25.1.0",
+    "aegir": "^26.0.0",
     "chai": "^4.2.0",
     "chai-bytes": "~0.1.2",
     "chai-string": "^1.5.0",
