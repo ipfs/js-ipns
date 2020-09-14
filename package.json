@@ -52,7 +52,7 @@
     "dirty-chai": "^2.0.1",
     "ipfs": "^0.49.0",
     "ipfs-http-client": "^47.0.1",
-    "ipfsd-ctl": "^6.0.0"
+    "ipfsd-ctl": "^7.0.0"
   },
   "contributors": [
     "Vasco Santos <vasco.santos@moxy.studio>",
