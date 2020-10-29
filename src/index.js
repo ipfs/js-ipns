@@ -25,6 +25,7 @@ const namespace = '/ipns/'
 
 /**
  * IPNS entry
+ *
  * @typedef {Object} IpnsEntry
  * @property {string} value - value to be stored in the record
  * @property {Uint8Array} signature - signature of the record
@@ -38,10 +39,10 @@ const namespace = '/ipns/'
  * The ipns entry validity should follow the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
  *
- * @param {Object} privateKey private key for signing the record.
- * @param {string} value value to be stored in the record.
- * @param {number} seq number representing the current version of the record.
- * @param {number|string} lifetime lifetime of the record (in milliseconds).
+ * @param {Object} privateKey - private key for signing the record.
+ * @param {string} value - value to be stored in the record.
+ * @param {number} seq - number representing the current version of the record.
+ * @param {number|string} lifetime - lifetime of the record (in milliseconds).
  * @returns {Promise<IpnsEntry>} entry
  */
 const create = (privateKey, value, seq, lifetime) => {
@@ -54,10 +55,11 @@ const create = (privateKey, value, seq, lifetime) => {
 /**
  * Same as create(), but instead of generating a new Date, it receives the intended expiration time
  * WARNING: nano precision is not standard, make sure the value in seconds is 9 orders of magnitude lesser than the one provided.
- * @param {Object} privateKey private key for signing the record.
- * @param {string} value value to be stored in the record.
- * @param {number} seq number representing the current version of the record.
- * @param {string} expiration expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
+ *
+ * @param {Object} privateKey - private key for signing the record.
+ * @param {string} value - value to be stored in the record.
+ * @param {number} seq - number representing the current version of the record.
+ * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * @returns {Promise<IpnsEntry>} entry
  */
 const createWithExpiration = (privateKey, value, seq, expiration) => {
@@ -83,8 +85,8 @@ const _create = async (privateKey, value, seq, isoValidity, validityType) => {
 /**
  * Validates the given ipns entry against the given public key.
  *
- * @param {Object} publicKey public key for validating the record.
- * @param {IpnsEntry} entry ipns entry record.
+ * @param {Object} publicKey - public key for validating the record.
+ * @param {IpnsEntry} entry - ipns entry record.
  * @returns {Promise}
  */
 const validate = async (publicKey, entry) => {
@@ -135,9 +137,9 @@ const validate = async (publicKey, entry) => {
  * send this as part of the record itself. For newer ed25519 keys, the public key
  * can be embedded in the peerId.
  *
- * @param {Object} publicKey public key to embed.
- * @param {Object} entry ipns entry record.
- * @return {IpnsEntry} entry with public key embedded
+ * @param {Object} publicKey - public key to embed.
+ * @param {Object} entry - ipns entry record.
+ * @returns {IpnsEntry} entry with public key embedded
  */
 const embedPublicKey = async (publicKey, entry) => {
   if (!publicKey || !publicKey.bytes || !entry) {
@@ -180,8 +182,8 @@ const embedPublicKey = async (publicKey, entry) => {
 /**
  * Extracts a public key matching `pid` from the ipns record.
  *
- * @param {Object} peerId peer identifier object.
- * @param {IpnsEntry} entry ipns entry record.
+ * @param {Object} peerId - peer identifier object.
+ * @param {IpnsEntry} entry - ipns entry record.
  * @returns {Object} the public key
  */
 const extractPublicKey = (peerId, entry) => {
@@ -216,7 +218,7 @@ const rawStdEncoding = (key) => multibase.encode('base32', key).toString().slice
  * Get key for storing the record locally.
  * Format: /ipns/${base32(<HASH>)}
  *
- * @param {Uint8Array} key peer identifier object.
+ * @param {Uint8Array} key - peer identifier object.
  * @returns {string}
  */
 const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
@@ -225,7 +227,7 @@ const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
  * Get key for sharing the record in the routing mechanism.
  * Format: ${base32(/ipns/<HASH>)}, ${base32(/pk/<HASH>)}
  *
- * @param {Uint8Array} pid peer identifier represented by the multihash of the public key as Uint8Array.
+ * @param {Uint8Array} pid - peer identifier represented by the multihash of the public key as Uint8Array.
  * @returns {Object} containing the `nameKey` and the `ipnsKey`.
  */
 const getIdKeys = (pid) => {
