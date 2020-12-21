@@ -42,7 +42,7 @@
     "peer-id": "^0.14.2",
     "protons": "^2.0.0",
     "timestamp-nano": "^1.0.0",
-    "uint8arrays": "^1.1.0"
+    "uint8arrays": "^2.0.5"
   },
   "devDependencies": {
     "aegir": "^30.2.0",
