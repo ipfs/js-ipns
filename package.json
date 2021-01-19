@@ -1,6 +1,6 @@
 {
   "name": "ipns",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "ipns record definitions",
   "leadMaintainer": "Vasco Santos <vasco.santos@moxy.studio>",
   "main": "src/index.js",
