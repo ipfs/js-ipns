@@ -50,7 +50,7 @@
     "chai-bytes": "~0.1.2",
     "chai-string": "^1.5.0",
     "dirty-chai": "^2.0.1",
-    "ipfs": "^0.53.0",
+    "ipfs": "^0.54.1",
     "ipfs-http-client": "^48.1.0",
     "ipfsd-ctl": "^7.0.3"
   },
