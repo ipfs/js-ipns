@@ -34,7 +34,7 @@
   "homepage": "https://github.com/ipfs/js-ipns#readme",
   "dependencies": {
     "debug": "^4.2.0",
-    "err-code": "^2.0.3",
+    "err-code": "^3.0.0",
     "interface-datastore": "^3.0.1",
     "libp2p-crypto": "^0.19.0",
     "multibase": "^3.0.1",
