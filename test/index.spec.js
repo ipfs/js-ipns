@@ -11,42 +11,30 @@ chai.use(chaiBytes)
 chai.use(chaiString)
 const { toB58String } = require('multihashes')
 const uint8ArrayFromString = require('uint8arrays/from-string')
+const PeerId = require('peer-id')
 
-const ipfs = require('ipfs')
-const ipfsHttpClient = require('ipfs-http-client')
-const { createFactory } = require('ipfsd-ctl')
 const crypto = require('libp2p-crypto')
 const { fromB58String } = require('multihashes')
 
 const ipns = require('../src')
 const ERRORS = require('../src/errors')
 
-const ctl = createFactory({
-  type: 'proc',
-  ipfsHttpModule: ipfsHttpClient,
-  ipfsModule: ipfs
-})
-
 describe('ipns', function () {
   this.timeout(20 * 1000)
 
   const cid = 'QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq'
 
-  let ipfs = null
-  let ipfsd = null
-  let ipfsId = null
-  let rsa = null
+  /** @type {{ id: string, publicKey: string }} */
+  let ipfsId
+  /** @type {import('libp2p-crypto').keys.supportedKeys.rsa.RsaPrivateKey} */
+  let rsa
 
   before(async () => {
     rsa = await crypto.keys.generateKeyPair('RSA', 2048)
-    ipfsd = await ctl.spawn()
-    ipfs = ipfsd.api
-    ipfsId = await ipfs.id()
-  })
 
-  after(async () => {
-    if (ipfsd) {
-      await ipfsd.stop()
+    ipfsId = {
+      id: 'QmQ73f8hbM4hKwRYBqeUsPtiwfE2x6WPv9WnzaYt4nYcXf',
+      publicKey: 'CAASpgIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUOR0AJ2/yO0S/JIkKmYV/QdHzQXi1nrTCCXtEbUDVW5mXZfNf9bKeNDfW3UIIOwVzV6/sRhJqq/8sQAhmzURj1q2onCKgSLzjdePSLtykolQeQGSD+JO7rcxOLx+sTdIyJiclP/tkK2gfo2nrI6pjFTKNzR8VSoJx7gfiqY1N9LBgDsD4WjaOM2pBgzgVUlXpk27Aqvcd+htSWi6JuIZaBhPY/IzEvXwntGH9k7F8VkT6nUBilhqFFSWnz8cNKToCHjyhoozKfqN89S7EGMiNvG4cX4Dc/nVXlZRTAi4PNNewutimujROy2/tNEquC2uAlcAzhRAcLL/ujhEjJYP1AgMBAAE='
     }
   })
 
@@ -59,9 +47,9 @@ describe('ipns', function () {
       value: uint8ArrayFromString(cid),
       sequence: sequence
     })
-    expect(entry).to.have.a.property('validity')
-    expect(entry).to.have.a.property('signature')
-    expect(entry).to.have.a.property('validityType')
+    expect(entry).to.have.property('validity')
+    expect(entry).to.have.property('signature')
+    expect(entry).to.have.property('validityType')
   })
 
   it('should be able to create a record with a fixed expiration', async () => {
@@ -72,7 +60,7 @@ describe('ipns', function () {
     const entry = await ipns.createWithExpiration(rsa, cid, sequence, expiration)
 
     await ipns.validate(rsa.public, entry)
-    expect(entry).to.have.a.property('validity')
+    expect(entry).to.have.property('validity')
     expect(entry.validity).to.equalBytes(uint8ArrayFromString('2033-05-18T03:33:20.000000000Z'))
   })
 
@@ -91,7 +79,7 @@ describe('ipns', function () {
     const entry = await ipns.create(rsa, cid, sequence, validity)
 
     // corrupt the record by changing the value to random bytes
-    entry.value = crypto.randomBytes(46).toString()
+    entry.value = crypto.randomBytes(46)
 
     try {
       await ipns.validate(rsa.public, entry)
@@ -148,10 +136,10 @@ describe('ipns', function () {
     const idKeys = ipns.getIdKeys(fromB58String(ipfsId.id))
 
     expect(idKeys).to.exist()
-    expect(idKeys).to.have.a.property('routingPubKey')
-    expect(idKeys).to.have.a.property('pkKey')
-    expect(idKeys).to.have.a.property('ipnsKey')
-    expect(idKeys).to.have.a.property('routingKey')
+    expect(idKeys).to.have.property('routingPubKey')
+    expect(idKeys).to.have.property('pkKey')
+    expect(idKeys).to.have.property('ipnsKey')
+    expect(idKeys).to.have.property('routingKey')
     expect(idKeys.routingPubKey).to.not.startsWith('/pk/')
     expect(idKeys.pkKey).to.not.startsWith('/pk/')
     expect(idKeys.ipnsKey).to.not.startsWith('/ipns/')
@@ -223,7 +211,7 @@ describe('ipns', function () {
 
     const entry = await ipns.create(rsa, cid, sequence, validity)
     await ipns.embedPublicKey(rsa.public, entry)
-    const publicKey = ipns.extractPublicKey(ipfsId, entry)
+    const publicKey = ipns.extractPublicKey(PeerId.createFromB58String(ipfsId.id), entry)
     expect(publicKey.bytes).to.equalBytes(rsa.public.bytes)
   })
 

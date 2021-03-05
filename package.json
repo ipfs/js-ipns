@@ -5,7 +5,11 @@
   "leadMaintainer": "Vasco Santos <vasco.santos@moxy.studio>",
   "main": "src/index.js",
   "scripts": {
-    "build": "aegir build",
+    "prepare": "run-s prepare:*",
+    "prepare:proto": "pbjs -t static-module -w commonjs --force-number --no-verify --no-delimited --no-create --no-beautify --no-defaults --lint eslint-disable -o src/pb/ipns.js src/pb/ipns.proto",
+    "prepare:proto-types": "pbts -o src/pb/ipns.d.ts src/pb/ipns.js",
+    "prepare:types": "aegir build --no-bundle",
+    "prepublishOnly": "aegir build",
     "lint": "aegir lint",
     "release": "aegir release",
     "release-minor": "aegir release --type minor",
@@ -37,22 +41,22 @@
     "err-code": "^3.0.1",
     "interface-datastore": "^3.0.1",
     "libp2p-crypto": "^0.19.0",
-    "multibase": "^3.0.1",
-    "multihashes": "^3.0.1",
+    "multibase": "^4.0.2",
+    "multihashes": "^4.0.2",
     "peer-id": "^0.14.2",
-    "protons": "^2.0.0",
+    "protobufjs": "^6.10.2",
     "timestamp-nano": "^1.0.0",
     "uint8arrays": "^2.0.5"
   },
   "devDependencies": {
-    "aegir": "^30.2.0",
+    "@types/chai-string": "^1.4.2",
+    "@types/debug": "^4.1.5",
+    "aegir": "^31.0.4",
     "chai": "^4.2.0",
     "chai-bytes": "~0.1.2",
     "chai-string": "^1.5.0",
     "dirty-chai": "^2.0.1",
-    "ipfs": "^0.54.2",
-    "ipfs-http-client": "^49.0.2",
-    "ipfsd-ctl": "^7.0.3"
+    "npm-run-all": "^4.1.5"
   },
   "contributors": [
     "Vasco Santos <vasco.santos@moxy.studio>",

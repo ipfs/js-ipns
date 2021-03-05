@@ -1,9 +1,3 @@
-'use strict'
-
-const protons = require('protons')
-
-/* eslint-disable no-tabs */
-const message = `
 message IpnsEntry {
   enum ValidityType {
 		EOL = 0; // setting an EOL says "this record is valid until..."
@@ -25,6 +19,3 @@ message IpnsEntry {
 	// peerID, making this field unnecessary.
 	optional bytes pubKey = 7;
 }
-`
-
-module.exports = protons(message).IpnsEntry
