@@ -1,3 +1,12 @@
+# [0.9.0](https://github.com/ipfs/js-ipns/compare/v0.8.2...v0.9.0) (2021-03-05)
+
+
+### Features
+
+* add types ([#106](https://github.com/ipfs/js-ipns/issues/106)) ([135552b](https://github.com/ipfs/js-ipns/commit/135552b3e0bcaa1b625d2b6789ff481e40b1c107))
+
+
+
 ## [0.8.2](https://github.com/ipfs/js-ipns/compare/v0.8.1...v0.8.2) (2021-01-19)
 
 
