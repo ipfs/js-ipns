@@ -1,1027 +1,332 @@
 <!doctype html>
-<html lang="en">
+<html class="default no-js">
 <head>
-  <meta charset='utf-8'>
-  <title>ipns 0.8.0 | Documentation</title>
-  <meta name='description' content='ipns record definitions'>
-  <meta name='viewport' content='width=device-width,initial-scale=1'>
-  <link href='assets/bass.css' rel='stylesheet'>
-  <link href='assets/style.css' rel='stylesheet'>
-  <link href='assets/github.css' rel='stylesheet'>
-  <link href='assets/split.css' rel='stylesheet'>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>ipns - v0.9.0</title>
+	<meta name="description" content="Documentation for ipns - v0.9.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
 </head>
-<body class='documentation m0'>
-    <div class='flex'>
-      <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
-        <div class='py1 px2'>
-          <h3 class='mb0 no-anchor'>ipns</h3>
-          <div class='mb1'><code>0.8.0</code></div>
-          <input
-            placeholder='Filter'
-            id='filter-input'
-            class='col12 block input'
-            spellcheck='false'
-            autocapitalize='off'
-            autocorrect='off'
-            type='text' />
-          <div id='toc'>
-            <ul class='list-reset h5 py1-ul'>
-              
-                
-                <li><a
-                  href='#ipnsentry'
-                  class="">
-                  IpnsEntry
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#create'
-                  class="">
-                  create
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#createwithexpiration'
-                  class="">
-                  createWithExpiration
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#validate'
-                  class="">
-                  validate
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#embedpublickey'
-                  class="">
-                  embedPublicKey
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#extractpublickey'
-                  class="">
-                  extractPublicKey
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#getlocalkey'
-                  class="">
-                  getLocalKey
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#getidkeys'
-                  class="">
-                  getIdKeys
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#torfc3339'
-                  class="">
-                  toRFC3339
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#parserfc3339'
-                  class="">
-                  parseRFC3339
-                  
-                </a>
-                
-                </li>
-              
-            </ul>
-          </div>
-          <div class='mt1 h6 quiet'>
-            <a href='https://documentation.js.org/reading-documentation.html'>Need help reading this?</a>
-          </div>
-        </div>
-      </div>
-      <div id='split-right' class='relative overflow-auto height-viewport-100'>
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='ipnsentry'>
-      IpnsEntry
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-ipns/blob/4d1aff1efd1035f2903f339b5c66d3ffcfdaf302/src/index.js#L26-L34'>
-      <span>src/index.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>IPNS entry</p>
-
-    <div class='pre p1 fill-light mt0'>IpnsEntry</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>value</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : value to be stored in the record
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>signature</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a>)</code>
-          : signature of the record
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>validityType</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
-          : Type of validation being used
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>validity</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : expiration datetime for the record in RFC3339 format
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>sequence</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
-          : number representing the version of the record
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='create'>
-      create
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-ipns/blob/4d1aff1efd1035f2903f339b5c66d3ffcfdaf302/src/index.js#L47-L52'>
-      <span>src/index.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Creates a new ipns entry and signs it with the given private key.
-The ipns entry validity should follow the [RFC3339]<a href="https://www.ietf.org/rfc/rfc3339.txt">https://www.ietf.org/rfc/rfc3339.txt</a> with nanoseconds precision.
-Note: This function does not embed the public key. If you want to do that, use <code>EmbedPublicKey</code>.</p>
-
-    <div class='pre p1 fill-light mt0'>create</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    private key for signing the record.
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>value</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    value to be stored in the record.
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>seq</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
-	    number representing the current version of the record.
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>lifetime</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>))</code>
-	    lifetime of the record (in milliseconds).
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="#ipnsentry">IpnsEntry</a>></code>:
-        entry
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='createwithexpiration'>
-      createWithExpiration
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-ipns/blob/4d1aff1efd1035f2903f339b5c66d3ffcfdaf302/src/index.js#L63-L66'>
-      <span>src/index.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Same as create(), but instead of generating a new Date, it receives the intended expiration time
-WARNING: nano precision is not standard, make sure the value in seconds is 9 orders of magnitude lesser than the one provided.</p>
-
-    <div class='pre p1 fill-light mt0'>createWithExpiration</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    private key for signing the record.
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>value</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    value to be stored in the record.
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>seq</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
-	    number representing the current version of the record.
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>expiration</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    expiration datetime for record in the 
-[RFC3339]
-<a href="https://www.ietf.org/rfc/rfc3339.txt">https://www.ietf.org/rfc/rfc3339.txt</a>
- with nanoseconds precision.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="#ipnsentry">IpnsEntry</a>></code>:
-        entry
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='validate'>
-      validate
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-ipns/blob/4d1aff1efd1035f2903f339b5c66d3ffcfdaf302/src/index.js#L90-L127'>
-      <span>src/index.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Validates the given ipns entry against the given public key.</p>
-
-    <div class='pre p1 fill-light mt0'>validate</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>publicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    public key for validating the record.
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>entry</span> <code class='quiet'>(<a href="#ipnsentry">IpnsEntry</a>)</code>
-	    ipns entry record.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='embedpublickey'>
-      embedPublicKey
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-ipns/blob/4d1aff1efd1035f2903f339b5c66d3ffcfdaf302/src/index.js#L142-L178'>
-      <span>src/index.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Embed the given public key in the given entry. While not strictly required,
-some nodes (eg. DHT servers) may reject IPNS entries that don't embed their
-public keys as they may not be able to validate them efficiently.
-As a consequence of nodes needing to validade a record upon receipt, they need
-the public key associated with it. For olde RSA keys, it is easier if we just
-send this as part of the record itself. For newer ed25519 keys, the public key
-can be embedded in the peerId.</p>
-
-    <div class='pre p1 fill-light mt0'>embedPublicKey</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>publicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    public key to embed.
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>entry</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    ipns entry record.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="#ipnsentry">IpnsEntry</a></code>:
-        entry with public key embedded
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='extractpublickey'>
-      extractPublicKey
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-ipns/blob/4d1aff1efd1035f2903f339b5c66d3ffcfdaf302/src/index.js#L187-L210'>
-      <span>src/index.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Extracts a public key matching <code>pid</code> from the ipns record.</p>
-
-    <div class='pre p1 fill-light mt0'>extractPublicKey</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>peerId</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    peer identifier object.
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>entry</span> <code class='quiet'>(<a href="#ipnsentry">IpnsEntry</a>)</code>
-	    ipns entry record.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
-        the public key
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='getlocalkey'>
-      getLocalKey
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-ipns/blob/4d1aff1efd1035f2903f339b5c66d3ffcfdaf302/src/index.js#L222-L222'>
-      <span>src/index.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Get key for storing the record locally.
-Format: /ipns/${base32(<HASH>)}</p>
-
-    <div class='pre p1 fill-light mt0'>getLocalKey</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>key</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a>)</code>
-	    peer identifier object.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>:
-        
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='getidkeys'>
-      getIdKeys
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-ipns/blob/4d1aff1efd1035f2903f339b5c66d3ffcfdaf302/src/index.js#L231-L241'>
-      <span>src/index.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Get key for sharing the record in the routing mechanism.
-Format: ${base32(/ipns/<HASH>)}, ${base32(/pk/<HASH>)}</p>
-
-    <div class='pre p1 fill-light mt0'>getIdKeys</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>pid</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a>)</code>
-	    peer identifier represented by the multihash of the public key as Uint8Array.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
-        containing the 
-<code>nameKey</code>
- and the 
-<code>ipnsKey</code>
-.
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='torfc3339'>
-      toRFC3339
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-ipns/blob/4d1aff1efd1035f2903f339b5c66d3ffcfdaf302/src/utils.js#L10-L21'>
-      <span>src/utils.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Convert a JavaScript date into an <code>RFC3339Nano</code> formatted
-string.</p>
-
-    <div class='pre p1 fill-light mt0'>toRFC3339(time: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>time</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>:
-        
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='parserfc3339'>
-      parseRFC3339
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/ipfs/js-ipns/blob/4d1aff1efd1035f2903f339b5c66d3ffcfdaf302/src/utils.js#L30-L54'>
-      <span>src/utils.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Parses a date string formatted as <code>RFC3339Nano</code> into a
-JavaScript Date object.</p>
-
-    <div class='pre p1 fill-light mt0'>parseRFC3339(time: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>time</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></code>:
-        
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-      </div>
-    </div>
-  <script src='assets/anchor.js'></script>
-  <script src='assets/split.js'></script>
-  <script src='assets/site.js'></script>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">ipns - v0.9.0</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<h1>ipns - v0.9.0</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#ipns-" id="ipns-" style="color: inherit; text-decoration: none;">
+					<h1>IPNS <!-- omit in toc --></h1>
+				</a>
+				<p><a href="http://protocol.ai"><img src="https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square" alt=""></a>
+					<a href="http://ipfs.io/"><img src="https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square" alt=""></a>
+					<a href="https://matrix.to/#/#ipfs:matrix.org"><img src="https://img.shields.io/badge/matrix-%23ipfs%3Amatrix.org-blue.svg?style=flat-square" alt="Matrix"></a>
+					<a href="http://webchat.freenode.net/?channels=%23ipfs"><img src="https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square" alt="IRC"></a>
+					<a href="https://discord.gg/24fmuwR"><img src="https://img.shields.io/discord/475789330380488707?color=blueviolet&label=discord&style=flat-square" alt="Discord"></a>
+					<a href="https://github.com/RichardLitt/standard-readme"><img src="https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square" alt="standard-readme"></a>
+				<a href="https://github.com/feross/standard"><img src="https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square" alt="js-standard-style"></a></p>
+				<blockquote>
+					<p>ipns record definitions</p>
+				</blockquote>
+				<p>This module contains all the necessary code for creating, understanding and validating IPNS records.</p>
+				<a href="#lead-maintainer-" id="lead-maintainer-" style="color: inherit; text-decoration: none;">
+					<h2>Lead Maintainer <!-- omit in toc --></h2>
+				</a>
+				<p><a href="https://github.com/vasco-santos">Vasco Santos</a>.</p>
+				<a href="#table-of-contents-" id="table-of-contents-" style="color: inherit; text-decoration: none;">
+					<h2>Table of Contents <!-- omit in toc --></h2>
+				</a>
+				<ul>
+					<li><a href="#usage">Usage</a><ul>
+							<li><a href="#create-record">Create record</a></li>
+							<li><a href="#validate-record">Validate record</a></li>
+							<li><a href="#embed-public-key-to-record">Embed public key to record</a></li>
+							<li><a href="#extract-public-key-from-record">Extract public key from record</a></li>
+							<li><a href="#datastore-key">Datastore key</a></li>
+							<li><a href="#marshal-data-with-proto-buffer">Marshal data with proto buffer</a></li>
+							<li><a href="#unmarshal-data-from-proto-buffer">Unmarshal data from proto buffer</a></li>
+							<li><a href="#validator">Validator</a></li>
+						</ul>
+					</li>
+					<li><a href="#api">API</a><ul>
+							<li><a href="#create-record-1">Create record</a></li>
+							<li><a href="#validate-record-1">Validate record</a></li>
+							<li><a href="#datastore-key-1">Datastore key</a></li>
+							<li><a href="#marshal-data-with-proto-buffer-1">Marshal data with proto buffer</a></li>
+							<li><a href="#unmarshal-data-from-proto-buffer-1">Unmarshal data from proto buffer</a></li>
+							<li><a href="#embed-public-key-to-record-1">Embed public key to record</a></li>
+							<li><a href="#extract-public-key-from-record-1">Extract public key from record</a></li>
+							<li><a href="#namespace">Namespace</a></li>
+						</ul>
+					</li>
+					<li><a href="#contribute">Contribute</a></li>
+					<li><a href="#license">License</a></li>
+				</ul>
+				<a href="#install" id="install" style="color: inherit; text-decoration: none;">
+					<h3>Install</h3>
+				</a>
+				<blockquote>
+					<p>npm install ipns</p>
+				</blockquote>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>Usage</h2>
+				</a>
+				<a href="#create-record" id="create-record" style="color: inherit; text-decoration: none;">
+					<h4>Create record</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ipns</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;ipns&#039;</span><span style="color: #000000">)</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">entryData</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">create</span><span style="color: #000000">(</span><span style="color: #001080">privateKey</span><span style="color: #000000">, </span><span style="color: #001080">value</span><span style="color: #000000">, </span><span style="color: #001080">sequenceNumber</span><span style="color: #000000">, </span><span style="color: #001080">lifetime</span><span style="color: #000000">)</span>
+</code></pre>
+				<a href="#validate-record" id="validate-record" style="color: inherit; text-decoration: none;">
+					<h4>Validate record</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ipns</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;ipns&#039;</span><span style="color: #000000">)</span>
+
+<span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">validate</span><span style="color: #000000">(</span><span style="color: #001080">publicKey</span><span style="color: #000000">, </span><span style="color: #001080">ipnsEntry</span><span style="color: #000000">)</span>
+<span style="color: #008000">// if no error thrown, the record is valid</span>
+</code></pre>
+				<a href="#embed-public-key-to-record" id="embed-public-key-to-record" style="color: inherit; text-decoration: none;">
+					<h4>Embed public key to record</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ipns</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;ipns&#039;</span><span style="color: #000000">)</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ipnsEntryWithEmbedPublicKey</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">embedPublicKey</span><span style="color: #000000">(</span><span style="color: #001080">publicKey</span><span style="color: #000000">, </span><span style="color: #001080">ipnsEntry</span><span style="color: #000000">)</span>
+</code></pre>
+				<a href="#extract-public-key-from-record" id="extract-public-key-from-record" style="color: inherit; text-decoration: none;">
+					<h4>Extract public key from record</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ipns</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;ipns&#039;</span><span style="color: #000000">)</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">publicKey</span><span style="color: #000000"> = </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">extractPublicKey</span><span style="color: #000000">(</span><span style="color: #001080">peerId</span><span style="color: #000000">, </span><span style="color: #001080">ipnsEntry</span><span style="color: #000000">)</span>
+</code></pre>
+				<a href="#datastore-key" id="datastore-key" style="color: inherit; text-decoration: none;">
+					<h4>Datastore key</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ipns</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;ipns&#039;</span><span style="color: #000000">)</span>
+
+<span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">getLocalKey</span><span style="color: #000000">(</span><span style="color: #001080">peerId</span><span style="color: #000000">)</span>
+</code></pre>
+				<p>Returns a key to be used for storing the ipns entry locally, that is:</p>
+				<pre><code><span style="color: #000000">/</span><span style="color: #001080">ipns</span><span style="color: #000000">/</span><span style="color: #001080">$</span><span style="color: #000000">{</span><span style="color: #795E26">base32</span><span style="color: #000000">(&lt;</span><span style="color: #267F99">HASH</span><span style="color: #000000">&gt;)}</span>
+</code></pre>
+				<a href="#marshal-data-with-proto-buffer" id="marshal-data-with-proto-buffer" style="color: inherit; text-decoration: none;">
+					<h4>Marshal data with proto buffer</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ipns</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;ipns&#039;</span><span style="color: #000000">)</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">entryData</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">create</span><span style="color: #000000">(</span><span style="color: #001080">privateKey</span><span style="color: #000000">, </span><span style="color: #001080">value</span><span style="color: #000000">, </span><span style="color: #001080">sequenceNumber</span><span style="color: #000000">, </span><span style="color: #001080">lifetime</span><span style="color: #000000">)</span>
+<span style="color: #008000">// ...</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">marshalledData</span><span style="color: #000000"> = </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">marshal</span><span style="color: #000000">(</span><span style="color: #001080">entryData</span><span style="color: #000000">)</span>
+<span style="color: #008000">// ...</span>
+</code></pre>
+				<p>Returns the entry data serialized.</p>
+				<a href="#unmarshal-data-from-proto-buffer" id="unmarshal-data-from-proto-buffer" style="color: inherit; text-decoration: none;">
+					<h4>Unmarshal data from proto buffer</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ipns</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;ipns&#039;</span><span style="color: #000000">)</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">data</span><span style="color: #000000"> = </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">unmarshal</span><span style="color: #000000">(</span><span style="color: #001080">storedData</span><span style="color: #000000">)</span>
+</code></pre>
+				<p>Returns the entry data structure after being serialized.</p>
+				<a href="#validator" id="validator" style="color: inherit; text-decoration: none;">
+					<h4>Validator</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ipns</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;ipns&#039;</span><span style="color: #000000">)</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">validator</span><span style="color: #000000"> = </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #001080">validator</span>
+</code></pre>
+				<p>Contains an object with <code>validate (marshalledData, key)</code> and <code>select (dataA, dataB)</code> functions.</p>
+				<p>The <code>validate</code> async function aims to verify if an IPNS record is valid. First the record is unmarshalled, then the public key is obtained and finally the record is validated (signature and validity are verified).</p>
+				<p>The <code>select</code> function is responsible for deciding which ipns record is the best (newer) between two records. Both records are unmarshalled and their sequence numbers are compared. If the first record provided is the newer, the operation result will be <code>0</code>, otherwise the operation result will be <code>1</code>.</p>
+				<a href="#api" id="api" style="color: inherit; text-decoration: none;">
+					<h2>API</h2>
+				</a>
+				<a href="#create-record-1" id="create-record-1" style="color: inherit; text-decoration: none;">
+					<h4>Create record</h4>
+				</a>
+				<pre><code class="language-js">
+<span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">create</span><span style="color: #000000">(</span><span style="color: #001080">privateKey</span><span style="color: #000000">, </span><span style="color: #001080">value</span><span style="color: #000000">, </span><span style="color: #001080">sequenceNumber</span><span style="color: #000000">, </span><span style="color: #001080">lifetime</span><span style="color: #000000">)</span>
+</code></pre>
+				<p>Create an IPNS record for being stored in a protocol buffer.</p>
+				<ul>
+					<li><code>privateKey</code> (<code>PrivKey</code> <a href="https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js">RSA Instance</a>): key to be used for cryptographic operations.</li>
+					<li><code>value</code> (string): ipfs path of the object to be published.</li>
+					<li><code>sequenceNumber</code> (Number): number representing the current version of the record.</li>
+					<li><code>lifetime</code> (string): lifetime of the record (in milliseconds).</li>
+				</ul>
+				<p>Returns a <code>Promise</code> that resolves to an object with the entry&#39;s properties eg:</p>
+				<pre><code class="language-js"><span style="color: #000000">{</span>
+<span style="color: #000000">  value: </span><span style="color: #267F99">Uint8Array</span><span style="color: #000000">,</span>
+<span style="color: #000000">  signature: </span><span style="color: #267F99">Uint8Array</span><span style="color: #000000">,</span>
+<span style="color: #000000">  validityType: </span><span style="color: #098658">0</span><span style="color: #000000">,</span>
+<span style="color: #000000">  validity: </span><span style="color: #267F99">Uint8Array</span><span style="color: #000000">,</span>
+<span style="color: #000000">  sequence: </span><span style="color: #098658">2</span>
+<span style="color: #000000">}</span>
+</code></pre>
+				<a href="#validate-record-1" id="validate-record-1" style="color: inherit; text-decoration: none;">
+					<h4>Validate record</h4>
+				</a>
+				<pre><code class="language-js">
+<span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">validate</span><span style="color: #000000">(</span><span style="color: #001080">publicKey</span><span style="color: #000000">, </span><span style="color: #001080">ipnsEntry</span><span style="color: #000000">)</span>
+</code></pre>
+				<p>Validate an IPNS record previously stored in a protocol buffer.</p>
+				<ul>
+					<li><code>publicKey</code> (<code>PubKey</code> <a href="https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js">RSA Instance</a>): key to be used for cryptographic operations.</li>
+					<li><code>ipnsEntry</code> (Object): ipns entry record (obtained using the create function).</li>
+				</ul>
+				<p>Returns a <code>Promise</code>, which may be rejected if the validation was not successful.</p>
+				<a href="#datastore-key-1" id="datastore-key-1" style="color: inherit; text-decoration: none;">
+					<h4>Datastore key</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">getDatastoreKey</span><span style="color: #000000">(</span><span style="color: #001080">peerId</span><span style="color: #000000">)</span>
+</code></pre>
+				<p>Get a key for storing the ipns entry in the datastore.</p>
+				<ul>
+					<li><code>peerId</code> (<code>Uint8Array</code>): peer identifier.</li>
+				</ul>
+				<a href="#marshal-data-with-proto-buffer-1" id="marshal-data-with-proto-buffer-1" style="color: inherit; text-decoration: none;">
+					<h4>Marshal data with proto buffer</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">marshalledData</span><span style="color: #000000"> = </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">marshal</span><span style="color: #000000">(</span><span style="color: #001080">entryData</span><span style="color: #000000">)</span>
+</code></pre>
+				<p>Returns the entry data serialized.</p>
+				<ul>
+					<li><code>entryData</code> (Object): ipns entry record (obtained using the create function).</li>
+				</ul>
+				<a href="#unmarshal-data-from-proto-buffer-1" id="unmarshal-data-from-proto-buffer-1" style="color: inherit; text-decoration: none;">
+					<h4>Unmarshal data from proto buffer</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">data</span><span style="color: #000000"> = </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">unmarshal</span><span style="color: #000000">(</span><span style="color: #001080">storedData</span><span style="color: #000000">)</span>
+</code></pre>
+				<p>Returns the entry data structure after being serialized.</p>
+				<ul>
+					<li><code>storedData</code> (Uint8Array): ipns entry record serialized.</li>
+				</ul>
+				<a href="#embed-public-key-to-record-1" id="embed-public-key-to-record-1" style="color: inherit; text-decoration: none;">
+					<h4>Embed public key to record</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">recordWithPublicKey</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">embedPublicKey</span><span style="color: #000000">(</span><span style="color: #001080">publicKey</span><span style="color: #000000">, </span><span style="color: #001080">ipnsEntry</span><span style="color: #000000">)</span>
+</code></pre>
+				<p>Embed a public key in an IPNS entry. If it is possible to extract the public key from the <code>peer-id</code>, there is no need to embed.</p>
+				<ul>
+					<li><code>publicKey</code> (<code>PubKey</code> <a href="https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js">RSA Instance</a>): key to be used for cryptographic operations.</li>
+					<li><code>ipnsEntry</code> (Object): ipns entry record (obtained using the create function).</li>
+				</ul>
+				<p> Returns a <code>Promise</code>. If the promise resolves to null it means the public key can be extracted directly from the <code>peer-id</code>.</p>
+				<a href="#extract-public-key-from-record-1" id="extract-public-key-from-record-1" style="color: inherit; text-decoration: none;">
+					<h4>Extract public key from record</h4>
+				</a>
+				<pre><code class="language-js"><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #795E26">extractPublicKey</span><span style="color: #000000">(</span><span style="color: #001080">peerId</span><span style="color: #000000">, </span><span style="color: #001080">ipnsEntry</span><span style="color: #000000">, [</span><span style="color: #001080">callback</span><span style="color: #000000">])</span>
+</code></pre>
+				<p>Extract a public key from an IPNS entry.</p>
+				<ul>
+					<li><code>peerId</code> (<code>PeerId</code> <a href="https://github.com/libp2p/js-peer-id">Instance</a>): peer identifier object.</li>
+					<li><code>ipnsEntry</code> (Object): ipns entry record (obtained using the create function).</li>
+				</ul>
+				<p>The returned public key (<code>PubKey</code> <a href="https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js">RSA Instance</a>): may be used for cryptographic operations.</p>
+				<a href="#namespace" id="namespace" style="color: inherit; text-decoration: none;">
+					<h4>Namespace</h4>
+				</a>
+				<p>Namespace constants for records.</p>
+				<pre><code class="language-js"><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #001080">namespace</span>
+
+<span style="color: #008000">// &#039;/ipns/&#039;</span>
+</code></pre>
+				<pre><code class="language-js"><span style="color: #001080">ipns</span><span style="color: #000000">.</span><span style="color: #001080">namespaceLength</span>
+
+<span style="color: #008000">// 6</span>
+</code></pre>
+				<a href="#contribute" id="contribute" style="color: inherit; text-decoration: none;">
+					<h2>Contribute</h2>
+				</a>
+				<p>Feel free to join in. All welcome. Open an <a href="https://github.com/ipfs/js-ipns/issues">issue</a>!</p>
+				<p>This repository falls under the IPFS <a href="https://github.com/ipfs/community/blob/master/code-of-conduct.md">Code of Conduct</a>.</p>
+				<p><a href="https://github.com/ipfs/community/blob/master/CONTRIBUTING.md"><img src="https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif" alt=""></a></p>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p>Copyright (c) Protocol Labs, Inc. under the <strong>MIT License</strong>. See <a href="./LICENSE">LICENSE file</a> for details.</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="modules.html#ipnsentry" class="tsd-kind-icon">IPNSEntry</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="modules.html#privatekey" class="tsd-kind-icon">Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="modules.html#publickey" class="tsd-kind-icon">Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-property">
+						<a href="modules.html#default" class="tsd-kind-icon">default</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer>
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+		</div>
+	</div>
+</footer>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
 </body>
 </html>
