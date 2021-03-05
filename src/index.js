@@ -12,26 +12,24 @@ const uint8ArrayToString = require('uint8arrays/to-string')
 const uint8ArrayConcat = require('uint8arrays/concat')
 
 const debug = require('debug')
-const log = debug('jsipns')
-log.error = debug('jsipns:error')
+const log = Object.assign(debug('jsipns'), {
+  error: debug('jsipns:error')
+})
 
-const ipnsEntryProto = require('./pb/ipns.proto')
+const {
+  IpnsEntry: ipnsEntryProto
+} = require('./pb/ipns.js')
 const { parseRFC3339 } = require('./utils')
 const ERRORS = require('./errors')
 
-const ID_MULTIHASH_CODE = multihash.names.id
+const ID_MULTIHASH_CODE = multihash.names.identity
 
 const namespace = '/ipns/'
 
 /**
- * IPNS entry
- *
- * @typedef {Object} IpnsEntry
- * @property {string} value - value to be stored in the record
- * @property {Uint8Array} signature - signature of the record
- * @property {number} validityType - Type of validation being used
- * @property {string} validity - expiration datetime for the record in RFC3339 format
- * @property {number} sequence - number representing the version of the record
+ * @typedef {import('./types').IPNSEntry} IPNSEntry
+ * @typedef {import('libp2p-crypto').PublicKey} PublicKey
+ * @typedef {import('libp2p-crypto').PrivateKey} PrivateKey
  */
 
 /**
@@ -39,11 +37,10 @@ const namespace = '/ipns/'
  * The ipns entry validity should follow the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
  *
- * @param {Object} privateKey - private key for signing the record.
+ * @param {PrivateKey} privateKey - private key for signing the record.
  * @param {string} value - value to be stored in the record.
  * @param {number} seq - number representing the current version of the record.
  * @param {number|string} lifetime - lifetime of the record (in milliseconds).
- * @returns {Promise<IpnsEntry>} entry
  */
 const create = (privateKey, value, seq, lifetime) => {
   // Validity in ISOString with nanoseconds precision and validity type EOL
@@ -56,17 +53,23 @@ const create = (privateKey, value, seq, lifetime) => {
  * Same as create(), but instead of generating a new Date, it receives the intended expiration time
  * WARNING: nano precision is not standard, make sure the value in seconds is 9 orders of magnitude lesser than the one provided.
  *
- * @param {Object} privateKey - private key for signing the record.
+ * @param {PrivateKey} privateKey - private key for signing the record.
  * @param {string} value - value to be stored in the record.
  * @param {number} seq - number representing the current version of the record.
  * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
- * @returns {Promise<IpnsEntry>} entry
  */
 const createWithExpiration = (privateKey, value, seq, expiration) => {
   const validityType = ipnsEntryProto.ValidityType.EOL
   return _create(privateKey, value, seq, expiration, validityType)
 }
 
+/**
+ * @param {PrivateKey} privateKey
+ * @param {string} value
+ * @param {number} seq
+ * @param {string} isoValidity
+ * @param {number} validityType
+ */
 const _create = async (privateKey, value, seq, isoValidity, validityType) => {
   const signature = await sign(privateKey, value, validityType, isoValidity)
 
@@ -85,9 +88,8 @@ const _create = async (privateKey, value, seq, isoValidity, validityType) => {
 /**
  * Validates the given ipns entry against the given public key.
  *
- * @param {Object} publicKey - public key for validating the record.
- * @param {IpnsEntry} entry - ipns entry record.
- * @returns {Promise}
+ * @param {PublicKey} publicKey - public key for validating the record.
+ * @param {IPNSEntry} entry - ipns entry record.
  */
 const validate = async (publicKey, entry) => {
   const { value, validityType, validity } = entry
@@ -116,7 +118,7 @@ const validate = async (publicKey, entry) => {
       throw errCode(new Error('unrecognized validity format (not an rfc3339 format)'), ERRORS.ERR_UNRECOGNIZED_FORMAT)
     }
 
-    if (validityDate < Date.now()) {
+    if (validityDate.getTime() < Date.now()) {
       log.error('record has expired')
       throw errCode(new Error('record has expired'), ERRORS.ERR_IPNS_EXPIRED_RECORD)
     }
@@ -137,9 +139,8 @@ const validate = async (publicKey, entry) => {
  * send this as part of the record itself. For newer ed25519 keys, the public key
  * can be embedded in the peerId.
  *
- * @param {Object} publicKey - public key to embed.
- * @param {Object} entry - ipns entry record.
- * @returns {IpnsEntry} entry with public key embedded
+ * @param {PublicKey} publicKey - public key to embed.
+ * @param {IPNSEntry} entry - ipns entry record.
  */
 const embedPublicKey = async (publicKey, entry) => {
   if (!publicKey || !publicKey.bytes || !entry) {
@@ -182,9 +183,8 @@ const embedPublicKey = async (publicKey, entry) => {
 /**
  * Extracts a public key matching `pid` from the ipns record.
  *
- * @param {Object} peerId - peer identifier object.
- * @param {IpnsEntry} entry - ipns entry record.
- * @returns {Object} the public key
+ * @param {PeerId} peerId - peer identifier object.
+ * @param {IPNSEntry} entry - ipns entry record.
  */
 const extractPublicKey = (peerId, entry) => {
   if (!entry || !peerId) {
@@ -211,7 +211,11 @@ const extractPublicKey = (peerId, entry) => {
   throw Object.assign(new Error('no public key is available'), { code: ERRORS.ERR_UNDEFINED_PARAMETER })
 }
 
-// rawStdEncoding with RFC4648
+/**
+ * rawStdEncoding with RFC4648
+ *
+ * @param {Uint8Array} key
+ */
 const rawStdEncoding = (key) => multibase.encode('base32', key).toString().slice(1).toUpperCase()
 
 /**
@@ -219,7 +223,6 @@ const rawStdEncoding = (key) => multibase.encode('base32', key).toString().slice
  * Format: /ipns/${base32(<HASH>)}
  *
  * @param {Uint8Array} key - peer identifier object.
- * @returns {string}
  */
 const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
 
@@ -228,7 +231,6 @@ const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
  * Format: ${base32(/ipns/<HASH>)}, ${base32(/pk/<HASH>)}
  *
  * @param {Uint8Array} pid - peer identifier represented by the multihash of the public key as Uint8Array.
- * @returns {Object} containing the `nameKey` and the `ipnsKey`.
  */
 const getIdKeys = (pid) => {
   const pkBuffer = uint8ArrayFromString('/pk/')
@@ -242,7 +244,14 @@ const getIdKeys = (pid) => {
   }
 }
 
-// Sign ipns record data
+/**
+ * Sign ipns record data
+ *
+ * @param {PrivateKey} privateKey
+ * @param {string} value
+ * @param {number} validityType
+ * @param {Uint8Array | string} validity
+ */
 const sign = (privateKey, value, validityType, validity) => {
   try {
     const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
@@ -254,7 +263,11 @@ const sign = (privateKey, value, validityType, validity) => {
   }
 }
 
-// Utility for getting the validity type code name of a validity
+/**
+ * Utility for getting the validity type code name of a validity
+ *
+ * @param {number} validityType
+ */
 const getValidityType = (validityType) => {
   if (validityType.toString() === '0') {
     return 'EOL'
@@ -265,7 +278,13 @@ const getValidityType = (validityType) => {
   throw errCode(error, ERRORS.ERR_UNRECOGNIZED_VALIDITY)
 }
 
-// Utility for creating the record data for being signed
+/**
+ * Utility for creating the record data for being signed
+ *
+ * @param {string | Uint8Array} value
+ * @param {number} validityType
+ * @param {string | Uint8Array} validity
+ */
 const ipnsEntryDataForSig = (value, validityType, validity) => {
   if (!(value instanceof Uint8Array)) {
     value = uint8ArrayFromString(value)
@@ -280,7 +299,11 @@ const ipnsEntryDataForSig = (value, validityType, validity) => {
   return uint8ArrayConcat([value, validity, validityTypeBuffer])
 }
 
-// Utility for extracting the public key from a peer-id
+/**
+ * Utility for extracting the public key from a peer-id
+ *
+ * @param {PeerId} peerId
+ */
 const extractPublicKeyFromId = (peerId) => {
   const decodedId = multihash.decode(peerId.id)
 
@@ -291,11 +314,34 @@ const extractPublicKeyFromId = (peerId) => {
   return crypto.keys.unmarshalPublicKey(decodedId.digest)
 }
 
-const marshal = ipnsEntryProto.encode
+/**
+ * @param {IPNSEntry} obj
+ */
+const marshal = (obj) => {
+  return ipnsEntryProto.encode(obj).finish()
+}
 
-const unmarshal = ipnsEntryProto.decode
+/**
+ * @param {Uint8Array} buf
+ * @returns {IPNSEntry}
+ */
+const unmarshal = (buf) => {
+  const message = ipnsEntryProto.decode(buf)
+
+  // @ts-ignore
+  return ipnsEntryProto.toObject(message, {
+    defaults: false,
+    arrays: true,
+    longs: Number,
+    objects: false
+  })
+}
 
 const validator = {
+  /**
+   * @param {Uint8Array} marshalledData
+   * @param {Uint8Array} key
+   */
   validate: async (marshalledData, key) => {
     const receivedEntry = unmarshal(marshalledData)
     const bufferId = key.slice('/ipns/'.length)
@@ -308,6 +354,10 @@ const validator = {
     await validate(pubKey, receivedEntry)
     return true
   },
+  /**
+   * @param {Uint8Array} dataA
+   * @param {Uint8Array} dataB
+   */
   select: (dataA, dataB) => {
     const entryA = unmarshal(dataA)
     const entryB = unmarshal(dataB)
