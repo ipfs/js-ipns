@@ -4,6 +4,7 @@
   "description": "ipns record definitions",
   "leadMaintainer": "Vasco Santos <vasco.santos@moxy.studio>",
   "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
     "prepare": "run-s prepare:*",
     "prepare:proto": "pbjs -t static-module -w commonjs --force-number --no-verify --no-delimited --no-create --no-beautify --no-defaults --lint eslint-disable -o src/pb/ipns.js src/pb/ipns.proto",
