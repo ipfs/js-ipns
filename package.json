@@ -18,6 +18,10 @@
     "test:browser": "aegir test -t browser -t webworker",
     "test:node": "aegir test -t node"
   },
+  "files": [
+    "src",
+    "dist"
+  ],
   "pre-push": [
     "lint",
     "test"
