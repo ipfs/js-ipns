@@ -1,3 +1,12 @@
+## [0.9.1](https://github.com/ipfs/js-ipns/compare/v0.9.0...v0.9.1) (2021-03-09)
+
+
+### Bug Fixes
+
+* add files list to package.json ([#108](https://github.com/ipfs/js-ipns/issues/108)) ([e990d8b](https://github.com/ipfs/js-ipns/commit/e990d8b3914f71356d5df3a8e3ad48eab4c05561))
+
+
+
 # [0.9.0](https://github.com/ipfs/js-ipns/compare/v0.8.2...v0.9.0) (2021-03-05)
 
 
