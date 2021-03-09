@@ -38,15 +38,15 @@ const namespace = '/ipns/'
  * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
  *
  * @param {PrivateKey} privateKey - private key for signing the record.
- * @param {string} value - value to be stored in the record.
+ * @param {Uint8Array} value - value to be stored in the record.
  * @param {number} seq - number representing the current version of the record.
- * @param {number|string} lifetime - lifetime of the record (in milliseconds).
+ * @param {number} lifetime - lifetime of the record (in milliseconds).
  */
 const create = (privateKey, value, seq, lifetime) => {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const isoValidity = new NanoDate(Date.now() + Number(lifetime)).toString()
   const validityType = ipnsEntryProto.ValidityType.EOL
-  return _create(privateKey, value, seq, isoValidity, validityType)
+  return _create(privateKey, value, seq, uint8ArrayFromString(isoValidity), validityType)
 }
 
 /**
@@ -54,30 +54,30 @@ const create = (privateKey, value, seq, lifetime) => {
  * WARNING: nano precision is not standard, make sure the value in seconds is 9 orders of magnitude lesser than the one provided.
  *
  * @param {PrivateKey} privateKey - private key for signing the record.
- * @param {string} value - value to be stored in the record.
+ * @param {Uint8Array} value - value to be stored in the record.
  * @param {number} seq - number representing the current version of the record.
  * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  */
 const createWithExpiration = (privateKey, value, seq, expiration) => {
   const validityType = ipnsEntryProto.ValidityType.EOL
-  return _create(privateKey, value, seq, expiration, validityType)
+  return _create(privateKey, value, seq, uint8ArrayFromString(expiration), validityType)
 }
 
 /**
  * @param {PrivateKey} privateKey
- * @param {string} value
+ * @param {Uint8Array} value
  * @param {number} seq
- * @param {string} isoValidity
+ * @param {Uint8Array} isoValidity
  * @param {number} validityType
  */
 const _create = async (privateKey, value, seq, isoValidity, validityType) => {
   const signature = await sign(privateKey, value, validityType, isoValidity)
 
   const entry = {
-    value: uint8ArrayFromString(value),
+    value,
     signature: signature,
     validityType: validityType,
-    validity: uint8ArrayFromString(isoValidity),
+    validity: isoValidity,
     sequence: seq
   }
 
@@ -248,9 +248,9 @@ const getIdKeys = (pid) => {
  * Sign ipns record data
  *
  * @param {PrivateKey} privateKey
- * @param {string} value
+ * @param {Uint8Array} value
  * @param {number} validityType
- * @param {Uint8Array | string} validity
+ * @param {Uint8Array} validity
  */
 const sign = (privateKey, value, validityType, validity) => {
   try {
@@ -281,19 +281,11 @@ const getValidityType = (validityType) => {
 /**
  * Utility for creating the record data for being signed
  *
- * @param {string | Uint8Array} value
+ * @param {Uint8Array} value
  * @param {number} validityType
- * @param {string | Uint8Array} validity
+ * @param {Uint8Array} validity
  */
 const ipnsEntryDataForSig = (value, validityType, validity) => {
-  if (!(value instanceof Uint8Array)) {
-    value = uint8ArrayFromString(value)
-  }
-
-  if (!(validity instanceof Uint8Array)) {
-    validity = uint8ArrayFromString(validity)
-  }
-
   const validityTypeBuffer = uint8ArrayFromString(getValidityType(validityType))
 
   return uint8ArrayConcat([value, validity, validityTypeBuffer])
@@ -327,14 +319,21 @@ const marshal = (obj) => {
  */
 const unmarshal = (buf) => {
   const message = ipnsEntryProto.decode(buf)
-
-  // @ts-ignore
-  return ipnsEntryProto.toObject(message, {
+  const object = ipnsEntryProto.toObject(message, {
     defaults: false,
     arrays: true,
     longs: Number,
     objects: false
   })
+
+  return {
+    value: object.value,
+    signature: object.signature,
+    validityType: object.validityType,
+    validity: object.validity,
+    sequence: object.sequence,
+    pubKey: object.pubKey
+  }
 }
 
 const validator = {

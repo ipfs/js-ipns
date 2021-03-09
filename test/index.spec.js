@@ -22,7 +22,7 @@ const ERRORS = require('../src/errors')
 describe('ipns', function () {
   this.timeout(20 * 1000)
 
-  const cid = 'QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq'
+  const cid = uint8ArrayFromString('QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq')
 
   /** @type {{ id: string, publicKey: string }} */
   let ipfsId
@@ -44,7 +44,7 @@ describe('ipns', function () {
 
     const entry = await ipns.create(rsa, cid, sequence, validity)
     expect(entry).to.deep.include({
-      value: uint8ArrayFromString(cid),
+      value: cid,
       sequence: sequence
     })
     expect(entry).to.have.property('validity')
