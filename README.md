@@ -141,9 +141,9 @@ ipns.create(privateKey, value, sequenceNumber, lifetime)
 Create an IPNS record for being stored in a protocol buffer.
 
 - `privateKey` (`PrivKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
-- `value` (string): ipfs path of the object to be published.
+- `value` (Uint8Array): ipfs path of the object to be published.
 - `sequenceNumber` (Number): number representing the current version of the record.
-- `lifetime` (string): lifetime of the record (in milliseconds).
+- `lifetime` (Number): lifetime of the record (in milliseconds).
 
 Returns a `Promise` that resolves to an object with the entry's properties eg:
 
