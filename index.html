@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ipns - v0.9.1</title>
-	<meta name="description" content="Documentation for ipns - v0.9.1">
+	<title>ipns - v0.10.0</title>
+	<meta name="description" content="Documentation for ipns - v0.10.0">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 	<script async src="assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">ipns - v0.9.1</a>
+					<a href="index.html" class="title">ipns - v0.10.0</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -50,7 +50,7 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<h1>ipns - v0.9.1</h1>
+			<h1>ipns - v0.10.0</h1>
 		</div>
 	</div>
 </header>
@@ -194,9 +194,9 @@
 				<p>Create an IPNS record for being stored in a protocol buffer.</p>
 				<ul>
 					<li><code>privateKey</code> (<code>PrivKey</code> <a href="https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js">RSA Instance</a>): key to be used for cryptographic operations.</li>
-					<li><code>value</code> (string): ipfs path of the object to be published.</li>
+					<li><code>value</code> (Uint8Array): ipfs path of the object to be published.</li>
 					<li><code>sequenceNumber</code> (Number): number representing the current version of the record.</li>
-					<li><code>lifetime</code> (string): lifetime of the record (in milliseconds).</li>
+					<li><code>lifetime</code> (Number): lifetime of the record (in milliseconds).</li>
 				</ul>
 				<p>Returns a <code>Promise</code> that resolves to an object with the entry&#39;s properties eg:</p>
 				<pre><code class="language-js"><span style="color: #000000">{</span>
