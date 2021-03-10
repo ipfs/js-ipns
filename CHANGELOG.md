@@ -1,3 +1,17 @@
+# [0.10.0](https://github.com/ipfs/js-ipns/compare/v0.9.1...v0.10.0) (2021-03-10)
+
+
+### Bug Fixes
+
+* remove value ambiguity ([#109](https://github.com/ipfs/js-ipns/issues/109)) ([5c589da](https://github.com/ipfs/js-ipns/commit/5c589da247d3103b2753eb435110ea6688e7bfa0))
+
+
+### BREAKING CHANGES
+
+* strings are no longer accepted as valid values to publish
+
+
+
 ## [0.9.1](https://github.com/ipfs/js-ipns/compare/v0.9.0...v0.9.1) (2021-03-09)
 
 
