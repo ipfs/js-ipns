@@ -130,6 +130,7 @@ describe('ipns', function () {
     const datastoreKey = ipns.getLocalKey(fromB58String(ipfsId.id))
 
     expect(datastoreKey).to.exist()
+    expect(datastoreKey.toString()).to.startWith('/ipns/CIQ')
   })
 
   it('should get id keys correctly', () => {

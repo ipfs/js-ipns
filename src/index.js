@@ -216,7 +216,7 @@ const extractPublicKey = (peerId, entry) => {
  *
  * @param {Uint8Array} key
  */
-const rawStdEncoding = (key) => multibase.encode('base32', key).toString().slice(1).toUpperCase()
+const rawStdEncoding = (key) => uint8ArrayToString(multibase.encode('base32', key)).slice(1).toUpperCase()
 
 /**
  * Get key for storing the record locally.
