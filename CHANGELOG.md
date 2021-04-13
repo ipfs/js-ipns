@@ -1,3 +1,12 @@
+## [0.10.1](https://github.com/ipfs/js-ipns/compare/v0.10.0...v0.10.1) (2021-04-13)
+
+
+### Bug Fixes
+
+* encode ipns key correctly ([#115](https://github.com/ipfs/js-ipns/issues/115)) ([a10889c](https://github.com/ipfs/js-ipns/commit/a10889c9bb0fdcb644081e7861d8a563249c6fd1))
+
+
+
 # [0.10.0](https://github.com/ipfs/js-ipns/compare/v0.9.1...v0.10.0) (2021-03-10)
 
 
