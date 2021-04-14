@@ -1,14 +1,7 @@
 /* eslint-env mocha */
 'use strict'
 
-const chai = require('chai')
-const dirtyChai = require('dirty-chai')
-const chaiBytes = require('chai-bytes')
-const chaiString = require('chai-string')
-const expect = chai.expect
-chai.use(dirtyChai)
-chai.use(chaiBytes)
-chai.use(chaiString)
+const { expect } = require('aegir/utils/chai')
 const { toB58String } = require('multihashes')
 const uint8ArrayFromString = require('uint8arrays/from-string')
 const PeerId = require('peer-id')

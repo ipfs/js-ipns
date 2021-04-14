@@ -53,13 +53,8 @@
     "uint8arrays": "^2.0.5"
   },
   "devDependencies": {
-    "@types/chai-string": "^1.4.2",
     "@types/debug": "^4.1.5",
-    "aegir": "^32.2.0",
-    "chai": "^4.2.0",
-    "chai-bytes": "~0.1.2",
-    "chai-string": "^1.5.0",
-    "dirty-chai": "^2.0.1",
+    "aegir": "^33.1.0",
     "npm-run-all": "^4.1.5",
     "util": "^0.12.3"
   },
