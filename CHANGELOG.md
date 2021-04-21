@@ -1,3 +1,18 @@
+# [0.11.0](https://github.com/ipfs/js-ipns/compare/v0.10.2...v0.11.0) (2021-04-21)
+
+
+### Bug Fixes
+
+* ipns validate should return void ([#118](https://github.com/ipfs/js-ipns/issues/118)) ([67d0ad4](https://github.com/ipfs/js-ipns/commit/67d0ad40d10fced861b7b4825882f648b64528f1))
+* specify pbjs root ([#119](https://github.com/ipfs/js-ipns/issues/119)) ([7cad961](https://github.com/ipfs/js-ipns/commit/7cad9611f87566047bc9e104be28970a877e9861))
+
+
+### BREAKING CHANGES
+
+* ipns validate function returns a void promise instead of boolean promise
+
+
+
 ## [0.10.2](https://github.com/ipfs/js-ipns/compare/v0.10.1...v0.10.2) (2021-04-15)
 
 
