@@ -351,7 +351,6 @@ const validator = {
 
     // Record validation
     await validate(pubKey, receivedEntry)
-    return true
   },
   /**
    * @param {Uint8Array} dataA

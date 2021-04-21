@@ -219,8 +219,7 @@ describe('ipns', function () {
     const marshalledData = ipns.marshal(entry)
     const key = uint8ArrayFromString(`/ipns/${ipfsId.id}`)
 
-    const valid = await ipns.validator.validate(marshalledData, key)
-    expect(valid).to.equal(true)
+    await ipns.validator.validate(marshalledData, key)
   })
 
   it('should use validator.validate to verify that a record is not valid', async () => {
