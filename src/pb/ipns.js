@@ -15,13 +15,15 @@ $root.IpnsEntry = (function() {
      * Properties of an IpnsEntry.
      * @exports IIpnsEntry
      * @interface IIpnsEntry
-     * @property {Uint8Array} value IpnsEntry value
-     * @property {Uint8Array} signature IpnsEntry signature
+     * @property {Uint8Array|null} [value] IpnsEntry value
+     * @property {Uint8Array|null} [signature] IpnsEntry signature
      * @property {IpnsEntry.ValidityType|null} [validityType] IpnsEntry validityType
      * @property {Uint8Array|null} [validity] IpnsEntry validity
-     * @property {number|null} [sequence] IpnsEntry sequence
-     * @property {number|null} [ttl] IpnsEntry ttl
+     * @property {number|Long|null} [sequence] IpnsEntry sequence
+     * @property {number|Long|null} [ttl] IpnsEntry ttl
      * @property {Uint8Array|null} [pubKey] IpnsEntry pubKey
+     * @property {Uint8Array|null} [signatureV2] IpnsEntry signatureV2
+     * @property {Uint8Array|null} [data] IpnsEntry data
      */
 
     /**
@@ -73,7 +75,7 @@ $root.IpnsEntry = (function() {
 
     /**
      * IpnsEntry sequence.
-     * @member {number} sequence
+     * @member {number|Long} sequence
      * @memberof IpnsEntry
      * @instance
      */
@@ -81,7 +83,7 @@ $root.IpnsEntry = (function() {
 
     /**
      * IpnsEntry ttl.
-     * @member {number} ttl
+     * @member {number|Long} ttl
      * @memberof IpnsEntry
      * @instance
      */
@@ -96,6 +98,22 @@ $root.IpnsEntry = (function() {
     IpnsEntry.prototype.pubKey = $util.newBuffer([]);
 
     /**
+     * IpnsEntry signatureV2.
+     * @member {Uint8Array} signatureV2
+     * @memberof IpnsEntry
+     * @instance
+     */
+    IpnsEntry.prototype.signatureV2 = $util.newBuffer([]);
+
+    /**
+     * IpnsEntry data.
+     * @member {Uint8Array} data
+     * @memberof IpnsEntry
+     * @instance
+     */
+    IpnsEntry.prototype.data = $util.newBuffer([]);
+
+    /**
      * Encodes the specified IpnsEntry message. Does not implicitly {@link IpnsEntry.verify|verify} messages.
      * @function encode
      * @memberof IpnsEntry
@@ -107,8 +125,10 @@ $root.IpnsEntry = (function() {
     IpnsEntry.encode = function encode(m, w) {
         if (!w)
             w = $Writer.create();
-        w.uint32(10).bytes(m.value);
-        w.uint32(18).bytes(m.signature);
+        if (m.value != null && Object.hasOwnProperty.call(m, "value"))
+            w.uint32(10).bytes(m.value);
+        if (m.signature != null && Object.hasOwnProperty.call(m, "signature"))
+            w.uint32(18).bytes(m.signature);
         if (m.validityType != null && Object.hasOwnProperty.call(m, "validityType"))
             w.uint32(24).int32(m.validityType);
         if (m.validity != null && Object.hasOwnProperty.call(m, "validity"))
@@ -119,6 +139,10 @@ $root.IpnsEntry = (function() {
             w.uint32(48).uint64(m.ttl);
         if (m.pubKey != null && Object.hasOwnProperty.call(m, "pubKey"))
             w.uint32(58).bytes(m.pubKey);
+        if (m.signatureV2 != null && Object.hasOwnProperty.call(m, "signatureV2"))
+            w.uint32(66).bytes(m.signatureV2);
+        if (m.data != null && Object.hasOwnProperty.call(m, "data"))
+            w.uint32(74).bytes(m.data);
         return w;
     };
 
@@ -161,15 +185,17 @@ $root.IpnsEntry = (function() {
             case 7:
                 m.pubKey = r.bytes();
                 break;
+            case 8:
+                m.signatureV2 = r.bytes();
+                break;
+            case 9:
+                m.data = r.bytes();
+                break;
             default:
                 r.skipType(t & 7);
                 break;
             }
         }
-        if (!m.hasOwnProperty("value"))
-            throw $util.ProtocolError("missing required 'value'", { instance: m });
-        if (!m.hasOwnProperty("signature"))
-            throw $util.ProtocolError("missing required 'signature'", { instance: m });
         return m;
     };
 
@@ -235,6 +261,18 @@ $root.IpnsEntry = (function() {
             else if (d.pubKey.length)
                 m.pubKey = d.pubKey;
         }
+        if (d.signatureV2 != null) {
+            if (typeof d.signatureV2 === "string")
+                $util.base64.decode(d.signatureV2, m.signatureV2 = $util.newBuffer($util.base64.length(d.signatureV2)), 0);
+            else if (d.signatureV2.length)
+                m.signatureV2 = d.signatureV2;
+        }
+        if (d.data != null) {
+            if (typeof d.data === "string")
+                $util.base64.decode(d.data, m.data = $util.newBuffer($util.base64.length(d.data)), 0);
+            else if (d.data.length)
+                m.data = d.data;
+        }
         return m;
     };
 
@@ -291,6 +329,20 @@ $root.IpnsEntry = (function() {
                 if (o.bytes !== Array)
                     d.pubKey = $util.newBuffer(d.pubKey);
             }
+            if (o.bytes === String)
+                d.signatureV2 = "";
+            else {
+                d.signatureV2 = [];
+                if (o.bytes !== Array)
+                    d.signatureV2 = $util.newBuffer(d.signatureV2);
+            }
+            if (o.bytes === String)
+                d.data = "";
+            else {
+                d.data = [];
+                if (o.bytes !== Array)
+                    d.data = $util.newBuffer(d.data);
+            }
         }
         if (m.value != null && m.hasOwnProperty("value")) {
             d.value = o.bytes === String ? $util.base64.encode(m.value, 0, m.value.length) : o.bytes === Array ? Array.prototype.slice.call(m.value) : m.value;
@@ -318,6 +370,12 @@ $root.IpnsEntry = (function() {
         }
         if (m.pubKey != null && m.hasOwnProperty("pubKey")) {
             d.pubKey = o.bytes === String ? $util.base64.encode(m.pubKey, 0, m.pubKey.length) : o.bytes === Array ? Array.prototype.slice.call(m.pubKey) : m.pubKey;
+        }
+        if (m.signatureV2 != null && m.hasOwnProperty("signatureV2")) {
+            d.signatureV2 = o.bytes === String ? $util.base64.encode(m.signatureV2, 0, m.signatureV2.length) : o.bytes === Array ? Array.prototype.slice.call(m.signatureV2) : m.signatureV2;
+        }
+        if (m.data != null && m.hasOwnProperty("data")) {
+            d.data = o.bytes === String ? $util.base64.encode(m.data, 0, m.data.length) : o.bytes === Array ? Array.prototype.slice.call(m.data) : m.data;
         }
         return d;
     };

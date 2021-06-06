@@ -3,10 +3,10 @@ import * as $protobuf from "protobufjs";
 export interface IIpnsEntry {
 
     /** IpnsEntry value */
-    value: Uint8Array;
+    value?: (Uint8Array|null);
 
     /** IpnsEntry signature */
-    signature: Uint8Array;
+    signature?: (Uint8Array|null);
 
     /** IpnsEntry validityType */
     validityType?: (IpnsEntry.ValidityType|null);
@@ -15,13 +15,19 @@ export interface IIpnsEntry {
     validity?: (Uint8Array|null);
 
     /** IpnsEntry sequence */
-    sequence?: (number|null);
+    sequence?: (number|Long|null);
 
     /** IpnsEntry ttl */
-    ttl?: (number|null);
+    ttl?: (number|Long|null);
 
     /** IpnsEntry pubKey */
     pubKey?: (Uint8Array|null);
+
+    /** IpnsEntry signatureV2 */
+    signatureV2?: (Uint8Array|null);
+
+    /** IpnsEntry data */
+    data?: (Uint8Array|null);
 }
 
 /** Represents an IpnsEntry. */
@@ -46,13 +52,19 @@ export class IpnsEntry implements IIpnsEntry {
     public validity: Uint8Array;
 
     /** IpnsEntry sequence. */
-    public sequence: number;
+    public sequence: (number|Long);
 
     /** IpnsEntry ttl. */
-    public ttl: number;
+    public ttl: (number|Long);
 
     /** IpnsEntry pubKey. */
     public pubKey: Uint8Array;
+
+    /** IpnsEntry signatureV2. */
+    public signatureV2: Uint8Array;
+
+    /** IpnsEntry data. */
+    public data: Uint8Array;
 
     /**
      * Encodes the specified IpnsEntry message. Does not implicitly {@link IpnsEntry.verify|verify} messages.

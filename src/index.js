@@ -10,6 +10,9 @@ const multibase = require('multibase')
 const uint8ArrayFromString = require('uint8arrays/from-string')
 const uint8ArrayToString = require('uint8arrays/to-string')
 const uint8ArrayConcat = require('uint8arrays/concat')
+const uint8ArrayEquals = require('uint8arrays/equals')
+const cborg = require('cborg')
+const Long = require('long')
 
 const debug = require('debug')
 const log = Object.assign(debug('jsipns'), {
@@ -39,14 +42,17 @@ const namespace = '/ipns/'
  *
  * @param {PrivateKey} privateKey - private key for signing the record.
  * @param {Uint8Array} value - value to be stored in the record.
- * @param {number} seq - number representing the current version of the record.
+ * @param {number | bigint} seq - number representing the current version of the record.
  * @param {number} lifetime - lifetime of the record (in milliseconds).
  */
 const create = (privateKey, value, seq, lifetime) => {
   // Validity in ISOString with nanoseconds precision and validity type EOL
-  const isoValidity = new NanoDate(Date.now() + Number(lifetime)).toString()
+  const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = ipnsEntryProto.ValidityType.EOL
-  return _create(privateKey, value, seq, uint8ArrayFromString(isoValidity), validityType)
+  const [ms, ns] = lifetime.toString().split('.')
+  const lifetimeNs = BigInt(ms) * 100000n + BigInt(ns || 0)
+
+  return _create(privateKey, value, seq, validityType, expirationDate, lifetimeNs)
 }
 
 /**
@@ -55,34 +61,67 @@ const create = (privateKey, value, seq, lifetime) => {
  *
  * @param {PrivateKey} privateKey - private key for signing the record.
  * @param {Uint8Array} value - value to be stored in the record.
- * @param {number} seq - number representing the current version of the record.
+ * @param {number | bigint} seq - number representing the current version of the record.
  * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  */
 const createWithExpiration = (privateKey, value, seq, expiration) => {
+  const expirationDate = NanoDate.fromString(expiration)
   const validityType = ipnsEntryProto.ValidityType.EOL
-  return _create(privateKey, value, seq, uint8ArrayFromString(expiration), validityType)
+
+  const ttlMs = expirationDate.toDate().getTime() - Date.now()
+  const ttlNs = (BigInt(ttlMs) * 100000n) + BigInt(expirationDate.getNano())
+
+  return _create(privateKey, value, seq, validityType, expirationDate, ttlNs)
 }
 
 /**
  * @param {PrivateKey} privateKey
  * @param {Uint8Array} value
- * @param {number} seq
- * @param {Uint8Array} isoValidity
+ * @param {number | bigint} seq
  * @param {number} validityType
+ * @param {NanoDate} expirationDate
+ * @param {bigint} ttl
  */
-const _create = async (privateKey, value, seq, isoValidity, validityType) => {
-  const signature = await sign(privateKey, value, validityType, isoValidity)
+const _create = async (privateKey, value, seq, validityType, expirationDate, ttl) => {
+  seq = BigInt(seq)
+  const isoValidity = uint8ArrayFromString(expirationDate.toString())
+  const signatureV1 = await sign(privateKey, value, validityType, isoValidity)
+  const data = createCborData(value, isoValidity, validityType, seq, ttl)
+  const sigData = ipnsEntryDataForV2Sig(data)
+  const signatureV2 = await privateKey.sign(sigData)
 
   const entry = {
     value,
-    signature: signature,
+    signature: signatureV1,
     validityType: validityType,
     validity: isoValidity,
-    sequence: seq
+    sequence: seq,
+    ttl,
+    signatureV2,
+    data
   }
 
   log(`ipns entry for ${value} created`)
   return entry
+}
+
+/**
+ * @param {Uint8Array} value
+ * @param {Uint8Array} validity
+ * @param {number} validityType
+ * @param {bigint} sequence
+ * @param {bigint} ttl
+ */
+const createCborData = (value, validity, validityType, sequence, ttl) => {
+  const data = {
+    value,
+    validity,
+    validityType,
+    sequence,
+    ttl
+  }
+
+  return cborg.encode(data)
 }
 
 /**
@@ -93,12 +132,26 @@ const _create = async (privateKey, value, seq, isoValidity, validityType) => {
  */
 const validate = async (publicKey, entry) => {
   const { value, validityType, validity } = entry
-  const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
+
+  /** @type {Uint8Array} */
+  let dataForSignature
+  let signature
+
+  // Check v2 signature if it's available, otherwise use the v1 signature
+  if (entry.signatureV2 && entry.data) {
+    signature = entry.signatureV2
+    dataForSignature = ipnsEntryDataForV2Sig(entry.data)
+
+    validateCborDataMatchesPbData(entry)
+  } else {
+    signature = entry.signature
+    dataForSignature = ipnsEntryDataForV1Sig(value, validityType, validity)
+  }
 
   // Validate Signature
   let isValid
   try {
-    isValid = await publicKey.verify(dataForSignature, entry.signature)
+    isValid = await publicKey.verify(dataForSignature, signature)
   } catch (err) {
     isValid = false
   }
@@ -131,11 +184,42 @@ const validate = async (publicKey, entry) => {
 }
 
 /**
+ * @param {IPNSEntry} entry
+ */
+const validateCborDataMatchesPbData = async (entry) => {
+  if (!entry.data) {
+    throw errCode(new Error('Record data is missing'), ERRORS.ERR_INVALID_RECORD_DATA)
+  }
+
+  const data = cborg.decode(entry.data)
+
+  if (!uint8ArrayEquals(data.value, entry.value)) {
+    throw errCode(new Error('Field "value" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
+  }
+
+  if (!uint8ArrayEquals(data.validity, entry.validity)) {
+    throw errCode(new Error('Field "validity" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
+  }
+
+  if (data.validityType !== entry.validityType) {
+    throw errCode(new Error('Field "validityType" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
+  }
+
+  if (data.sequence !== entry.sequence) {
+    throw errCode(new Error('Field "sequence" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
+  }
+
+  if (data.ttl !== entry.ttl) {
+    throw errCode(new Error('Field "ttl" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
+  }
+}
+
+/**
  * Embed the given public key in the given entry. While not strictly required,
  * some nodes (eg. DHT servers) may reject IPNS entries that don't embed their
  * public keys as they may not be able to validate them efficiently.
- * As a consequence of nodes needing to validade a record upon receipt, they need
- * the public key associated with it. For olde RSA keys, it is easier if we just
+ * As a consequence of nodes needing to validate a record upon receipt, they need
+ * the public key associated with it. For old RSA keys, it is easier if we just
  * send this as part of the record itself. For newer ed25519 keys, the public key
  * can be embedded in the peerId.
  *
@@ -254,7 +338,7 @@ const getIdKeys = (pid) => {
  */
 const sign = (privateKey, value, validityType, validity) => {
   try {
-    const dataForSignature = ipnsEntryDataForSig(value, validityType, validity)
+    const dataForSignature = ipnsEntryDataForV1Sig(value, validityType, validity)
 
     return privateKey.sign(dataForSignature)
   } catch (error) {
@@ -285,10 +369,21 @@ const getValidityType = (validityType) => {
  * @param {number} validityType
  * @param {Uint8Array} validity
  */
-const ipnsEntryDataForSig = (value, validityType, validity) => {
+const ipnsEntryDataForV1Sig = (value, validityType, validity) => {
   const validityTypeBuffer = uint8ArrayFromString(getValidityType(validityType))
 
   return uint8ArrayConcat([value, validity, validityTypeBuffer])
+}
+
+/**
+ * Utility for creating the record data for being signed
+ *
+ * @param {Uint8Array} data
+ */
+const ipnsEntryDataForV2Sig = (data) => {
+  const entryData = uint8ArrayFromString('ipns-signature:')
+
+  return uint8ArrayConcat([entryData, data])
 }
 
 /**
@@ -310,7 +405,11 @@ const extractPublicKeyFromId = (peerId) => {
  * @param {IPNSEntry} obj
  */
 const marshal = (obj) => {
-  return ipnsEntryProto.encode(obj).finish()
+  return ipnsEntryProto.encode({
+    ...obj,
+    sequence: Long.fromString(obj.sequence.toString()),
+    ttl: Long.fromString(obj.ttl.toString())
+  }).finish()
 }
 
 /**
@@ -322,7 +421,6 @@ const unmarshal = (buf) => {
   const object = ipnsEntryProto.toObject(message, {
     defaults: false,
     arrays: true,
-    longs: Number,
     objects: false
   })
 
@@ -331,8 +429,9 @@ const unmarshal = (buf) => {
     signature: object.signature,
     validityType: object.validityType,
     validity: object.validity,
-    sequence: object.sequence,
-    pubKey: object.pubKey
+    sequence: BigInt(object.sequence.toString()),
+    pubKey: object.pubKey,
+    ttl: BigInt(object.ttl.toString())
   }
 }
 
