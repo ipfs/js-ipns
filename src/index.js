@@ -192,6 +192,10 @@ const validateCborDataMatchesPbData = async (entry) => {
   }
 
   const data = cborg.decode(entry.data)
+  if (Number.isInteger(data.sequence)) {
+    // sequence must be a BigInt, but DAG-CBOR doesn't preserve this for Numbers within the safe-integer range
+    data.sequence = BigInt(data.sequence)
+  }
 
   if (!uint8ArrayEquals(data.value, entry.value)) {
     throw errCode(new Error('Field "value" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
