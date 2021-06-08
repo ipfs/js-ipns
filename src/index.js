@@ -186,35 +186,41 @@ const validate = async (publicKey, entry) => {
 /**
  * @param {IPNSEntry} entry
  */
-const validateCborDataMatchesPbData = async (entry) => {
+const validateCborDataMatchesPbData = (entry) => {
   if (!entry.data) {
     throw errCode(new Error('Record data is missing'), ERRORS.ERR_INVALID_RECORD_DATA)
   }
 
   const data = cborg.decode(entry.data)
+
   if (Number.isInteger(data.sequence)) {
     // sequence must be a BigInt, but DAG-CBOR doesn't preserve this for Numbers within the safe-integer range
     data.sequence = BigInt(data.sequence)
   }
 
+  if (Number.isInteger(data.ttl)) {
+    // ttl must be a BigInt, but DAG-CBOR doesn't preserve this for Numbers within the safe-integer range
+    data.ttl = BigInt(data.ttl)
+  }
+
   if (!uint8ArrayEquals(data.value, entry.value)) {
-    throw errCode(new Error('Field "value" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
+    throw errCode(new Error('Field "value" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
   if (!uint8ArrayEquals(data.validity, entry.validity)) {
-    throw errCode(new Error('Field "validity" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
+    throw errCode(new Error('Field "validity" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
   if (data.validityType !== entry.validityType) {
-    throw errCode(new Error('Field "validityType" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
+    throw errCode(new Error('Field "validityType" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
   if (data.sequence !== entry.sequence) {
-    throw errCode(new Error('Field "sequence" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
+    throw errCode(new Error('Field "sequence" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
   if (data.ttl !== entry.ttl) {
-    throw errCode(new Error('Field "ttl" did not match between protobuf and CBOR'), ERRORS.ERR_INVALID_RECORD_DATA)
+    throw errCode(new Error('Field "ttl" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 }
 

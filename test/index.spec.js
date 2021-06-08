@@ -87,14 +87,7 @@ describe('ipns', function () {
     // corrupt the record by changing the value to random bytes
     entry.value = crypto.randomBytes(46)
 
-    try {
-      await ipns.validate(rsa.public, entry)
-    } catch (err) {
-      expect(err).to.exist()
-      expect(err).to.include({
-        code: ERRORS.ERR_SIGNATURE_VERIFICATION
-      })
-    }
+    return expect(ipns.validate(rsa.public, entry)).to.eventually.be.rejected().with.property('code', ERRORS.ERR_SIGNATURE_VERIFICATION)
   })
 
   it('should create an ipns record with a validity of 1 nanosecond correctly and it should not be valid 1ms later', async () => {
