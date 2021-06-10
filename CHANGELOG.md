@@ -1,3 +1,12 @@
+# [0.12.0](https://github.com/ipfs/js-ipns/compare/v0.11.0...v0.12.0) (2021-06-10)
+
+
+### Features
+
+* validate v2 ipns signatures ([#121](https://github.com/ipfs/js-ipns/issues/121)) ([d1421f9](https://github.com/ipfs/js-ipns/commit/d1421f9389961ac6bf7b0ab4d80442fd7b78c14f))
+
+
+
 # [0.11.0](https://github.com/ipfs/js-ipns/compare/v0.10.2...v0.11.0) (2021-04-21)
 
 
