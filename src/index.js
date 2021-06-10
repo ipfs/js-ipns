@@ -418,7 +418,7 @@ const marshal = (obj) => {
   return ipnsEntryProto.encode({
     ...obj,
     sequence: Long.fromString(obj.sequence.toString()),
-    ttl: Long.fromString(obj.ttl.toString())
+    ttl: obj.ttl == null ? undefined : Long.fromString(obj.ttl.toString())
   }).finish()
 }
 
@@ -439,9 +439,9 @@ const unmarshal = (buf) => {
     signature: object.signature,
     validityType: object.validityType,
     validity: object.validity,
-    sequence: BigInt(object.sequence.toString()),
+    sequence: Object.hasOwnProperty.call(object, 'sequence') ? BigInt(`${object.sequence}`) : 0n,
     pubKey: object.pubKey,
-    ttl: BigInt(object.ttl.toString())
+    ttl: Object.hasOwnProperty.call(object, 'ttl') ? BigInt(`${object.ttl}`) : undefined
   }
 }
 
