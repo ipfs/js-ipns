@@ -38,7 +38,7 @@ describe('ipns', function () {
     const entry = await ipns.create(rsa, cid, sequence, validity)
     expect(entry).to.deep.include({
       value: cid,
-      sequence: sequence
+      sequence: BigInt(sequence)
     })
     expect(entry).to.have.property('validity')
     expect(entry).to.have.property('signature')
@@ -65,6 +65,19 @@ describe('ipns', function () {
     return ipns.validate(rsa.public, entry)
   })
 
+  it('should validate a v1 message', async () => {
+    const sequence = 0
+    const validity = 1000000
+
+    const entry = await ipns.create(rsa, cid, sequence, validity)
+
+    // extra fields added for v2 sigs
+    delete entry.data
+    delete entry.signatureV2
+
+    return ipns.validate(rsa.public, entry)
+  })
+
   it('should fail to validate a bad record', async () => {
     const sequence = 0
     const validity = 1000000
@@ -74,14 +87,7 @@ describe('ipns', function () {
     // corrupt the record by changing the value to random bytes
     entry.value = crypto.randomBytes(46)
 
-    try {
-      await ipns.validate(rsa.public, entry)
-    } catch (err) {
-      expect(err).to.exist()
-      expect(err).to.include({
-        code: ERRORS.ERR_SIGNATURE_VERIFICATION
-      })
-    }
+    return expect(ipns.validate(rsa.public, entry)).to.eventually.be.rejected().with.property('code', ERRORS.ERR_SIGNATURE_VERIFICATION)
   })
 
   it('should create an ipns record with a validity of 1 nanosecond correctly and it should not be valid 1ms later', async () => {
@@ -165,20 +171,20 @@ describe('ipns', function () {
     })
   })
 
-  // It should have a public key embeded for newer ed25519 keys
+  // It should have a public key embedded for newer ed25519 keys
   // https://github.com/ipfs/go-ipns/blob/d51115b4b14ed7fcca5472aadff0fee6772aca8c/ipns.go#L81
   // https://github.com/ipfs/go-ipns/blob/d51115b4b14ed7fcca5472aadff0fee6772aca8c/ipns_test.go
   // https://github.com/libp2p/go-libp2p-peer/blob/7f219a1e70011a258c5d3e502aef6896c60d03ce/peer.go#L80
   // IDFromEd25519PublicKey is not currently implement on js-libp2p-peer
   // https://github.com/libp2p/go-libp2p-peer/pull/30
-  it.skip('should be able to extract a public key directly from the peer', async () => {
+  it('should be able to extract a public key directly from the peer', async () => {
     const sequence = 0
     const validity = 1000000
 
     const ed25519 = await crypto.keys.generateKeyPair('ed25519', 2048)
     const entry = await ipns.create(ed25519, cid, sequence, validity)
     const entryWithKey = ipns.embedPublicKey(ed25519.public, entry)
-    expect(entryWithKey).to.not.exist() // Should be null
+    expect(entryWithKey).to.not.have.property('pubKey') // ed25519 keys should not be embedded
   })
 
   it('validator with no valid public key should error', async () => {
