@@ -1,3 +1,17 @@
+# [0.13.0](https://github.com/ipfs/js-ipns/compare/v0.12.0...v0.13.0) (2021-07-09)
+
+
+### chore
+
+* update deps ([#126](https://github.com/ipfs/js-ipns/issues/126)) ([063fc85](https://github.com/ipfs/js-ipns/commit/063fc85f831a33ebcbda45e2a9526712cc327d8c))
+
+
+### BREAKING CHANGES
+
+* uses new peer-id class and supporting ecosystem modules
+
+
+
 # [0.12.0](https://github.com/ipfs/js-ipns/compare/v0.11.0...v0.12.0) (2021-06-10)
 
 
