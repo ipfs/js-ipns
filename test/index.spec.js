@@ -2,12 +2,11 @@
 'use strict'
 
 const { expect } = require('aegir/utils/chai')
-const { toB58String } = require('multihashes')
+const { base58btc } = require('multiformats/bases/base58')
 const uint8ArrayFromString = require('uint8arrays/from-string')
 const PeerId = require('peer-id')
 
 const crypto = require('libp2p-crypto')
-const { fromB58String } = require('multihashes')
 
 const ipns = require('../src')
 const ERRORS = require('../src/errors')
@@ -126,14 +125,14 @@ describe('ipns', function () {
   })
 
   it('should get datastore key correctly', () => {
-    const datastoreKey = ipns.getLocalKey(fromB58String(ipfsId.id))
+    const datastoreKey = ipns.getLocalKey(base58btc.decode(`z${ipfsId.id}`))
 
     expect(datastoreKey).to.exist()
     expect(datastoreKey.toString()).to.startWith('/ipns/CIQ')
   })
 
   it('should get id keys correctly', () => {
-    const idKeys = ipns.getIdKeys(fromB58String(ipfsId.id))
+    const idKeys = ipns.getIdKeys(base58btc.decode(`z${ipfsId.id}`))
 
     expect(idKeys).to.exist()
     expect(idKeys).to.have.property('routingPubKey')
@@ -153,8 +152,8 @@ describe('ipns', function () {
     ]
 
     keys.forEach(key => {
-      const { routingKey } = ipns.getIdKeys(fromB58String(key))
-      const id = toB58String(routingKey.uint8Array().subarray(ipns.namespaceLength))
+      const { routingKey } = ipns.getIdKeys(base58btc.decode(`z${key}`))
+      const id = base58btc.encode(routingKey.uint8Array().subarray(ipns.namespaceLength)).substring(1)
 
       expect(id).to.equal(key)
     })

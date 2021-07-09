@@ -4,9 +4,10 @@ const NanoDate = require('timestamp-nano')
 const { Key } = require('interface-datastore')
 const crypto = require('libp2p-crypto')
 const PeerId = require('peer-id')
-const multihash = require('multihashes')
+const Digest = require('multiformats/hashes/digest')
+const { identity } = require('multiformats/hashes/identity')
 const errCode = require('err-code')
-const multibase = require('multibase')
+const { base32upper } = require('multiformats/bases/base32')
 const uint8ArrayFromString = require('uint8arrays/from-string')
 const uint8ArrayToString = require('uint8arrays/to-string')
 const uint8ArrayConcat = require('uint8arrays/concat')
@@ -25,7 +26,7 @@ const {
 const { parseRFC3339 } = require('./utils')
 const ERRORS = require('./errors')
 
-const ID_MULTIHASH_CODE = multihash.names.identity
+const ID_MULTIHASH_CODE = identity.code
 
 const namespace = '/ipns/'
 
@@ -310,7 +311,7 @@ const extractPublicKey = (peerId, entry) => {
  *
  * @param {Uint8Array} key
  */
-const rawStdEncoding = (key) => uint8ArrayToString(multibase.encode('base32', key)).slice(1).toUpperCase()
+const rawStdEncoding = (key) => base32upper.encode(key).slice(1)
 
 /**
  * Get key for storing the record locally.
@@ -402,13 +403,13 @@ const ipnsEntryDataForV2Sig = (data) => {
  * @param {PeerId} peerId
  */
 const extractPublicKeyFromId = (peerId) => {
-  const decodedId = multihash.decode(peerId.id)
+  const digest = Digest.decode(peerId.id)
 
-  if (decodedId.code !== ID_MULTIHASH_CODE) {
+  if (digest.code !== ID_MULTIHASH_CODE) {
     return null
   }
 
-  return crypto.keys.unmarshalPublicKey(decodedId.digest)
+  return crypto.keys.unmarshalPublicKey(digest.digest)
 }
 
 /**
@@ -452,8 +453,8 @@ const validator = {
    */
   validate: async (marshalledData, key) => {
     const receivedEntry = unmarshal(marshalledData)
-    const bufferId = key.slice('/ipns/'.length)
-    const peerId = PeerId.createFromBytes(bufferId)
+    const bufferId = uint8ArrayToString(key).substring('/ipns/'.length)
+    const peerId = PeerId.parse(bufferId)
 
     // extract public key
     const pubKey = extractPublicKey(peerId, receivedEntry)
