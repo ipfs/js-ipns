@@ -1,6 +1,6 @@
 {
   "name": "ipns",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "ipns record definitions",
   "leadMaintainer": "Vasco Santos <vasco.santos@moxy.studio>",
   "main": "src/index.js",
@@ -71,13 +71,14 @@
     "Jacob Heun <jacobheun@gmail.com>",
     "Hugo Dias <hugomrdias@gmail.com>",
     "Hector Sanjuan <code@hector.link>",
-    "Steven Allen <steven@stebalien.com>",
     "dirkmc <dirkmdev@gmail.com>",
     "Alan Shaw <alan.shaw@protocol.ai>",
+    "swedneck <40505480+swedneck@users.noreply.github.com>",
     "Bryan Stenson <bryan.stenson@gmail.com>",
     "Diogo Silva <fsdiogo@gmail.com>",
     "Esteban Ordano <eordano@gmail.com>",
     "Juhamatti Niemelä <iiska@iki.fi>",
-    "Rob Brackett <rob@robbrackett.com>"
+    "Rob Brackett <rob@robbrackett.com>",
+    "Steven Allen <steven@stebalien.com>"
   ]
 }
