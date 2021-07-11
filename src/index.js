@@ -29,6 +29,7 @@ const ERRORS = require('./errors')
 const ID_MULTIHASH_CODE = identity.code
 
 const namespace = '/ipns/'
+const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
 
 /**
  * @typedef {import('./types').IPNSEntry} IPNSEntry
@@ -453,8 +454,8 @@ const validator = {
    */
   validate: async (marshalledData, key) => {
     const receivedEntry = unmarshal(marshalledData)
-    const bufferId = uint8ArrayToString(key).substring('/ipns/'.length)
-    const peerId = PeerId.parse(bufferId)
+    const bufferId = key.slice(IPNS_PREFIX.length)
+    const peerId = PeerId.createFromBytes(bufferId)
 
     // extract public key
     const pubKey = extractPublicKey(peerId, receivedEntry)
