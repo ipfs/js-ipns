@@ -4,6 +4,7 @@
 const { expect } = require('aegir/utils/chai')
 const { base58btc } = require('multiformats/bases/base58')
 const uint8ArrayFromString = require('uint8arrays/from-string')
+const uint8ArrayConcat = require('uint8arrays/concat')
 const PeerId = require('peer-id')
 
 const crypto = require('libp2p-crypto')
@@ -193,7 +194,8 @@ describe('ipns', function () {
     const entry = await ipns.create(rsa, cid, sequence, validity)
 
     const marshalledData = ipns.marshal(entry)
-    const key = uint8ArrayFromString(`/ipns/${ipfsId.id}`)
+    const keyBytes = base58btc.decode(`z${ipfsId.id}`)
+    const key = uint8ArrayConcat([uint8ArrayFromString('/ipns/'), keyBytes])
 
     try {
       await ipns.validator.validate(marshalledData, key)
@@ -222,7 +224,9 @@ describe('ipns', function () {
     await ipns.embedPublicKey(rsa.public, entry)
 
     const marshalledData = ipns.marshal(entry)
-    const key = uint8ArrayFromString(`/ipns/${ipfsId.id}`)
+
+    const keyBytes = base58btc.decode(`z${ipfsId.id}`)
+    const key = uint8ArrayConcat([uint8ArrayFromString('/ipns/'), keyBytes])
 
     await ipns.validator.validate(marshalledData, key)
   })
@@ -237,7 +241,9 @@ describe('ipns', function () {
     // corrupt the record by changing the value to random bytes
     entry.value = crypto.randomBytes(46)
     const marshalledData = ipns.marshal(entry)
-    const key = uint8ArrayFromString(`/ipns/${ipfsId.id}`)
+
+    const keyBytes = base58btc.decode(`z${ipfsId.id}`)
+    const key = uint8ArrayConcat([uint8ArrayFromString('/ipns/'), keyBytes])
 
     try {
       await ipns.validator.validate(marshalledData, key)
