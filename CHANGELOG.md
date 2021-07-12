@@ -1,3 +1,22 @@
+## [0.13.2](https://github.com/ipfs/js-ipns/compare/v0.12.0...v0.13.2) (2021-07-12)
+
+
+### Bug Fixes
+
+* parse peer id from message correctly ([#127](https://github.com/ipfs/js-ipns/issues/127)) ([d7c8e51](https://github.com/ipfs/js-ipns/commit/d7c8e51c1505b1d75ef800d65c8896a3fe66d6d5))
+
+
+### chore
+
+* update deps ([#126](https://github.com/ipfs/js-ipns/issues/126)) ([063fc85](https://github.com/ipfs/js-ipns/commit/063fc85f831a33ebcbda45e2a9526712cc327d8c))
+
+
+### BREAKING CHANGES
+
+* uses new peer-id class and supporting ecosystem modules
+
+
+
 ## [0.13.1](https://github.com/ipfs/js-ipns/compare/v0.13.0...v0.13.1) (2021-07-10)
 
 
