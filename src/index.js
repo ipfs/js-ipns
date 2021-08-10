@@ -116,11 +116,11 @@ const _create = async (privateKey, value, seq, validityType, expirationDate, ttl
  */
 const createCborData = (value, validity, validityType, sequence, ttl) => {
   const data = {
-    value,
-    validity,
-    validityType,
-    sequence,
-    ttl
+    Value: value,
+    Validity: validity,
+    ValidityType: validityType,
+    Sequence: sequence,
+    TTL: ttl
   }
 
   return cborg.encode(data)
@@ -195,33 +195,33 @@ const validateCborDataMatchesPbData = (entry) => {
 
   const data = cborg.decode(entry.data)
 
-  if (Number.isInteger(data.sequence)) {
+  if (Number.isInteger(data.Sequence)) {
     // sequence must be a BigInt, but DAG-CBOR doesn't preserve this for Numbers within the safe-integer range
-    data.sequence = BigInt(data.sequence)
+    data.Sequence = BigInt(data.Sequence)
   }
 
-  if (Number.isInteger(data.ttl)) {
+  if (Number.isInteger(data.TTL)) {
     // ttl must be a BigInt, but DAG-CBOR doesn't preserve this for Numbers within the safe-integer range
-    data.ttl = BigInt(data.ttl)
+    data.TTL = BigInt(data.TTL)
   }
 
-  if (!uint8ArrayEquals(data.value, entry.value)) {
+  if (!uint8ArrayEquals(data.Value, entry.value)) {
     throw errCode(new Error('Field "value" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
-  if (!uint8ArrayEquals(data.validity, entry.validity)) {
+  if (!uint8ArrayEquals(data.Validity, entry.validity)) {
     throw errCode(new Error('Field "validity" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
-  if (data.validityType !== entry.validityType) {
+  if (data.ValidityType !== entry.validityType) {
     throw errCode(new Error('Field "validityType" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
-  if (data.sequence !== entry.sequence) {
+  if (data.Sequence !== entry.sequence) {
     throw errCode(new Error('Field "sequence" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
-  if (data.ttl !== entry.ttl) {
+  if (data.TTL !== entry.ttl) {
     throw errCode(new Error('Field "ttl" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 }
