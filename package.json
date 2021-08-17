@@ -51,7 +51,7 @@
     "peer-id": "^0.15.0",
     "protobufjs": "^6.10.2",
     "timestamp-nano": "^1.0.0",
-    "uint8arrays": "^2.0.5"
+    "uint8arrays": "^3.0.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
