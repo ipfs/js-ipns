@@ -3,8 +3,8 @@
 
 const { expect } = require('aegir/utils/chai')
 const { base58btc } = require('multiformats/bases/base58')
-const uint8ArrayFromString = require('uint8arrays/from-string')
-const uint8ArrayConcat = require('uint8arrays/concat')
+const { fromString: uint8ArrayFromString } = require('uint8arrays/from-string')
+const { concat: uint8ArrayConcat } = require('uint8arrays/concat')
 const PeerId = require('peer-id')
 
 const crypto = require('libp2p-crypto')
