@@ -1,3 +1,12 @@
+## [0.13.4](https://github.com/ipfs/js-ipns/compare/v0.13.2...v0.13.4) (2021-08-19)
+
+
+### Bug Fixes
+
+* cbor keys should be pascal case ([#128](https://github.com/ipfs/js-ipns/issues/128)) ([1f8bcd3](https://github.com/ipfs/js-ipns/commit/1f8bcd379a7ba37daef0ceefc1ef69f4c15dab63))
+
+
+
 ## [0.13.3](https://github.com/ipfs/js-ipns/compare/v0.13.2...v0.13.3) (2021-08-11)
 
 
