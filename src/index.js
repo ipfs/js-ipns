@@ -83,6 +83,7 @@ const createWithExpiration = (privateKey, value, seq, expiration) => {
  * @param {number} validityType
  * @param {NanoDate} expirationDate
  * @param {bigint} ttl
+ * @returns {Promise<IPNSEntry>}
  */
 const _create = async (privateKey, value, seq, validityType, expirationDate, ttl) => {
   seq = BigInt(seq)
@@ -277,7 +278,8 @@ const embedPublicKey = async (publicKey, entry) => {
 }
 
 /**
- * Extracts a public key matching `pid` from the ipns record.
+ * Extracts a public key from the passed PeerId, falling
+ * back to the pubKey embedded in the ipns record.
  *
  * @param {PeerId} peerId - peer identifier object.
  * @param {IPNSEntry} entry - ipns entry record.
@@ -443,7 +445,9 @@ const unmarshal = (buf) => {
     validity: object.validity,
     sequence: Object.hasOwnProperty.call(object, 'sequence') ? BigInt(`${object.sequence}`) : 0n,
     pubKey: object.pubKey,
-    ttl: Object.hasOwnProperty.call(object, 'ttl') ? BigInt(`${object.ttl}`) : undefined
+    ttl: Object.hasOwnProperty.call(object, 'ttl') ? BigInt(`${object.ttl}`) : undefined,
+    signatureV2: object.signatureV2,
+    data: object.data
   }
 }
 
@@ -463,6 +467,7 @@ const validator = {
     // Record validation
     await validate(pubKey, receivedEntry)
   },
+
   /**
    * @param {Uint8Array} dataA
    * @param {Uint8Array} dataB
@@ -471,7 +476,25 @@ const validator = {
     const entryA = unmarshal(dataA)
     const entryB = unmarshal(dataB)
 
-    return entryA.sequence > entryB.sequence ? 0 : 1
+    // having a newer signature version is better than an older signature version
+    if (entryA.signatureV2 && !entryB.signatureV2) {
+      return 0
+    } else if (entryB.signatureV2 && !entryA.signatureV2) {
+      return 1
+    }
+
+    // choose later sequence number
+    if (entryA.sequence > entryB.sequence) {
+      return 0
+    } else if (entryA.sequence < entryB.sequence) {
+      return 1
+    }
+
+    // choose longer lived record if sequence numbers the same
+    const entryAValidityDate = parseRFC3339(uint8ArrayToString(entryA.validity))
+    const entryBValidityDate = parseRFC3339(uint8ArrayToString(entryB.validity))
+
+    return entryBValidityDate.getTime() > entryAValidityDate.getTime() ? 1 : 0
   }
 }
 

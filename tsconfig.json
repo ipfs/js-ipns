@@ -4,10 +4,10 @@
     "outDir": "dist"
   },
   "include": [
-    "src"
+    "src",
+    "test"
   ],
   "exclude": [
-    "src/pb/ipns.js",
-    "test"
+    "src/pb/ipns.js"
   ]
 }
