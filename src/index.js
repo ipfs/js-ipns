@@ -284,7 +284,7 @@ const embedPublicKey = async (publicKey, entry) => {
  * @param {PeerId} peerId - peer identifier object.
  * @param {IPNSEntry} entry - ipns entry record.
  */
-const extractPublicKey = (peerId, entry) => {
+const extractPublicKey = async (peerId, entry) => {
   if (!entry || !peerId) {
     const error = new Error('one or more of the provided parameters are not defined')
 
@@ -292,21 +292,30 @@ const extractPublicKey = (peerId, entry) => {
     throw errCode(error, ERRORS.ERR_UNDEFINED_PARAMETER)
   }
 
+  let pubKey
+
   if (entry.pubKey) {
-    let pubKey
     try {
       pubKey = crypto.keys.unmarshalPublicKey(entry.pubKey)
     } catch (err) {
       log.error(err)
       throw err
     }
+
+    const otherId = await PeerId.createFromPubKey(entry.pubKey)
+
+    if (!otherId.equals(peerId)) {
+      throw errCode(new Error('Embedded public key did not match PeerID'), ERRORS.ERR_INVALID_EMBEDDED_KEY)
+    }
+  } else if (peerId.pubKey) {
+    pubKey = peerId.pubKey
+  }
+
+  if (pubKey) {
     return pubKey
   }
 
-  if (peerId.pubKey) {
-    return peerId.pubKey
-  }
-  throw Object.assign(new Error('no public key is available'), { code: ERRORS.ERR_UNDEFINED_PARAMETER })
+  throw errCode(new Error('no public key is available'), ERRORS.ERR_UNDEFINED_PARAMETER)
 }
 
 /**
@@ -462,7 +471,7 @@ const validator = {
     const peerId = PeerId.createFromBytes(bufferId)
 
     // extract public key
-    const pubKey = extractPublicKey(peerId, receivedEntry)
+    const pubKey = await extractPublicKey(peerId, receivedEntry)
 
     // Record validation
     await validate(pubKey, receivedEntry)
