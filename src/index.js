@@ -83,6 +83,7 @@ const createWithExpiration = (privateKey, value, seq, expiration) => {
  * @param {number} validityType
  * @param {NanoDate} expirationDate
  * @param {bigint} ttl
+ * @returns {Promise<IPNSEntry>}
  */
 const _create = async (privateKey, value, seq, validityType, expirationDate, ttl) => {
   seq = BigInt(seq)
@@ -277,12 +278,13 @@ const embedPublicKey = async (publicKey, entry) => {
 }
 
 /**
- * Extracts a public key matching `pid` from the ipns record.
+ * Extracts a public key from the passed PeerId, falling
+ * back to the pubKey embedded in the ipns record.
  *
  * @param {PeerId} peerId - peer identifier object.
  * @param {IPNSEntry} entry - ipns entry record.
  */
-const extractPublicKey = (peerId, entry) => {
+const extractPublicKey = async (peerId, entry) => {
   if (!entry || !peerId) {
     const error = new Error('one or more of the provided parameters are not defined')
 
@@ -290,21 +292,30 @@ const extractPublicKey = (peerId, entry) => {
     throw errCode(error, ERRORS.ERR_UNDEFINED_PARAMETER)
   }
 
+  let pubKey
+
   if (entry.pubKey) {
-    let pubKey
     try {
       pubKey = crypto.keys.unmarshalPublicKey(entry.pubKey)
     } catch (err) {
       log.error(err)
       throw err
     }
+
+    const otherId = await PeerId.createFromPubKey(entry.pubKey)
+
+    if (!otherId.equals(peerId)) {
+      throw errCode(new Error('Embedded public key did not match PeerID'), ERRORS.ERR_INVALID_EMBEDDED_KEY)
+    }
+  } else if (peerId.pubKey) {
+    pubKey = peerId.pubKey
+  }
+
+  if (pubKey) {
     return pubKey
   }
 
-  if (peerId.pubKey) {
-    return peerId.pubKey
-  }
-  throw Object.assign(new Error('no public key is available'), { code: ERRORS.ERR_UNDEFINED_PARAMETER })
+  throw errCode(new Error('no public key is available'), ERRORS.ERR_UNDEFINED_PARAMETER)
 }
 
 /**
@@ -443,7 +454,9 @@ const unmarshal = (buf) => {
     validity: object.validity,
     sequence: Object.hasOwnProperty.call(object, 'sequence') ? BigInt(`${object.sequence}`) : 0n,
     pubKey: object.pubKey,
-    ttl: Object.hasOwnProperty.call(object, 'ttl') ? BigInt(`${object.ttl}`) : undefined
+    ttl: Object.hasOwnProperty.call(object, 'ttl') ? BigInt(`${object.ttl}`) : undefined,
+    signatureV2: object.signatureV2,
+    data: object.data
   }
 }
 
@@ -458,11 +471,12 @@ const validator = {
     const peerId = PeerId.createFromBytes(bufferId)
 
     // extract public key
-    const pubKey = extractPublicKey(peerId, receivedEntry)
+    const pubKey = await extractPublicKey(peerId, receivedEntry)
 
     // Record validation
     await validate(pubKey, receivedEntry)
   },
+
   /**
    * @param {Uint8Array} dataA
    * @param {Uint8Array} dataB
@@ -471,7 +485,25 @@ const validator = {
     const entryA = unmarshal(dataA)
     const entryB = unmarshal(dataB)
 
-    return entryA.sequence > entryB.sequence ? 0 : 1
+    // having a newer signature version is better than an older signature version
+    if (entryA.signatureV2 && !entryB.signatureV2) {
+      return 0
+    } else if (entryB.signatureV2 && !entryA.signatureV2) {
+      return 1
+    }
+
+    // choose later sequence number
+    if (entryA.sequence > entryB.sequence) {
+      return 0
+    } else if (entryA.sequence < entryB.sequence) {
+      return 1
+    }
+
+    // choose longer lived record if sequence numbers the same
+    const entryAValidityDate = parseRFC3339(uint8ArrayToString(entryA.validity))
+    const entryBValidityDate = parseRFC3339(uint8ArrayToString(entryB.validity))
+
+    return entryBValidityDate.getTime() > entryAValidityDate.getTime() ? 1 : 0
   }
 }
 

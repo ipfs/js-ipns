@@ -3,6 +3,7 @@
 
 const { expect } = require('aegir/utils/chai')
 const { base58btc } = require('multiformats/bases/base58')
+const { base64urlpad } = require('multiformats/bases/base64')
 const { fromString: uint8ArrayFromString } = require('uint8arrays/from-string')
 const { concat: uint8ArrayConcat } = require('uint8arrays/concat')
 const PeerId = require('peer-id')
@@ -21,13 +22,18 @@ describe('ipns', function () {
   let ipfsId
   /** @type {import('libp2p-crypto').keys.supportedKeys.rsa.RsaPrivateKey} */
   let rsa
+  /** @type {import('libp2p-crypto').keys.supportedKeys.rsa.RsaPrivateKey} */
+  let rsa2
 
   before(async () => {
     rsa = await crypto.keys.generateKeyPair('RSA', 2048)
+    rsa2 = await crypto.keys.generateKeyPair('RSA', 2048)
+
+    const peerId = await PeerId.createFromPubKey(rsa.public.bytes)
 
     ipfsId = {
-      id: 'QmQ73f8hbM4hKwRYBqeUsPtiwfE2x6WPv9WnzaYt4nYcXf',
-      publicKey: 'CAASpgIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUOR0AJ2/yO0S/JIkKmYV/QdHzQXi1nrTCCXtEbUDVW5mXZfNf9bKeNDfW3UIIOwVzV6/sRhJqq/8sQAhmzURj1q2onCKgSLzjdePSLtykolQeQGSD+JO7rcxOLx+sTdIyJiclP/tkK2gfo2nrI6pjFTKNzR8VSoJx7gfiqY1N9LBgDsD4WjaOM2pBgzgVUlXpk27Aqvcd+htSWi6JuIZaBhPY/IzEvXwntGH9k7F8VkT6nUBilhqFFSWnz8cNKToCHjyhoozKfqN89S7EGMiNvG4cX4Dc/nVXlZRTAi4PNNewutimujROy2/tNEquC2uAlcAzhRAcLL/ujhEjJYP1AgMBAAE='
+      id: peerId.toB58String(),
+      publicKey: base64urlpad.encode(rsa.public.bytes)
     }
   })
 
@@ -43,6 +49,8 @@ describe('ipns', function () {
     expect(entry).to.have.property('validity')
     expect(entry).to.have.property('signature')
     expect(entry).to.have.property('validityType')
+    expect(entry).to.have.property('signatureV2')
+    expect(entry).to.have.property('data')
   })
 
   it('should be able to create a record with a fixed expiration', async () => {
@@ -121,6 +129,19 @@ describe('ipns', function () {
     expect(entryDataCreated.validityType).to.equal(unmarshalledData.validityType)
     expect(entryDataCreated.signature).to.equalBytes(unmarshalledData.signature)
     expect(entryDataCreated.sequence).to.equal(unmarshalledData.sequence)
+    expect(entryDataCreated.ttl).to.equal(unmarshalledData.ttl)
+
+    if (!unmarshalledData.signatureV2) {
+      throw new Error('No v2 sig found')
+    }
+
+    expect(entryDataCreated.signatureV2).to.equalBytes(unmarshalledData.signatureV2)
+
+    if (!unmarshalledData.data) {
+      throw new Error('No v2 data found')
+    }
+
+    expect(entryDataCreated.data).to.equalBytes(unmarshalledData.data)
 
     return ipns.validate(rsa.public, unmarshalledData)
   })
@@ -206,13 +227,13 @@ describe('ipns', function () {
     expect.fail('Expected ERR_UNDEFINED_PARAMETER')
   })
 
-  it('should be able to export a previously embed public key from an ipns record', async () => {
+  it('should be able to export a previously embedded public key from an ipns record', async () => {
     const sequence = 0
     const validity = 1000000
 
     const entry = await ipns.create(rsa, cid, sequence, validity)
     await ipns.embedPublicKey(rsa.public, entry)
-    const publicKey = ipns.extractPublicKey(PeerId.createFromB58String(ipfsId.id), entry)
+    const publicKey = await ipns.extractPublicKey(PeerId.createFromB58String(ipfsId.id), entry)
     expect(publicKey.bytes).to.equalBytes(rsa.public.bytes)
   })
 
@@ -245,22 +266,46 @@ describe('ipns', function () {
     const keyBytes = base58btc.decode(`z${ipfsId.id}`)
     const key = uint8ArrayConcat([uint8ArrayFromString('/ipns/'), keyBytes])
 
-    try {
-      await ipns.validator.validate(marshalledData, key)
-    } catch (err) {
-      expect(err).to.exist()
-      expect(err).to.include({
-        code: ERRORS.ERR_SIGNATURE_VERIFICATION
-      })
-    }
+    await expect(ipns.validator.validate(marshalledData, key))
+      .to.eventually.be.rejected().with.property('code', ERRORS.ERR_SIGNATURE_VERIFICATION)
   })
 
-  it('should use validator.select to select the record with the highest sequence number', async () => {
+  it('should use validator.validate to verify that a record is not valid when it is passed with the wrong IPNS key', async () => {
     const sequence = 0
     const validity = 1000000
 
     const entry = await ipns.create(rsa, cid, sequence, validity)
-    const newEntry = await ipns.create(rsa, cid, (sequence + 1), validity)
+    await ipns.embedPublicKey(rsa.public, entry)
+    const marshalledData = ipns.marshal(entry)
+
+    const keyBytes = (await PeerId.createFromPrivKey(rsa2.bytes)).toBytes()
+    const key = uint8ArrayConcat([uint8ArrayFromString('/ipns/'), keyBytes])
+
+    await expect(ipns.validator.validate(marshalledData, key))
+      .to.eventually.be.rejected().with.property('code', ERRORS.ERR_INVALID_EMBEDDED_KEY)
+  })
+
+  it('should use validator.validate to verify that a record is not valid when the wrong key is embedded', async () => {
+    const sequence = 0
+    const validity = 1000000
+
+    const entry = await ipns.create(rsa, cid, sequence, validity)
+    await ipns.embedPublicKey(rsa2.public, entry)
+    const marshalledData = ipns.marshal(entry)
+
+    const keyBytes = (await PeerId.createFromPrivKey(rsa.bytes)).toBytes()
+    const key = uint8ArrayConcat([uint8ArrayFromString('/ipns/'), keyBytes])
+
+    await expect(ipns.validator.validate(marshalledData, key))
+      .to.eventually.be.rejected().with.property('code', ERRORS.ERR_INVALID_EMBEDDED_KEY)
+  })
+
+  it('should use validator.select to select the record with the highest sequence number', async () => {
+    const sequence = 0
+    const lifetime = 1000000
+
+    const entry = await ipns.create(rsa, cid, sequence, lifetime)
+    const newEntry = await ipns.create(rsa, cid, (sequence + 1), lifetime)
 
     const marshalledData = ipns.marshal(entry)
     const marshalledNewData = ipns.marshal(newEntry)
@@ -270,5 +315,41 @@ describe('ipns', function () {
 
     valid = ipns.validator.select(marshalledData, marshalledNewData)
     expect(valid).to.equal(1) // new data is the selected one
+  })
+
+  it('should use validator.select to select the record with the longest validity', async () => {
+    const sequence = 0
+    const lifetime = 1000000
+
+    const entry = await ipns.create(rsa, cid, sequence, lifetime)
+    const newEntry = await ipns.create(rsa, cid, sequence, (lifetime + 1))
+
+    const marshalledData = ipns.marshal(entry)
+    const marshalledNewData = ipns.marshal(newEntry)
+
+    let valid = ipns.validator.select(marshalledNewData, marshalledData)
+    expect(valid).to.equal(0) // new data is the selected one
+
+    valid = ipns.validator.select(marshalledData, marshalledNewData)
+    expect(valid).to.equal(1) // new data is the selected one
+  })
+
+  it('should use validator.select to select an older record with a v2 sig when the newer record only uses v1', async () => {
+    const sequence = 0
+    const lifetime = 1000000
+
+    const entry = await ipns.create(rsa, cid, sequence, lifetime)
+
+    const newEntry = await ipns.create(rsa, cid, sequence + 1, lifetime)
+    delete newEntry.signatureV2
+
+    const marshalledData = ipns.marshal(entry)
+    const marshalledNewData = ipns.marshal(newEntry)
+
+    let valid = ipns.validator.select(marshalledNewData, marshalledData)
+    expect(valid).to.equal(1) // old data is the selected one
+
+    valid = ipns.validator.select(marshalledData, marshalledNewData)
+    expect(valid).to.equal(0) // old data is the selected one
   })
 })
