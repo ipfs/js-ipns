@@ -1,3 +1,17 @@
+# [0.14.0](https://github.com/ipfs/js-ipns/compare/v0.13.4...v0.14.0) (2021-09-02)
+
+
+### Bug Fixes
+
+* update record selection rules ([#134](https://github.com/ipfs/js-ipns/issues/134)) ([fd1481a](https://github.com/ipfs/js-ipns/commit/fd1481a8fc00138d4543ca27050e080aefd8b31d)), closes [/github.com/ipfs/go-ipns/blob/a2d4e93f7e8ffc9f996471eb1a24ff12c8484120/ipns.go#L325-L362](https://github.com//github.com/ipfs/go-ipns/blob/a2d4e93f7e8ffc9f996471eb1a24ff12c8484120/ipns.go/issues/L325-L362)
+
+
+### BREAKING CHANGES
+
+* extractPublicKey is now async
+
+
+
 ## [0.13.4](https://github.com/ipfs/js-ipns/compare/v0.13.2...v0.13.4) (2021-08-19)
 
 
