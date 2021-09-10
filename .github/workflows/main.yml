@@ -56,21 +56,21 @@ jobs:
       - run: npm install
       - run: npm run test -- -t ${{ matrix.type }} -- --browser ${{ matrix.browser }}
     test-electron:
-     needs: check
-     runs-on: ubuntu-latest
-     name: test ${{ matrix.type }}
-     strategy:
-       matrix:
-         type:
-           - electron-main
-           - electron-renderer
-       fail-fast: true
-     steps:
-       - uses: actions/checkout@v2
-       - uses: actions/setup-node@v1
-         with:
-           node-version: 16
-       - run: npm install
-       - uses: GabrielBB/xvfb-action@v1
-         with:
-           run: npm run test -- -t ${{ matrix.type }} --bail
+      needs: check
+      runs-on: ubuntu-latest
+      name: test ${{ matrix.type }}
+      strategy:
+        matrix:
+          type:
+            - electron-main
+            - electron-renderer
+        fail-fast: true
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions/setup-node@v1
+          with:
+            node-version: 16
+        - run: npm install
+        - uses: GabrielBB/xvfb-action@v1
+          with:
+            run: npm run test -- -t ${{ matrix.type }} --bail
