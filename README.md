@@ -48,7 +48,7 @@ This module contains all the necessary code for creating, understanding and vali
 #### Create record
 
 ```js
-const ipns from 'ipns')
+import * as ipns from 'ipns'
 
 const entryData = await ipns.create(privateKey, value, sequenceNumber, lifetime)
 ```
@@ -56,7 +56,7 @@ const entryData = await ipns.create(privateKey, value, sequenceNumber, lifetime)
 #### Validate record
 
 ```js
-const ipns from 'ipns')
+import * as ipns from 'ipns'
 
 await ipns.validate(publicKey, ipnsEntry)
 // if no error thrown, the record is valid
@@ -65,7 +65,7 @@ await ipns.validate(publicKey, ipnsEntry)
 #### Embed public key to record
 
 ```js
-const ipns from 'ipns')
+import * as ipns from 'ipns'
 
 const ipnsEntryWithEmbedPublicKey = await ipns.embedPublicKey(publicKey, ipnsEntry)
 ```
@@ -73,7 +73,7 @@ const ipnsEntryWithEmbedPublicKey = await ipns.embedPublicKey(publicKey, ipnsEnt
 #### Extract public key from record
 
 ```js
-const ipns from 'ipns')
+import * as ipns from 'ipns'
 
 const publicKey = ipns.extractPublicKey(peerId, ipnsEntry)
 ```
@@ -81,7 +81,7 @@ const publicKey = ipns.extractPublicKey(peerId, ipnsEntry)
 #### Datastore key
 
 ```js
-const ipns from 'ipns')
+import * as ipns from 'ipns'
 
 ipns.getLocalKey(peerId)
 ```
@@ -95,7 +95,7 @@ Returns a key to be used for storing the ipns entry locally, that is:
 #### Marshal data with proto buffer
 
 ```js
-const ipns from 'ipns')
+import * as ipns from 'ipns'
 
 const entryData = await ipns.create(privateKey, value, sequenceNumber, lifetime)
 // ...
@@ -108,7 +108,7 @@ Returns the entry data serialized.
 #### Unmarshal data from proto buffer
 
 ```js
-const ipns from 'ipns')
+import * as ipns from 'ipns'
 
 const data = ipns.unmarshal(storedData)
 ```
@@ -118,7 +118,7 @@ Returns the entry data structure after being serialized.
 #### Validator
 
 ```js
-const ipns from 'ipns')
+import * as ipns from 'ipns'
 
 const validator = ipns.validator
 ```
@@ -160,7 +160,6 @@ Returns a `Promise` that resolves to an object with the entry's properties eg:
 #### Validate record
 
 ```js
-
 ipns.validate(publicKey, ipnsEntry)
 ```
 
