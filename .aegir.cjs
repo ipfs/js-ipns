@@ -4,5 +4,8 @@
 module.exports = {
   build: {
     bundlesizeMax: '143KB'
+  },
+  ts: {
+    copyTo: './dist/types'
   }
 }
