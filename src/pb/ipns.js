@@ -1,15 +1,13 @@
 /*eslint-disable*/
-"use strict";
-
-var $protobuf = require("protobufjs/minimal");
+import $protobuf from "protobufjs/minimal.js";
 
 // Common aliases
-var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
+const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
 
 // Exported root namespace
-var $root = $protobuf.roots["ipfs-ipns"] || ($protobuf.roots["ipfs-ipns"] = {});
+const $root = $protobuf.roots["ipfs-ipns"] || ($protobuf.roots["ipfs-ipns"] = {});
 
-$root.IpnsEntry = (function() {
+export const IpnsEntry = $root.IpnsEntry = (() => {
 
     /**
      * Properties of an IpnsEntry.
@@ -398,7 +396,7 @@ $root.IpnsEntry = (function() {
      * @property {number} EOL=0 EOL value
      */
     IpnsEntry.ValidityType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "EOL"] = 0;
         return values;
     })();
@@ -406,4 +404,4 @@ $root.IpnsEntry = (function() {
     return IpnsEntry;
 })();
 
-module.exports = $root;
+export { $root as default };

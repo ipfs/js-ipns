@@ -1,17 +1,14 @@
 /* eslint-env mocha */
-'use strict'
 
-const { expect } = require('aegir/utils/chai')
-const { base58btc } = require('multiformats/bases/base58')
-const { base64urlpad } = require('multiformats/bases/base64')
-const { fromString: uint8ArrayFromString } = require('uint8arrays/from-string')
-const { concat: uint8ArrayConcat } = require('uint8arrays/concat')
-const PeerId = require('peer-id')
-
-const crypto = require('libp2p-crypto')
-
-const ipns = require('../src')
-const ERRORS = require('../src/errors')
+import { expect } from 'aegir/utils/chai.js'
+import { base58btc } from 'multiformats/bases/base58'
+import { base64urlpad } from 'multiformats/bases/base64'
+import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
+import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
+import PeerId from 'peer-id'
+import crypto from 'libp2p-crypto'
+import * as ipns from '../src/index.js'
+import * as ERRORS from '../src/errors.js'
 
 describe('ipns', function () {
   this.timeout(20 * 1000)
@@ -220,7 +217,7 @@ describe('ipns', function () {
 
     try {
       await ipns.validator.validate(marshalledData, key)
-    } catch (err) {
+    } catch (/** @type {any} */ err) {
       expect(err.code).to.eql(ERRORS.ERR_UNDEFINED_PARAMETER)
       return
     }
