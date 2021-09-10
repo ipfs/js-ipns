@@ -22,7 +22,7 @@ jobs:
   test-node:
     needs: check
     runs-on: ${{ matrix.os }}
-    name: Test node ${{ matrix.node }}
+    name: test node ${{ matrix.node }}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
@@ -55,7 +55,7 @@ jobs:
           node-version: 16
       - run: npm install
       - run: npm run test -- -t ${{ matrix.type }} -- --browser ${{ matrix.browser }}
-   test-electron:
+    test-electron:
      needs: check
      runs-on: ubuntu-latest
      name: test ${{ matrix.type }}
