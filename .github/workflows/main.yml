@@ -1,0 +1,76 @@
+name: ci
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 16
+    - run: npm install
+    - run: npm run build
+    - run: npm run lint
+    - run: npm run depcheck
+  test-node:
+    needs: check
+    runs-on: ${{ matrix.os }}
+    name: Test node ${{ matrix.node }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        node: [14, 16]
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm install
+      - run: npm run test -- --cov -t node
+  test-browser:
+    needs: check
+    runs-on: ubuntu-latest
+    name: test ${{ matrix.browser }} ${{ matrix.type }}
+    strategy:
+      matrix:
+        browser:
+          - chromium
+          - firefox
+        type:
+          - browser
+          - webworker
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - run: npm install
+      - run: npm run test -- -t ${{ matrix.type }} -- --browser ${{ matrix.browser }}
+   test-electron:
+     needs: check
+     runs-on: ubuntu-latest
+     name: test ${{ matrix.type }}
+     strategy:
+       matrix:
+         type:
+           - electron-main
+           - electron-renderer
+       fail-fast: true
+     steps:
+       - uses: actions/checkout@v2
+       - uses: actions/setup-node@v1
+         with:
+           node-version: 16
+       - run: npm install
+       - uses: GabrielBB/xvfb-action@v1
+         with:
+           run: npm run test -- -t ${{ matrix.type }} --bail

@@ -1,35 +1,32 @@
-'use strict'
 
-const NanoDate = require('timestamp-nano')
-const { Key } = require('interface-datastore')
-const crypto = require('libp2p-crypto')
-const PeerId = require('peer-id')
-const Digest = require('multiformats/hashes/digest')
-const { identity } = require('multiformats/hashes/identity')
-const errCode = require('err-code')
-const { base32upper } = require('multiformats/bases/base32')
-const { fromString: uint8ArrayFromString } = require('uint8arrays/from-string')
-const { toString: uint8ArrayToString } = require('uint8arrays/to-string')
-const { concat: uint8ArrayConcat } = require('uint8arrays/concat')
-const { equals: uint8ArrayEquals } = require('uint8arrays/equals')
-const cborg = require('cborg')
-const Long = require('long')
+import NanoDate from 'timestamp-nano'
+import { Key } from 'interface-datastore/key'
+import crypto from 'libp2p-crypto'
+import PeerId from 'peer-id'
+import * as Digest from 'multiformats/hashes/digest'
+import { identity } from 'multiformats/hashes/identity'
+import errCode from 'err-code'
+import { base32upper } from 'multiformats/bases/base32'
+import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
+import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
+import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
+import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
+import * as cborg from 'cborg'
+import Long from 'long'
+import debug from 'debug'
+import { IpnsEntry as ipnsEntryProto } from './pb/ipns.js'
+import { parseRFC3339 } from './utils.js'
+import * as ERRORS from './errors.js'
 
-const debug = require('debug')
 const log = Object.assign(debug('jsipns'), {
   error: debug('jsipns:error')
 })
 
-const {
-  IpnsEntry: ipnsEntryProto
-} = require('./pb/ipns.js')
-const { parseRFC3339 } = require('./utils')
-const ERRORS = require('./errors')
-
 const ID_MULTIHASH_CODE = identity.code
-
-const namespace = '/ipns/'
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
+
+export const namespace = '/ipns/'
+export const namespaceLength = namespace.length
 
 /**
  * @typedef {import('./types').IPNSEntry} IPNSEntry
@@ -47,12 +44,12 @@ const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
  * @param {number | bigint} seq - number representing the current version of the record.
  * @param {number} lifetime - lifetime of the record (in milliseconds).
  */
-const create = (privateKey, value, seq, lifetime) => {
+export const create = (privateKey, value, seq, lifetime) => {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = ipnsEntryProto.ValidityType.EOL
   const [ms, ns] = lifetime.toString().split('.')
-  const lifetimeNs = BigInt(ms) * 100000n + BigInt(ns || 0)
+  const lifetimeNs = (BigInt(ms) * BigInt(100000)) + BigInt(ns || 0)
 
   return _create(privateKey, value, seq, validityType, expirationDate, lifetimeNs)
 }
@@ -66,12 +63,12 @@ const create = (privateKey, value, seq, lifetime) => {
  * @param {number | bigint} seq - number representing the current version of the record.
  * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  */
-const createWithExpiration = (privateKey, value, seq, expiration) => {
+export const createWithExpiration = (privateKey, value, seq, expiration) => {
   const expirationDate = NanoDate.fromString(expiration)
   const validityType = ipnsEntryProto.ValidityType.EOL
 
   const ttlMs = expirationDate.toDate().getTime() - Date.now()
-  const ttlNs = (BigInt(ttlMs) * 100000n) + BigInt(expirationDate.getNano())
+  const ttlNs = (BigInt(ttlMs) * BigInt(100000)) + BigInt(expirationDate.getNano())
 
   return _create(privateKey, value, seq, validityType, expirationDate, ttlNs)
 }
@@ -133,7 +130,7 @@ const createCborData = (value, validity, validityType, sequence, ttl) => {
  * @param {PublicKey} publicKey - public key for validating the record.
  * @param {IPNSEntry} entry - ipns entry record.
  */
-const validate = async (publicKey, entry) => {
+export const validate = async (publicKey, entry) => {
   const { value, validityType, validity } = entry
 
   /** @type {Uint8Array} */
@@ -239,7 +236,7 @@ const validateCborDataMatchesPbData = (entry) => {
  * @param {PublicKey} publicKey - public key to embed.
  * @param {IPNSEntry} entry - ipns entry record.
  */
-const embedPublicKey = async (publicKey, entry) => {
+export const embedPublicKey = async (publicKey, entry) => {
   if (!publicKey || !publicKey.bytes || !entry) {
     const error = new Error('one or more of the provided parameters are not defined')
     log.error(error)
@@ -284,7 +281,7 @@ const embedPublicKey = async (publicKey, entry) => {
  * @param {PeerId} peerId - peer identifier object.
  * @param {IPNSEntry} entry - ipns entry record.
  */
-const extractPublicKey = async (peerId, entry) => {
+export const extractPublicKey = async (peerId, entry) => {
   if (!entry || !peerId) {
     const error = new Error('one or more of the provided parameters are not defined')
 
@@ -331,7 +328,7 @@ const rawStdEncoding = (key) => base32upper.encode(key).slice(1)
  *
  * @param {Uint8Array} key - peer identifier object.
  */
-const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
+export const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
 
 /**
  * Get key for sharing the record in the routing mechanism.
@@ -339,7 +336,7 @@ const getLocalKey = (key) => new Key(`/ipns/${rawStdEncoding(key)}`)
  *
  * @param {Uint8Array} pid - peer identifier represented by the multihash of the public key as Uint8Array.
  */
-const getIdKeys = (pid) => {
+export const getIdKeys = (pid) => {
   const pkBuffer = uint8ArrayFromString('/pk/')
   const ipnsBuffer = uint8ArrayFromString('/ipns/')
 
@@ -364,7 +361,7 @@ const sign = (privateKey, value, validityType, validity) => {
     const dataForSignature = ipnsEntryDataForV1Sig(value, validityType, validity)
 
     return privateKey.sign(dataForSignature)
-  } catch (error) {
+  } catch (/** @type {any} */ error) {
     log.error('record signature creation failed')
     throw errCode(new Error('record signature creation failed: ' + error.message), ERRORS.ERR_SIGNATURE_CREATION)
   }
@@ -427,7 +424,7 @@ const extractPublicKeyFromId = (peerId) => {
 /**
  * @param {IPNSEntry} obj
  */
-const marshal = (obj) => {
+export const marshal = (obj) => {
   return ipnsEntryProto.encode({
     ...obj,
     sequence: Long.fromString(obj.sequence.toString()),
@@ -439,7 +436,7 @@ const marshal = (obj) => {
  * @param {Uint8Array} buf
  * @returns {IPNSEntry}
  */
-const unmarshal = (buf) => {
+export const unmarshal = (buf) => {
   const message = ipnsEntryProto.decode(buf)
   const object = ipnsEntryProto.toObject(message, {
     defaults: false,
@@ -460,7 +457,7 @@ const unmarshal = (buf) => {
   }
 }
 
-const validator = {
+export const validator = {
   /**
    * @param {Uint8Array} marshalledData
    * @param {Uint8Array} key
@@ -505,30 +502,4 @@ const validator = {
 
     return entryBValidityDate.getTime() > entryAValidityDate.getTime() ? 1 : 0
   }
-}
-
-module.exports = {
-  // create ipns entry record
-  create,
-  // create ipns entry record specifying the expiration time
-  createWithExpiration,
-  // validate ipns entry record
-  validate,
-  // embed public key in the record
-  embedPublicKey,
-  // extract public key from the record
-  extractPublicKey,
-  // get key for storing the entry locally
-  getLocalKey,
-  // get keys for routing
-  getIdKeys,
-  // marshal
-  marshal,
-  // unmarshal
-  unmarshal,
-  // validator
-  validator,
-  // namespace
-  namespace,
-  namespaceLength: namespace.length
 }
