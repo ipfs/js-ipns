@@ -1,3 +1,17 @@
+## [0.14.1](https://github.com/ipfs/js-ipns/compare/v0.14.0...v0.14.1) (2021-09-10)
+
+
+### chore
+
+* switch to ESM ([#136](https://github.com/ipfs/js-ipns/issues/136)) ([e4175cc](https://github.com/ipfs/js-ipns/commit/e4175ccf887d8ebc5590693759ef46b31a5ee18f))
+
+
+### BREAKING CHANGES
+
+* deep imports/requires are no longer possible
+
+
+
 # [0.14.0](https://github.com/ipfs/js-ipns/compare/v0.13.4...v0.14.0) (2021-09-02)
 
 
