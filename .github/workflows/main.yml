@@ -53,8 +53,9 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 16
-      - run: npm install
-      - run: npm run test -- -t ${{ matrix.type }} -- --browser ${{ matrix.browser }}
+      run: |
+        npm install
+        npm run test -- -t ${{ matrix.type }} -- --browser ${{ matrix.browser }}
     test-electron:
       needs: check
       runs-on: ubuntu-latest
