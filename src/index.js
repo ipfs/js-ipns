@@ -479,6 +479,7 @@ export const validator = {
    * @param {Uint8Array} dataB
    */
   select: (dataA, dataB) => {
+    if(!dataB) return 0 //when only one record
     const entryA = unmarshal(dataA)
     const entryB = unmarshal(dataB)
 
