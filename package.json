@@ -1,6 +1,6 @@
 {
   "name": "ipns",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "description": "ipns record definitions",
   "leadMaintainer": "Vasco Santos <vasco.santos@moxy.studio>",
   "main": "src/index.js",
@@ -69,7 +69,7 @@
   },
   "contributors": [
     "Vasco Santos <vasco.santos@moxy.studio>",
-    "Alex Potsides <alex@achingbrain.net>",
+    "achingbrain <alex@achingbrain.net>",
     "Jacob Heun <jacobheun@gmail.com>",
     "Hugo Dias <hugomrdias@gmail.com>",
     "Hector Sanjuan <code@hector.link>",
