@@ -1,3 +1,7 @@
+## [0.15.1](https://github.com/ipfs/js-ipns/compare/v0.15.0...v0.15.1) (2021-11-30)
+
+
+
 # [0.15.0](https://github.com/ipfs/js-ipns/compare/v0.14.1...v0.15.0) (2021-09-14)
 
 
