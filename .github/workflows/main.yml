@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
+    - uses: actions/setup-node@v2
       with:
-        node-version: 16
+        node-version: lts/*
     - run: npm install
     - run: npm run build
     - run: npm run lint
@@ -26,7 +26,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        node: [14, 16]
+        node: [16]
       fail-fast: true
     steps:
       - uses: actions/checkout@v2
@@ -50,9 +50,9 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: lts/*
       - run: npm install
       - run: npm run test -- -t ${{ matrix.type }} -- --browser ${{ matrix.browser }}
   test-electron:
@@ -67,9 +67,9 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: lts/*
       - run: npm install
       - uses: GabrielBB/xvfb-action@v1
         with:
