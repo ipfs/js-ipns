@@ -1,3 +1,17 @@
+# [0.16.0](https://github.com/ipfs/js-ipns/compare/v0.15.1...v0.16.0) (2021-12-02)
+
+
+### chore
+
+* update deps ([#149](https://github.com/ipfs/js-ipns/issues/149)) ([87068ad](https://github.com/ipfs/js-ipns/commit/87068ad0c592f0eb481b7423598ad1054c462240))
+
+
+### BREAKING CHANGES
+
+* requires node 15+
+
+
+
 ## [0.15.1](https://github.com/ipfs/js-ipns/compare/v0.15.0...v0.15.1) (2021-11-30)
 
 
