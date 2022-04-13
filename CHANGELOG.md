@@ -1,3 +1,14 @@
+## [1.0.0](https://github.com/ipfs/js-ipns/compare/v0.16.0...v1.0.0) (2022-04-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* this module is now ESM-only
+
+### Features
+
+* convert to typescript ([#154](https://github.com/ipfs/js-ipns/issues/154)) ([dd308f0](https://github.com/ipfs/js-ipns/commit/dd308f010311bd07a375270cf0ac505883bb740f))
+
 # [0.16.0](https://github.com/ipfs/js-ipns/compare/v0.15.1...v0.16.0) (2021-12-02)
 
 
@@ -443,6 +454,3 @@ expiration param changed from time of the record (in nanoseconds) to datetime fo
 ### Features
 
 * initial implementation ([b8eb65f](https://github.com/ipfs/js-ipns/commit/b8eb65f))
-
-
-
