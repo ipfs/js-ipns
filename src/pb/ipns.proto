@@ -1,18 +1,28 @@
 // https://github.com/ipfs/go-ipns/blob/master/pb/ipns.proto
 
+syntax = "proto3";
+
 message IpnsEntry {
   enum ValidityType {
 		EOL = 0; // setting an EOL says "this record is valid until..."
 	}
 
+	// value to be stored in the record
   optional bytes value = 1;
+
+	// signature of the record
 	optional bytes signature = 2;
 
+	// Type of validation being used
 	optional ValidityType validityType = 3;
+
+	// expiration datetime for the record in RFC3339 format
 	optional bytes validity = 4;
 
+	// number representing the version of the record
 	optional uint64 sequence = 5;
 
+	// ttl in nanoseconds
 	optional uint64 ttl = 6;
 
 	// in order for nodes to properly validate a record upon receipt, they need the public
@@ -21,7 +31,9 @@ message IpnsEntry {
 	// peerID, making this field unnecessary.
 	optional bytes pubKey = 7;
 
+	// the v2 signature of the record
 	optional bytes signatureV2 = 8;
 
+	// extensible data
 	optional bytes data = 9;
 }
