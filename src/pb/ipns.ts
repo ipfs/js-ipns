@@ -21,9 +21,13 @@ export namespace IpnsEntry {
     EOL = 'EOL'
   }
 
+  enum __ValidityTypeValues {
+    EOL = 0
+  }
+
   export namespace ValidityType {
     export const codec = () => {
-      return enumeration<typeof ValidityType>(ValidityType)
+      return enumeration<typeof ValidityType>(__ValidityTypeValues)
     }
   }
 
