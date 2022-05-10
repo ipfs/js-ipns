@@ -1,6 +1,6 @@
 {
   "name": "ipns",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ipns record definitions",
   "author": "Vasco Santos <vasco.santos@moxy.studio>",
   "license": "Apache-2.0 OR MIT",

@@ -1,3 +1,10 @@
+### [1.0.1](https://github.com/ipfs/js-ipns/compare/v1.0.0...v1.0.1) (2022-05-10)
+
+
+### Bug Fixes
+
+* encode enums correctly ([#156](https://github.com/ipfs/js-ipns/issues/156)) ([9267f06](https://github.com/ipfs/js-ipns/commit/9267f0645c980bf0727bf87a4316996a07cb2147))
+
 ## [1.0.0](https://github.com/ipfs/js-ipns/compare/v0.16.0...v1.0.0) (2022-04-13)
 
 
