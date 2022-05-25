@@ -162,7 +162,7 @@
   },
   "dependencies": {
     "@libp2p/crypto": "^0.22.12",
-    "@libp2p/interfaces": "^1.3.20",
+    "@libp2p/interfaces": "^2.0.2",
     "@libp2p/logger": "^1.1.3",
     "@libp2p/peer-id": "^1.1.9",
     "cborg": "^1.3.3",
