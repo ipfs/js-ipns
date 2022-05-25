@@ -1,3 +1,10 @@
+### [1.0.2](https://github.com/ipfs/js-ipns/compare/v1.0.1...v1.0.2) (2022-05-25)
+
+
+### Trivial Changes
+
+* **deps:** bump @libp2p/interfaces from 1.3.32 to 2.0.2 ([#159](https://github.com/ipfs/js-ipns/issues/159)) ([0f4bb9f](https://github.com/ipfs/js-ipns/commit/0f4bb9ff7f1831f080b79afb7d087416300e891c))
+
 ### [1.0.1](https://github.com/ipfs/js-ipns/compare/v1.0.0...v1.0.1) (2022-05-10)
 
 
