@@ -1,5 +1,5 @@
 import errCode from 'err-code'
-import type { PeerId } from '@libp2p/interfaces/peer-id'
+import type { PeerId } from '@libp2p/interface-peer-id'
 import type { IPNSEntry, IPNSEntryData } from './index.js'
 import * as ERRORS from './errors.js'
 import { unmarshalPublicKey } from '@libp2p/crypto/keys'

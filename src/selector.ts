@@ -1,7 +1,7 @@
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import { IpnsEntry } from './pb/ipns.js'
 import { parseRFC3339 } from './utils.js'
-import type { SelectFn } from '@libp2p/interfaces/dht'
+import type { SelectFn } from '@libp2p/interface-dht'
 
 export const ipnsSelector: SelectFn = (key, data) => {
   const entries = data.map((buf, index) => ({

@@ -5,8 +5,8 @@ import { IpnsEntry } from './pb/ipns.js'
 import { parseRFC3339, extractPublicKey, ipnsEntryDataForV1Sig, ipnsEntryDataForV2Sig, unmarshal, peerIdFromRoutingKey, parseCborData } from './utils.js'
 import * as ERRORS from './errors.js'
 import type { IPNSEntry } from './index.js'
-import type { PublicKey } from '@libp2p/interfaces/keys'
-import type { ValidateFn } from '@libp2p/interfaces/dht'
+import type { PublicKey } from '@libp2p/interface-keys'
+import type { ValidateFn } from '@libp2p/interface-dht'
 import { logger } from '@libp2p/logger'
 
 const log = logger('ipns:validator')
