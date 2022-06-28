@@ -1,25 +1,19 @@
-# IPNS <!-- omit in toc -->
+# ipns <!-- omit in toc -->
 
-[![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://protocol.ai)
-[![](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io/)
-[![Matrix](https://img.shields.io/badge/matrix-%23ipfs%3Amatrix.org-blue.svg?style=flat-square)](https://matrix.to/#/#ipfs:matrix.org)
+[![ipfs.io](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io)
 [![IRC](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
-[![Discord](https://img.shields.io/discord/475789330380488707?color=blueviolet&label=discord&style=flat-square)](https://discord.gg/24fmuwR)
-[![standard-readme](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
+[![Discord](https://img.shields.io/discord/806902334369824788?style=flat-square)](https://discord.gg/ipfs)
+[![codecov](https://img.shields.io/codecov/c/github/ipfs/js-ipns.svg?style=flat-square)](https://codecov.io/gh/ipfs/js-ipns)
+[![CI](https://img.shields.io/github/workflow/status/libp2p/js-libp2p-interfaces/test%20&%20maybe%20release/master?style=flat-square)](https://github.com/ipfs/js-ipns/actions/workflows/js-test-and-release.yml)
 
 > ipns record definitions
 
-This module contains all the necessary code for creating, understanding and validating IPNS records.
+## Table of contents <!-- omit in toc -->
 
-## Lead Maintainer <!-- omit in toc -->
-
-[Vasco Santos](https://github.com/vasco-santos).
-
-## Table of Contents <!-- omit in toc -->
-
+- [Install](#install)
+- [Lead Maintainer <!-- omit in toc -->](#lead-maintainer----omit-in-toc---)
 - [Usage](#usage)
-    - [Create record](#create-record)
+  - - [Create record](#create-record)
     - [Validate record](#validate-record)
     - [Embed public key to record](#embed-public-key-to-record)
     - [Extract public key from record](#extract-public-key-from-record)
@@ -28,7 +22,7 @@ This module contains all the necessary code for creating, understanding and vali
     - [Unmarshal data from proto buffer](#unmarshal-data-from-proto-buffer)
     - [Validator](#validator)
 - [API](#api)
-    - [Create record](#create-record-1)
+  - - [Create record](#create-record-1)
     - [Validate record](#validate-record-1)
     - [Datastore key](#datastore-key-1)
     - [Marshal data with proto buffer](#marshal-data-with-proto-buffer-1)
@@ -38,10 +32,19 @@ This module contains all the necessary code for creating, understanding and vali
     - [Namespace](#namespace)
 - [Contribute](#contribute)
 - [License](#license)
+- [Contribute](#contribute-1)
 
-### Install
+## Install
 
-> npm install ipns
+```console
+$ npm i ipns
+```
+
+This module contains all the necessary code for creating, understanding and validating IPNS records.
+
+## Lead Maintainer <!-- omit in toc -->
+
+[Vasco Santos](https://github.com/vasco-santos).
 
 ## Usage
 
@@ -88,9 +91,7 @@ ipns.getLocalKey(peerId)
 
 Returns a key to be used for storing the ipns entry locally, that is:
 
-```
-/ipns/${base32(<HASH>)}
-```
+    /ipns/${base32(<HASH>)}
 
 #### Marshal data with proto buffer
 
@@ -211,7 +212,7 @@ Embed a public key in an IPNS entry. If it is possible to extract the public key
 - `publicKey` (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
 - `ipnsEntry` (Object): ipns entry record (obtained using the create function).
 
- Returns a `Promise`. If the promise resolves to null it means the public key can be extracted directly from the `peer-id`.
+Returns a `Promise`. If the promise resolves to null it means the public key can be extracted directly from the `peer-id`.
 
 #### Extract public key from record
 
@@ -252,4 +253,15 @@ This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/c
 
 ## License
 
-Copyright (c) Protocol Labs, Inc. under the **MIT License**. See [LICENSE file](./LICENSE) for details.
+Licensed under either of
+
+- Apache 2.0, ([LICENSE-APACHE](LICENSE-APACHE) / <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT ([LICENSE-MIT](LICENSE-MIT) / <http://opensource.org/licenses/MIT>)
+
+## Contribute
+
+Feel free to join in. All welcome. Open an [issue](https://github.com/ipfs/js-ipfs-unixfs-importer/issues)!
+
+This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
+
+[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/CONTRIBUTING.md)

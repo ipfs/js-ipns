@@ -11,8 +11,8 @@ import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
 import * as Digest from 'multiformats/hashes/digest'
 import { identity } from 'multiformats/hashes/identity'
 import { IpnsEntry } from './pb/ipns.js'
-import type { PrivateKey } from '@libp2p/interfaces/keys'
-import type { PeerId } from '@libp2p/interfaces/peer-id'
+import type { PrivateKey } from '@libp2p/interface-keys'
+import type { PeerId } from '@libp2p/interface-peer-id'
 
 const log = logger('ipns')
 const ID_MULTIHASH_CODE = identity.code

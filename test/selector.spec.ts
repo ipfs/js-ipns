@@ -7,7 +7,7 @@ import { generateKeyPair } from '@libp2p/crypto/keys'
 import * as ipns from '../src/index.js'
 import { marshal, peerIdToRoutingKey } from '../src/utils.js'
 import { ipnsSelector } from '../src/selector.js'
-import type { PeerId } from '@libp2p/interfaces/peer-id'
+import type { PeerId } from '@libp2p/interface-peer-id'
 
 describe('selector', function () {
   this.timeout(20 * 1000)
