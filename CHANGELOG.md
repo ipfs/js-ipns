@@ -1,3 +1,14 @@
+## [2.0.0](https://github.com/ipfs/js-ipns/compare/v1.0.2...v2.0.0) (2022-06-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* update to new libp2p interface versions
+
+### Features
+
+* update deps ([#163](https://github.com/ipfs/js-ipns/issues/163)) ([719925a](https://github.com/ipfs/js-ipns/commit/719925a8ae250bba1f0221613a7c430d82414391))
+
 ### [1.0.2](https://github.com/ipfs/js-ipns/compare/v1.0.1...v1.0.2) (2022-05-25)
 
 
