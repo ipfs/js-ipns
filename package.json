@@ -175,7 +175,7 @@
     "err-code": "^3.0.1",
     "interface-datastore": "^6.0.2",
     "multiformats": "^9.4.5",
-    "protons-runtime": "^1.0.4",
+    "protons-runtime": "^2.0.2",
     "timestamp-nano": "^1.0.0",
     "uint8arrays": "^3.0.0"
   },
