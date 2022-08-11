@@ -4,7 +4,7 @@
 [![IRC](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
 [![Discord](https://img.shields.io/discord/806902334369824788?style=flat-square)](https://discord.gg/ipfs)
 [![codecov](https://img.shields.io/codecov/c/github/ipfs/js-ipns.svg?style=flat-square)](https://codecov.io/gh/ipfs/js-ipns)
-[![CI](https://img.shields.io/github/workflow/status/libp2p/js-libp2p-interfaces/test%20&%20maybe%20release/master?style=flat-square)](https://github.com/ipfs/js-ipns/actions/workflows/js-test-and-release.yml)
+[![CI](https://img.shields.io/github/workflow/status/ipfs/js-ipns/test%20&%20maybe%20release/master?style=flat-square)](https://github.com/ipfs/js-ipns/actions/workflows/js-test-and-release.yml)
 
 > ipns record definitions
 
