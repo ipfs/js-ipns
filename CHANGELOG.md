@@ -1,3 +1,16 @@
+## [2.0.1](https://github.com/ipfs/js-ipns/compare/v2.0.0...v2.0.1) (2022-08-11)
+
+
+### Trivial Changes
+
+* Update .github/workflows/stale.yml [skip ci] ([116d5ec](https://github.com/ipfs/js-ipns/commit/116d5ecd8024a8edd70501e0b259bbe90587d089))
+* update project config ([#174](https://github.com/ipfs/js-ipns/issues/174)) ([5200b95](https://github.com/ipfs/js-ipns/commit/5200b952699e0e32be0b62488d65ce1b3ec2e22a))
+
+
+### Dependencies
+
+* update protons to 5.1.0 ([#175](https://github.com/ipfs/js-ipns/issues/175)) ([4c50ec9](https://github.com/ipfs/js-ipns/commit/4c50ec9f750de1c154339396ebf30c9ea3c5fba7))
+
 ## [2.0.0](https://github.com/ipfs/js-ipns/compare/v1.0.2...v2.0.0) (2022-06-28)
 
 
