@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/ipfs/js-ipns/compare/v2.0.1...v2.0.2) (2022-08-14)
+
+
+### Dependencies
+
+* bump interface-datastore from 6.1.1 to 7.0.0 ([#176](https://github.com/ipfs/js-ipns/issues/176)) ([7f8caa0](https://github.com/ipfs/js-ipns/commit/7f8caa0538318d111da3b48e0503859308d161fd))
+
 ## [2.0.1](https://github.com/ipfs/js-ipns/compare/v2.0.0...v2.0.1) (2022-08-11)
 
 
