@@ -123,6 +123,16 @@ export const marshal = (obj: IPNSEntry): Uint8Array => {
 export const unmarshal = (buf: Uint8Array): IPNSEntry => {
   const message = IpnsEntry.decode(buf)
 
+  // protobufjs returns bigints as numbers
+  if (message.sequence != null) {
+    message.sequence = BigInt(message.sequence)
+  }
+
+  // protobufjs returns bigints as numbers
+  if (message.ttl != null) {
+    message.ttl = BigInt(message.ttl)
+  }
+
   return {
     value: message.value ?? new Uint8Array(0),
     signature: message.signature ?? new Uint8Array(0),
