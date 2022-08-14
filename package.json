@@ -176,7 +176,7 @@
     "@libp2p/peer-id": "^1.1.9",
     "cborg": "^1.3.3",
     "err-code": "^3.0.1",
-    "interface-datastore": "^6.0.2",
+    "interface-datastore": "^7.0.0",
     "multiformats": "^9.4.5",
     "protons-runtime": "^3.1.0",
     "timestamp-nano": "^1.0.0",
