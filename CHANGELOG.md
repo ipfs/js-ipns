@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/ipfs/js-ipns/compare/v2.0.2...v2.0.3) (2022-08-14)
+
+
+### Bug Fixes
+
+* ensure bigints are bigints ([#177](https://github.com/ipfs/js-ipns/issues/177)) ([4d1c0dd](https://github.com/ipfs/js-ipns/commit/4d1c0ddd6974f74494dd3b0a4defc56e51e75c3e))
+
 ## [2.0.2](https://github.com/ipfs/js-ipns/compare/v2.0.1...v2.0.2) (2022-08-14)
 
 
