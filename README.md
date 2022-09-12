@@ -150,11 +150,12 @@ Returns a `Promise` that resolves to an object with the entry's properties eg:
 ```js
 {
   value: Uint8Array,
+  signature: Uint8Array, // V1 (legacy, ignored)
   validityType: 0,
   validity: Uint8Array,
   sequence: 2,
-  signatureV2: Uint8Array,
-  data: Uint8Array
+  signatureV2: Uint8Array, // V2 signature of data field
+  data: Uint8Array // DAG-CBOR that was signed
 }
 ```
 
