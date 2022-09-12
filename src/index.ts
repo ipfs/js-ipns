@@ -95,7 +95,7 @@ const _create = async (peerId: PeerId, value: Uint8Array, seq: number | bigint, 
   }
 
   const privateKey = await unmarshalPrivateKey(peerId.privateKey)
-  const signatureV1 = await sign(privateKey, value, validityType, isoValidity)
+  const signatureV1 = await signLegacyV1(privateKey, value, validityType, isoValidity)
   const data = createCborData(value, isoValidity, validityType, seq, ttl)
   const sigData = ipnsEntryDataForV2Sig(data)
   const signatureV2 = await privateKey.sign(sigData)
@@ -144,9 +144,9 @@ export { peerIdToRoutingKey } from './utils.js'
 export { peerIdFromRoutingKey } from './utils.js'
 
 /**
- * Sign ipns record data
+ * Sign ipns record data using the legacy V1 signature scheme
  */
-const sign = async (privateKey: PrivateKey, value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array) => {
+const signLegacyV1 = async (privateKey: PrivateKey, value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array) => {
   try {
     const dataForSignature = ipnsEntryDataForV1Sig(value, validityType, validity)
 

@@ -2,7 +2,7 @@ import errCode from 'err-code'
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
 import { IpnsEntry } from './pb/ipns.js'
-import { parseRFC3339, extractPublicKey, ipnsEntryDataForV1Sig, ipnsEntryDataForV2Sig, unmarshal, peerIdFromRoutingKey, parseCborData } from './utils.js'
+import { parseRFC3339, extractPublicKey, ipnsEntryDataForV2Sig, unmarshal, peerIdFromRoutingKey, parseCborData } from './utils.js'
 import * as ERRORS from './errors.js'
 import type { IPNSEntry } from './index.js'
 import type { PublicKey } from '@libp2p/interface-keys'
@@ -27,8 +27,7 @@ export const validate = async (publicKey: PublicKey, entry: IPNSEntry) => {
 
     validateCborDataMatchesPbData(entry)
   } else {
-    signature = entry.signature ?? new Uint8Array(0)
-    dataForSignature = ipnsEntryDataForV1Sig(value, validityType, validity)
+    throw errCode(new Error('missing data or signatureV2'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
   // Validate Signature
