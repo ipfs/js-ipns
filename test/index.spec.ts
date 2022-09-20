@@ -60,17 +60,35 @@ describe('ipns', function () {
     await ipnsValidator(peerIdToRoutingKey(peerId), marshal(entry))
   })
 
-  it('should validate a v1 message', async () => {
+  it('should fail to validate a v1 (deprecated legacy) message', async () => {
     const sequence = 0
     const validity = 1000000
 
     const entry = await ipns.create(peerId, cid, sequence, validity)
 
-    // extra fields added for v2 sigs
+    // remove the extra fields added for v2 sigs
     delete entry.data
     delete entry.signatureV2
 
-    await ipnsValidator(peerIdToRoutingKey(peerId), marshal(entry))
+    // confirm a v1 exists
+    expect(entry).to.have.property('signature')
+
+    await expect(ipnsValidator(peerIdToRoutingKey(peerId), marshal(entry))).to.eventually.be.rejected().with.property('code', ERRORS.ERR_SIGNATURE_VERIFICATION)
+  })
+
+  it('should fail to validate a v2 without v2 signature (ignore v1)', async () => {
+    const sequence = 0
+    const validity = 1000000
+
+    const entry = await ipns.create(peerId, cid, sequence, validity)
+
+    // remove v2 sig
+    delete entry.signatureV2
+
+    // confirm a v1 exists
+    expect(entry).to.have.property('signature')
+
+    await expect(ipnsValidator(peerIdToRoutingKey(peerId), marshal(entry))).to.eventually.be.rejected().with.property('code', ERRORS.ERR_SIGNATURE_VERIFICATION)
   })
 
   it('should fail to validate a bad record', async () => {

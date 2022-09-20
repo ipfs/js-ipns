@@ -1,7 +1,6 @@
 # ipns <!-- omit in toc -->
 
-[![ipfs.io](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io)
-[![IRC](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
+[![ipfs.tech](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](https://ipfs.tech)
 [![Discord](https://img.shields.io/discord/806902334369824788?style=flat-square)](https://discord.gg/ipfs)
 [![codecov](https://img.shields.io/codecov/c/github/ipfs/js-ipns.svg?style=flat-square)](https://codecov.io/gh/ipfs/js-ipns)
 [![CI](https://img.shields.io/github/workflow/status/ipfs/js-ipns/test%20&%20maybe%20release/master?style=flat-square)](https://github.com/ipfs/js-ipns/actions/workflows/js-test-and-release.yml)
@@ -126,7 +125,7 @@ const validator = ipns.validator
 
 Contains an object with `validate (marshalledData, key)` and `select (dataA, dataB)` functions.
 
-The `validate` async function aims to verify if an IPNS record is valid. First the record is unmarshalled, then the public key is obtained and finally the record is validated (signature and validity are verified).
+The `validate` async function aims to verify if an IPNS record is valid. First the record is unmarshalled, then the public key is obtained and finally the record is validated (`signatureV2` of CBOR `data` is verified).
 
 The `select` function is responsible for deciding which ipns record is the best (newer) between two records. Both records are unmarshalled and their sequence numbers are compared. If the first record provided is the newer, the operation result will be `0`, otherwise the operation result will be `1`.
 
@@ -151,10 +150,12 @@ Returns a `Promise` that resolves to an object with the entry's properties eg:
 ```js
 {
   value: Uint8Array,
-  signature: Uint8Array,
+  signature: Uint8Array, // V1 (legacy, ignored)
   validityType: 0,
   validity: Uint8Array,
-  sequence: 2
+  sequence: 2,
+  signatureV2: Uint8Array, // V2 signature of data field
+  data: Uint8Array // DAG-CBOR that was signed
 }
 ```
 
