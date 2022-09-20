@@ -1,3 +1,14 @@
+## [3.0.0](https://github.com/ipfs/js-ipns/compare/v2.0.3...v3.0.0) (2022-09-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* IPNS V1 signatures are ignored, records without V2 signature are no longer marked as Valid.
+
+### Bug Fixes
+
+* require V2 signatures ([#180](https://github.com/ipfs/js-ipns/issues/180)) ([d522bcc](https://github.com/ipfs/js-ipns/commit/d522bccdacb645c887ca1ce566fe17eac1bcd1fd))
+
 ## [2.0.3](https://github.com/ipfs/js-ipns/compare/v2.0.2...v2.0.3) (2022-08-14)
 
 
