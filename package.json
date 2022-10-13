@@ -180,7 +180,7 @@
     "multiformats": "^9.4.5",
     "protons-runtime": "^3.1.0",
     "timestamp-nano": "^1.0.0",
-    "uint8arrays": "^3.0.0"
+    "uint8arrays": "^4.0.2"
   },
   "devDependencies": {
     "@libp2p/peer-id-factory": "^1.0.9",
