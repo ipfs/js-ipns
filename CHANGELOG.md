@@ -1,3 +1,14 @@
+## [4.0.0](https://github.com/ipfs/js-ipns/compare/v3.0.0...v4.0.0) (2022-10-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* update multiformats, protons and uint8arrays (#189)
+
+### Dependencies
+
+* update multiformats, protons and uint8arrays ([#189](https://github.com/ipfs/js-ipns/issues/189)) ([645c3b8](https://github.com/ipfs/js-ipns/commit/645c3b8c11c02ba43714b9806d0d2b0e0940217e))
+
 ## [3.0.0](https://github.com/ipfs/js-ipns/compare/v2.0.3...v3.0.0) (2022-09-20)
 
 
