@@ -1,5 +1,7 @@
 /* eslint-disable import/export */
+/* eslint-disable complexity */
 /* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
 import { enumeration, encodeMessage, decodeMessage, message } from 'protons-runtime'
 import type { Uint8ArrayList } from 'uint8arraylist'
@@ -36,58 +38,58 @@ export namespace IpnsEntry {
 
   export const codec = (): Codec<IpnsEntry> => {
     if (_codec == null) {
-      _codec = message<IpnsEntry>((obj, writer, opts = {}) => {
+      _codec = message<IpnsEntry>((obj, w, opts = {}) => {
         if (opts.lengthDelimited !== false) {
-          writer.fork()
+          w.fork()
         }
 
         if (obj.value != null) {
-          writer.uint32(10)
-          writer.bytes(obj.value)
+          w.uint32(10)
+          w.bytes(obj.value)
         }
 
         if (obj.signature != null) {
-          writer.uint32(18)
-          writer.bytes(obj.signature)
+          w.uint32(18)
+          w.bytes(obj.signature)
         }
 
         if (obj.validityType != null) {
-          writer.uint32(24)
-          IpnsEntry.ValidityType.codec().encode(obj.validityType, writer)
+          w.uint32(24)
+          IpnsEntry.ValidityType.codec().encode(obj.validityType, w)
         }
 
         if (obj.validity != null) {
-          writer.uint32(34)
-          writer.bytes(obj.validity)
+          w.uint32(34)
+          w.bytes(obj.validity)
         }
 
         if (obj.sequence != null) {
-          writer.uint32(40)
-          writer.uint64(obj.sequence)
+          w.uint32(40)
+          w.uint64(obj.sequence)
         }
 
         if (obj.ttl != null) {
-          writer.uint32(48)
-          writer.uint64(obj.ttl)
+          w.uint32(48)
+          w.uint64(obj.ttl)
         }
 
         if (obj.pubKey != null) {
-          writer.uint32(58)
-          writer.bytes(obj.pubKey)
+          w.uint32(58)
+          w.bytes(obj.pubKey)
         }
 
         if (obj.signatureV2 != null) {
-          writer.uint32(66)
-          writer.bytes(obj.signatureV2)
+          w.uint32(66)
+          w.bytes(obj.signatureV2)
         }
 
         if (obj.data != null) {
-          writer.uint32(74)
-          writer.bytes(obj.data)
+          w.uint32(74)
+          w.bytes(obj.data)
         }
 
         if (opts.lengthDelimited !== false) {
-          writer.ldelim()
+          w.ldelim()
         }
       }, (reader, length) => {
         const obj: any = {}
