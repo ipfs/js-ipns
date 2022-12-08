@@ -32,6 +32,12 @@ export interface IPNSEntry {
   data?: Uint8Array // extensible data
 }
 
+//
+export type UnsignedIPNSEntry = Omit<IPNSEntry, 'signature' | 'signatureV2'> & {
+  dataForSignatureV1: Uint8Array
+  dataForSignatureV2: Uint8Array
+}
+
 export interface IPNSEntryData {
   Value: Uint8Array
   Validity: Uint8Array
@@ -65,6 +71,49 @@ export const create = async (peerId: PeerId, value: Uint8Array, seq: number | bi
   const lifetimeNs = (BigInt(ms) * BigInt(100000)) + BigInt(ns ?? '0')
 
   return await _create(peerId, value, seq, validityType, expirationDate, lifetimeNs)
+}
+
+/**
+ * Creates an unsigned ipns record for signing with a crypto wallet
+ *
+ * The ipns entry validity should follow the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
+ * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
+ *
+ * This method
+ * 1. Creates IpnsEntry and sets `value`, `validity`, `validityType`, `sequence`, and `ttl`
+ * 2. Creates a DAG-CBOR document with the same values for `value`, `validity`, `validityType`, sequence, and ttl
+ * 3. Store DAG-CBOR in IpnsEntry.data
+ * 4. Prepare the data for signing in dataForSignatureV1 and dataForSignatureV2
+ *
+ * @param {Uint8Array} value - value to be stored in the record.
+ * @param {number | bigint} seq - number representing the current version of the record.
+ * @param {number} lifetime - lifetime of the record (in milliseconds from now).
+ */
+export const createUnsigned = (value: Uint8Array, seq: number | bigint, lifetime: number): UnsignedIPNSEntry => {
+  // Validity in ISOString with nanoseconds precision and validity type EOL
+  const expirationDate = new NanoDate(Date.now() + Number(lifetime))
+  const validityType = IpnsEntry.ValidityType.EOL
+  const [ms, ns] = lifetime.toString().split('.')
+  const ttl = (BigInt(ms) * BigInt(100000)) + BigInt(ns ?? '0')
+
+  seq = BigInt(seq)
+  const isoValidity = uint8ArrayFromString(expirationDate.toString())
+
+  const dataForSignatureV1 = ipnsEntryDataForV1Sig(value, validityType, isoValidity)
+
+  const data = createCborData(value, isoValidity, validityType, seq, ttl)
+  const dataForSignatureV2 = ipnsEntryDataForV2Sig(data)
+
+  return {
+    value,
+    validityType: validityType,
+    validity: isoValidity,
+    sequence: seq,
+    ttl,
+    dataForSignatureV1,
+    dataForSignatureV2,
+    data
+  }
 }
 
 /**

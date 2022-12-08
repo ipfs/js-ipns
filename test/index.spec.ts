@@ -206,6 +206,28 @@ describe('ipns', function () {
     await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected().with.property('code', ERRORS.ERR_UNDEFINED_PARAMETER)
   })
 
+  it('should be able to create an unsigned record', async () => {
+    const sequence = 0
+    const validity = 1000000
+    const cid = uint8ArrayFromString('/ipfs/bafybeicq6y27fphdisjtxaybzxold7dczhvxiiyn3bvkyht7b36lveerrm')
+
+    const record = ipns.createUnsigned(cid, sequence, validity)
+
+    expect(record).to.not.have.property('signatureV2')
+    expect(record).to.not.have.property('signature')
+
+    expect(record).to.have.property('dataForSignatureV1')
+    expect(record).to.have.property('dataForSignatureV2')
+    expect(record).to.deep.include({
+      value: cid,
+      sequence: BigInt(sequence)
+    })
+    expect(record).to.have.property('validity')
+    expect(record).to.have.property('validityType')
+    expect(record).to.have.property('data')
+    // await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected().with.property('code', ERRORS.ERR_UNDEFINED_PARAMETER)
+  })
+
   it('should be able to export a previously embedded public key from an ipns record', async () => {
     const sequence = 0
     const validity = 1000000
