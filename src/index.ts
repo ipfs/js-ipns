@@ -32,7 +32,6 @@ export interface IPNSEntry {
   data?: Uint8Array // extensible data
 }
 
-//
 export type UnsignedIPNSEntry = Omit<IPNSEntry, 'signature' | 'signatureV2'> & {
   dataForSignatureV1: Uint8Array
   dataForSignatureV2: Uint8Array
