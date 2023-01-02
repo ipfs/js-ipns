@@ -177,7 +177,7 @@
     "cborg": "^1.3.3",
     "err-code": "^3.0.1",
     "interface-datastore": "^7.0.0",
-    "multiformats": "^10.0.0",
+    "multiformats": "^11.0.0",
     "protons-runtime": "^4.0.1",
     "timestamp-nano": "^1.0.0",
     "uint8arrays": "^4.0.2"
