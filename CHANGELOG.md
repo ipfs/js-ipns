@@ -1,3 +1,14 @@
+## [5.0.0](https://github.com/ipfs/js-ipns/compare/v4.0.0...v5.0.0) (2023-01-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* update multiformats to v11 (#196)
+
+### Dependencies
+
+* update multiformats to v11 ([#196](https://github.com/ipfs/js-ipns/issues/196)) ([e06d891](https://github.com/ipfs/js-ipns/commit/e06d891ecfff3001eb98226d6270b354c4ad4349))
+
 ## [4.0.0](https://github.com/ipfs/js-ipns/compare/v3.0.0...v4.0.0) (2022-10-17)
 
 
