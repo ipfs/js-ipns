@@ -40,7 +40,7 @@
   },
   "files": [
     "src",
-    "dist/src",
+    "dist",
     "!dist/test",
     "!**/*.tsbuildinfo"
   ],
@@ -165,7 +165,8 @@
     "test:firefox-webworker": "aegir test -t webworker -- --browser firefox",
     "test:electron-main": "aegir test -t electron-main",
     "release": "aegir release",
-    "generate": "protons src/pb/ipns.proto"
+    "generate": "protons src/pb/ipns.proto",
+    "docs": "aegir docs"
   },
   "dependencies": {
     "@libp2p/crypto": "^1.0.0",
