@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/ipfs/js-ipns/compare/v5.0.0...v5.0.1) (2023-01-07)
+
+
+### Documentation
+
+* publish API docs ([#197](https://github.com/ipfs/js-ipns/issues/197)) ([ec88bf8](https://github.com/ipfs/js-ipns/commit/ec88bf8ce996fe049da336ef1ab7e1610706c1f6))
+
 ## [5.0.0](https://github.com/ipfs/js-ipns/compare/v4.0.0...v5.0.0) (2023-01-07)
 
 
