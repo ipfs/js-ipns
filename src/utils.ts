@@ -9,6 +9,7 @@ import { IpnsEntry } from './pb/ipns.js'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
 import * as cborg from 'cborg'
+import type { PublicKey } from '@libp2p/interface-keys'
 
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
@@ -17,7 +18,7 @@ const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
  * Convert a JavaScript date into an `RFC3339Nano` formatted
  * string
  */
-export function toRFC3339 (time: Date) {
+export function toRFC3339 (time: Date): string {
   const year = time.getUTCFullYear()
   const month = String(time.getUTCMonth() + 1).padStart(2, '0')
   const day = String(time.getUTCDate()).padStart(2, '0')
@@ -34,7 +35,7 @@ export function toRFC3339 (time: Date) {
  * Parses a date string formatted as `RFC3339Nano` into a
  * JavaScript Date object
  */
-export function parseRFC3339 (time: string) {
+export function parseRFC3339 (time: string): Date {
   const rfc3339Matcher = new RegExp(
     // 2006-01-02T
     '(\\d{4})-(\\d{2})-(\\d{2})T' +
@@ -64,7 +65,7 @@ export function parseRFC3339 (time: string) {
  * Extracts a public key from the passed PeerId, falling
  * back to the pubKey embedded in the ipns record
  */
-export const extractPublicKey = async (peerId: PeerId, entry: IpnsEntry) => {
+export const extractPublicKey = async (peerId: PeerId, entry: IpnsEntry): Promise<PublicKey> => {
   if (entry == null || peerId == null) {
     const error = new Error('one or more of the provided parameters are not defined')
 
@@ -72,7 +73,7 @@ export const extractPublicKey = async (peerId: PeerId, entry: IpnsEntry) => {
     throw errCode(error, ERRORS.ERR_UNDEFINED_PARAMETER)
   }
 
-  let pubKey
+  let pubKey: PublicKey | undefined
 
   if (entry.pubKey != null) {
     try {

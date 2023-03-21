@@ -14,7 +14,7 @@ const log = logger('ipns:validator')
 /**
  * Validates the given ipns entry against the given public key
  */
-export const validate = async (publicKey: PublicKey, entry: IPNSEntry) => {
+export const validate = async (publicKey: PublicKey, entry: IPNSEntry): Promise<void> => {
   const { value, validityType, validity } = entry
 
   let dataForSignature: Uint8Array
@@ -65,7 +65,7 @@ export const validate = async (publicKey: PublicKey, entry: IPNSEntry) => {
   log('ipns entry for %b is valid', value)
 }
 
-const validateCborDataMatchesPbData = (entry: IPNSEntry) => {
+const validateCborDataMatchesPbData = (entry: IPNSEntry): void => {
   if (entry.data == null) {
     throw errCode(new Error('Record data is missing'), ERRORS.ERR_INVALID_RECORD_DATA)
   }
