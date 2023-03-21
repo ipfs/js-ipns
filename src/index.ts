@@ -103,7 +103,7 @@ const _create = async (peerId: PeerId, value: Uint8Array, seq: number | bigint, 
   const entry: IPNSEntry = {
     value,
     signature: signatureV1,
-    validityType: validityType,
+    validityType,
     validity: isoValidity,
     sequence: seq,
     ttl,
@@ -146,7 +146,7 @@ export { peerIdFromRoutingKey } from './utils.js'
 /**
  * Sign ipns record data using the legacy V1 signature scheme
  */
-const signLegacyV1 = async (privateKey: PrivateKey, value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array) => {
+const signLegacyV1 = async (privateKey: PrivateKey, value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array): Promise<Uint8Array> => {
   try {
     const dataForSignature = ipnsEntryDataForV1Sig(value, validityType, validity)
 

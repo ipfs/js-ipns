@@ -29,7 +29,7 @@ export namespace IpnsEntry {
   }
 
   export namespace ValidityType {
-    export const codec = () => {
+    export const codec = (): Codec<ValidityType> => {
       return enumeration<ValidityType>(__ValidityTypeValues)
     }
   }

@@ -155,7 +155,7 @@
   "scripts": {
     "clean": "aegir clean",
     "lint": "aegir lint",
-    "dep-check": "aegir dep-check",
+    "dep-check": "aegir dep-check -i protons",
     "build": "aegir build",
     "test": "aegir test",
     "test:node": "aegir test -t node --cov",
@@ -181,6 +181,7 @@
     "multiformats": "^11.0.0",
     "protons-runtime": "^4.0.1",
     "timestamp-nano": "^1.0.0",
+    "uint8arraylist": "^2.4.3",
     "uint8arrays": "^4.0.2"
   },
   "devDependencies": {
