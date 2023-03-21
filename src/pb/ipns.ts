@@ -2,10 +2,11 @@
 /* eslint-disable complexity */
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
+/* eslint-disable @typescript-eslint/no-empty-interface */
 
 import { enumeration, encodeMessage, decodeMessage, message } from 'protons-runtime'
-import type { Uint8ArrayList } from 'uint8arraylist'
 import type { Codec } from 'protons-runtime'
+import type { Uint8ArrayList } from 'uint8arraylist'
 
 export interface IpnsEntry {
   value?: Uint8Array
@@ -140,7 +141,7 @@ export namespace IpnsEntry {
     return _codec
   }
 
-  export const encode = (obj: IpnsEntry): Uint8Array => {
+  export const encode = (obj: Partial<IpnsEntry>): Uint8Array => {
     return encodeMessage(obj, IpnsEntry.codec())
   }
 
