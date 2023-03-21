@@ -1,3 +1,16 @@
+## [6.0.0](https://github.com/ipfs/js-ipns/compare/v5.0.2...v6.0.0) (2023-03-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* bump interface-datastore from 7.0.4 to 8.1.0 (#215)
+
+### Dependencies
+
+* bump interface-datastore from 7.0.4 to 8.1.0 ([#215](https://github.com/ipfs/js-ipns/issues/215)) ([100799c](https://github.com/ipfs/js-ipns/commit/100799c97f177893417a70bcc8e5255013546031))
+* bump protons-runtime from 4.0.2 to 5.0.0 ([#201](https://github.com/ipfs/js-ipns/issues/201)) ([60c3a15](https://github.com/ipfs/js-ipns/commit/60c3a156f78e407b2194ab51cc7c5ae9b3fc503d))
+* **dev:** bump protons from 6.1.3 to 7.0.2 ([#204](https://github.com/ipfs/js-ipns/issues/204)) ([eb05501](https://github.com/ipfs/js-ipns/commit/eb05501647cc16efb34eb6a8ad7bc4263cdc84d9))
+
 ## [5.0.2](https://github.com/ipfs/js-ipns/compare/v5.0.1...v5.0.2) (2023-03-21)
 
 
