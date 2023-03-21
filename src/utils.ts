@@ -9,7 +9,7 @@ import { IpnsEntry } from './pb/ipns.js'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
 import * as cborg from 'cborg'
-import { PublicKey } from '@libp2p/interface-keys'
+import type { PublicKey } from '@libp2p/interface-keys'
 
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
@@ -73,7 +73,7 @@ export const extractPublicKey = async (peerId: PeerId, entry: IpnsEntry): Promis
     throw errCode(error, ERRORS.ERR_UNDEFINED_PARAMETER)
   }
 
-  let pubKey: PublicKey
+  let pubKey: PublicKey | undefined
 
   if (entry.pubKey != null) {
     try {
