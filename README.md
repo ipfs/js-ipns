@@ -11,7 +11,6 @@
 
 - [Install](#install)
   - [Browser `<script>` tag](#browser-script-tag)
-- [Lead Maintainer <!-- omit in toc -->](#lead-maintainer----omit-in-toc---)
 - [Usage](#usage)
   - - [Create record](#create-record)
     - [Validate record](#validate-record)
@@ -230,15 +229,6 @@ ipns.namespaceLength
 
 // 6
 ```
-
-## Contribute
-
-Feel free to join in. All welcome. Open an [issue](https://github.com/ipfs/js-ipns/issues)!
-
-This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
-
-[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/CONTRIBUTING.md)
-
 ## API Docs
 
 - <https://ipfs.github.io/js-ipns>
