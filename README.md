@@ -182,16 +182,6 @@ Validate an IPNS record previously stored in a protocol buffer.
 
 Returns a `Promise`, which may be rejected if the validation was not successful.
 
-#### Datastore key
-
-```js
-ipns.getDatastoreKey(peerId)
-```
-
-Get a key for storing the ipns entry in the datastore.
-
-- `peerId` (`Uint8Array`): peer identifier.
-
 #### Marshal data with proto buffer
 
 ```js
@@ -211,19 +201,6 @@ const data = ipns.unmarshal(storedData)
 Returns the entry data structure after being serialized.
 
 - `storedData` (Uint8Array): ipns entry record serialized.
-
-#### Embed public key to record
-
-```js
-const recordWithPublicKey = await ipns.embedPublicKey(publicKey, ipnsEntry)
-```
-
-Embed a public key in an IPNS entry. If it is possible to extract the public key from the `peer-id`, there is no need to embed.
-
-- `publicKey` (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
-- `ipnsEntry` (Object): ipns entry record (obtained using the create function).
-
-Returns a `Promise`. If the promise resolves to null it means the public key can be extracted directly from the `peer-id`.
 
 #### Extract public key from record
 
