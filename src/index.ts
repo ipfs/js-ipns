@@ -142,6 +142,7 @@ export { unmarshal } from './utils.js'
 export { marshal } from './utils.js'
 export { peerIdToRoutingKey } from './utils.js'
 export { peerIdFromRoutingKey } from './utils.js'
+export { extractPublicKey } from './utils.js'
 
 /**
  * Sign ipns record data using the legacy V1 signature scheme
