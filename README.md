@@ -87,7 +87,7 @@ const ipnsEntryWithEmbedPublicKey = await ipns.embedPublicKey(publicKey, ipnsEnt
 ```js
 import * as ipns from 'ipns'
 
-const publicKey = ipns.extractPublicKey(peerId, ipnsEntry)
+const publicKey = await ipns.extractPublicKey(peerId, ipnsEntry)
 ```
 
 #### Datastore key
@@ -228,15 +228,15 @@ Returns a `Promise`. If the promise resolves to null it means the public key can
 #### Extract public key from record
 
 ```js
-ipns.extractPublicKey(peerId, ipnsEntry, [callback])
+const publicKey = await ipns.extractPublicKey(peerId, ipnsEntry)
 ```
 
 Extract a public key from an IPNS entry.
 
-- `peerId` (`PeerId` [Instance](https://github.com/libp2p/js-peer-id)): peer identifier object.
+- `peerId` (`PeerId` [Instance](https://github.com/libp2p/js-libp2p-peer-id/tree/master/packages/libp2p-peer-id)): peer identifier object.
 - `ipnsEntry` (Object): ipns entry record (obtained using the create function).
 
-The returned public key (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): may be used for cryptographic operations.
+Returns a `Promise` which resolves to public key ([`PublicKey`](https://github.com/libp2p/js-libp2p-interfaces/blob/master/packages/interface-keys/src/index.ts) ): may be used for cryptographic operations.
 
 #### Namespace
 
