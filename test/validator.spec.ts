@@ -80,4 +80,11 @@ describe('validator', function () {
 
     await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected().with.property('code', ERRORS.ERR_INVALID_EMBEDDED_KEY)
   })
+
+  it('should limit the size of incoming records', async () => {
+    const marshalledData = new Uint8Array(1024 * 1024)
+    const key = new Uint8Array()
+
+    await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected().with.property('code', ERRORS.ERR_RECORD_TOO_LARGE)
+  })
 })

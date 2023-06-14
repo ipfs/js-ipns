@@ -12,6 +12,11 @@ import type { PublicKey } from '@libp2p/interface-keys'
 const log = logger('ipns:validator')
 
 /**
+ * Limit valid IPNS record sizes to 10kb
+ */
+const MAX_RECORD_SIZE = 1024 * 10
+
+/**
  * Validates the given ipns entry against the given public key
  */
 export const validate = async (publicKey: PublicKey, entry: IPNSEntry): Promise<void> => {
@@ -94,6 +99,10 @@ const validateCborDataMatchesPbData = (entry: IPNSEntry): void => {
 }
 
 export const ipnsValidator: ValidateFn = async (key, marshalledData) => {
+  if (marshalledData.byteLength > MAX_RECORD_SIZE) {
+    throw errCode(new Error('record too large'), ERRORS.ERR_RECORD_TOO_LARGE)
+  }
+
   const peerId = peerIdFromRoutingKey(key)
   const receivedEntry = unmarshal(marshalledData)
 
