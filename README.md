@@ -12,27 +12,24 @@
 - [Install](#install)
   - [Browser `<script>` tag](#browser-script-tag)
 - [Usage](#usage)
-  - - [Create record](#create-record)
-    - [Validate record](#validate-record)
-    - [Embed public key to record](#embed-public-key-to-record)
-    - [Extract public key from record](#extract-public-key-from-record)
-    - [Datastore key](#datastore-key)
-    - [Marshal data with proto buffer](#marshal-data-with-proto-buffer)
-    - [Unmarshal data from proto buffer](#unmarshal-data-from-proto-buffer)
-    - [Validator](#validator)
+  - [Create record](#create-record)
+  - [Validate record](#validate-record)
+  - [Embed public key to record](#embed-public-key-to-record)
+  - [Extract public key from record](#extract-public-key-from-record)
+  - [Datastore key](#datastore-key)
+  - [Marshal data with proto buffer](#marshal-data-with-proto-buffer)
+  - [Unmarshal data from proto buffer](#unmarshal-data-from-proto-buffer)
+  - [Validator](#validator)
 - [API](#api)
-  - - [Create record](#create-record-1)
-    - [Validate record](#validate-record-1)
-    - [Datastore key](#datastore-key-1)
-    - [Marshal data with proto buffer](#marshal-data-with-proto-buffer-1)
-    - [Unmarshal data from proto buffer](#unmarshal-data-from-proto-buffer-1)
-    - [Embed public key to record](#embed-public-key-to-record-1)
-    - [Extract public key from record](#extract-public-key-from-record-1)
-    - [Namespace](#namespace)
-- [Contribute](#contribute)
+  - [Create record](#create-record-1)
+  - [Validate record](#validate-record-1)
+  - [Marshal data with proto buffer](#marshal-data-with-proto-buffer-1)
+  - [Unmarshal data from proto buffer](#unmarshal-data-from-proto-buffer-1)
+  - [Extract public key from record](#extract-public-key-from-record-1)
+  - [Namespace](#namespace)
 - [API Docs](#api-docs)
 - [License](#license)
-- [Contribute](#contribute-1)
+- [Contribute](#contribute)
 
 ## Install
 
@@ -50,13 +47,9 @@ Loading this module through a script tag will make it's exports available as `Ip
 
 This module contains all the necessary code for creating, understanding and validating IPNS records.
 
-## Lead Maintainer <!-- omit in toc -->
-
-[Vasco Santos](https://github.com/vasco-santos).
-
 ## Usage
 
-#### Create record
+### Create record
 
 ```js
 import * as ipns from 'ipns'
@@ -64,7 +57,7 @@ import * as ipns from 'ipns'
 const entryData = await ipns.create(privateKey, value, sequenceNumber, lifetime)
 ```
 
-#### Validate record
+### Validate record
 
 ```js
 import * as ipns from 'ipns'
@@ -73,7 +66,7 @@ await ipns.validate(publicKey, ipnsEntry)
 // if no error thrown, the record is valid
 ```
 
-#### Embed public key to record
+### Embed public key to record
 
 ```js
 import * as ipns from 'ipns'
@@ -81,7 +74,7 @@ import * as ipns from 'ipns'
 const ipnsEntryWithEmbedPublicKey = await ipns.embedPublicKey(publicKey, ipnsEntry)
 ```
 
-#### Extract public key from record
+### Extract public key from record
 
 ```js
 import * as ipns from 'ipns'
@@ -89,7 +82,7 @@ import * as ipns from 'ipns'
 const publicKey = await ipns.extractPublicKey(peerId, ipnsEntry)
 ```
 
-#### Datastore key
+### Datastore key
 
 ```js
 import * as ipns from 'ipns'
@@ -101,7 +94,7 @@ Returns a key to be used for storing the ipns entry locally, that is:
 
     /ipns/${base32(<HASH>)}
 
-#### Marshal data with proto buffer
+### Marshal data with proto buffer
 
 ```js
 import * as ipns from 'ipns'
@@ -114,7 +107,7 @@ const marshalledData = ipns.marshal(entryData)
 
 Returns the entry data serialized.
 
-#### Unmarshal data from proto buffer
+### Unmarshal data from proto buffer
 
 ```js
 import * as ipns from 'ipns'
@@ -124,7 +117,7 @@ const data = ipns.unmarshal(storedData)
 
 Returns the entry data structure after being serialized.
 
-#### Validator
+### Validator
 
 ```js
 import * as ipns from 'ipns'
@@ -140,7 +133,7 @@ The `select` function is responsible for deciding which ipns record is the best 
 
 ## API
 
-#### Create record
+### Create record
 
 ```js
 
@@ -168,7 +161,7 @@ Returns a `Promise` that resolves to an object with the entry's properties eg:
 }
 ```
 
-#### Validate record
+### Validate record
 
 ```js
 ipns.validate(publicKey, ipnsEntry)
@@ -181,7 +174,7 @@ Validate an IPNS record previously stored in a protocol buffer.
 
 Returns a `Promise`, which may be rejected if the validation was not successful.
 
-#### Marshal data with proto buffer
+### Marshal data with proto buffer
 
 ```js
 const marshalledData = ipns.marshal(entryData)
@@ -191,7 +184,7 @@ Returns the entry data serialized.
 
 - `entryData` (Object): ipns entry record (obtained using the create function).
 
-#### Unmarshal data from proto buffer
+### Unmarshal data from proto buffer
 
 ```js
 const data = ipns.unmarshal(storedData)
@@ -201,7 +194,7 @@ Returns the entry data structure after being serialized.
 
 - `storedData` (Uint8Array): ipns entry record serialized.
 
-#### Extract public key from record
+### Extract public key from record
 
 ```js
 const publicKey = await ipns.extractPublicKey(peerId, ipnsEntry)
@@ -214,7 +207,7 @@ Extract a public key from an IPNS entry.
 
 Returns a `Promise` which resolves to public key ([`PublicKey`](https://github.com/libp2p/js-libp2p-interfaces/blob/master/packages/interface-keys/src/index.ts) ): may be used for cryptographic operations.
 
-#### Namespace
+### Namespace
 
 Namespace constants for records.
 
@@ -229,6 +222,7 @@ ipns.namespaceLength
 
 // 6
 ```
+
 ## API Docs
 
 - <https://ipfs.github.io/js-ipns>
