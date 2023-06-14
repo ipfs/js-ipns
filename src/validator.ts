@@ -1,13 +1,13 @@
+import { logger } from '@libp2p/logger'
 import errCode from 'err-code'
-import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
+import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
+import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import { parseRFC3339, extractPublicKey, ipnsEntryDataForV2Sig, unmarshal, peerIdFromRoutingKey, parseCborData } from './utils.js'
-import * as ERRORS from './errors.js'
 import type { IPNSEntry } from './index.js'
-import type { PublicKey } from '@libp2p/interface-keys'
 import type { ValidateFn } from '@libp2p/interface-dht'
-import { logger } from '@libp2p/logger'
+import type { PublicKey } from '@libp2p/interface-keys'
 
 const log = logger('ipns:validator')
 

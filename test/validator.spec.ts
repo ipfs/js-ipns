@@ -1,17 +1,17 @@
 /* eslint-env mocha */
 
+import { randomBytes } from '@libp2p/crypto'
+import { generateKeyPair } from '@libp2p/crypto/keys'
+import { peerIdFromKeys } from '@libp2p/peer-id'
 import { expect } from 'aegir/chai'
 import { base58btc } from 'multiformats/bases/base58'
-import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
-import { peerIdFromKeys } from '@libp2p/peer-id'
-import { generateKeyPair } from '@libp2p/crypto/keys'
-import { randomBytes } from '@libp2p/crypto'
-import * as ipns from '../src/index.js'
+import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import * as ERRORS from '../src/errors.js'
-import type { PeerId } from '@libp2p/interface-peer-id'
+import * as ipns from '../src/index.js'
 import { marshal, peerIdToRoutingKey } from '../src/utils.js'
 import { ipnsValidator } from '../src/validator.js'
+import type { PeerId } from '@libp2p/interface-peer-id'
 
 describe('validator', function () {
   this.timeout(20 * 1000)

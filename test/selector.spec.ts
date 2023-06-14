@@ -1,12 +1,12 @@
 /* eslint-env mocha */
 
+import { generateKeyPair } from '@libp2p/crypto/keys'
+import { peerIdFromKeys } from '@libp2p/peer-id'
 import { expect } from 'aegir/chai'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
-import { peerIdFromKeys } from '@libp2p/peer-id'
-import { generateKeyPair } from '@libp2p/crypto/keys'
 import * as ipns from '../src/index.js'
-import { marshal, peerIdToRoutingKey } from '../src/utils.js'
 import { ipnsSelector } from '../src/selector.js'
+import { marshal, peerIdToRoutingKey } from '../src/utils.js'
 import type { PeerId } from '@libp2p/interface-peer-id'
 
 describe('selector', function () {

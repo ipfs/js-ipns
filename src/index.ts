@@ -1,16 +1,16 @@
-import NanoDate from 'timestamp-nano'
-import { Key } from 'interface-datastore/key'
 import { unmarshalPrivateKey } from '@libp2p/crypto/keys'
-import errCode from 'err-code'
-import { base32upper } from 'multiformats/bases/base32'
-import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { logger } from '@libp2p/logger'
-import { createCborData, ipnsEntryDataForV1Sig, ipnsEntryDataForV2Sig } from './utils.js'
-import * as ERRORS from './errors.js'
-import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
+import errCode from 'err-code'
+import { Key } from 'interface-datastore/key'
+import { base32upper } from 'multiformats/bases/base32'
 import * as Digest from 'multiformats/hashes/digest'
 import { identity } from 'multiformats/hashes/identity'
+import NanoDate from 'timestamp-nano'
+import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
+import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
+import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
+import { createCborData, ipnsEntryDataForV1Sig, ipnsEntryDataForV2Sig } from './utils.js'
 import type { PrivateKey } from '@libp2p/interface-keys'
 import type { PeerId } from '@libp2p/interface-peer-id'
 
@@ -64,7 +64,7 @@ export const create = async (peerId: PeerId, value: Uint8Array, seq: number | bi
   const [ms, ns] = lifetime.toString().split('.')
   const lifetimeNs = (BigInt(ms) * BigInt(100000)) + BigInt(ns ?? '0')
 
-  return await _create(peerId, value, seq, validityType, expirationDate, lifetimeNs)
+  return _create(peerId, value, seq, validityType, expirationDate, lifetimeNs)
 }
 
 /**
@@ -83,7 +83,7 @@ export const createWithExpiration = async (peerId: PeerId, value: Uint8Array, se
   const ttlMs = expirationDate.toDate().getTime() - Date.now()
   const ttlNs = (BigInt(ttlMs) * BigInt(100000)) + BigInt(expirationDate.getNano())
 
-  return await _create(peerId, value, seq, validityType, expirationDate, ttlNs)
+  return _create(peerId, value, seq, validityType, expirationDate, ttlNs)
 }
 
 const _create = async (peerId: PeerId, value: Uint8Array, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint): Promise<IPNSEntry> => {
