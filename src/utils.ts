@@ -1,15 +1,15 @@
-import errCode from 'err-code'
-import type { PeerId } from '@libp2p/interface-peer-id'
-import type { IPNSEntry, IPNSEntryData } from './index.js'
-import * as ERRORS from './errors.js'
 import { unmarshalPublicKey } from '@libp2p/crypto/keys'
-import { peerIdFromBytes, peerIdFromKeys } from '@libp2p/peer-id'
 import { logger } from '@libp2p/logger'
-import { IpnsEntry } from './pb/ipns.js'
-import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
-import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
+import { peerIdFromBytes, peerIdFromKeys } from '@libp2p/peer-id'
 import * as cborg from 'cborg'
+import errCode from 'err-code'
+import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
+import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
+import * as ERRORS from './errors.js'
+import { IpnsEntry } from './pb/ipns.js'
+import type { IPNSEntry, IPNSEntryData } from './index.js'
 import type { PublicKey } from '@libp2p/interface-keys'
+import type { PeerId } from '@libp2p/interface-peer-id'
 
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
