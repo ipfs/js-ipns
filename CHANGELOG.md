@@ -1,3 +1,10 @@
+## [6.0.2](https://github.com/ipfs/js-ipns/compare/v6.0.1...v6.0.2) (2023-06-14)
+
+
+### Bug Fixes
+
+* export extractPublicKey and update README ([#216](https://github.com/ipfs/js-ipns/issues/216)) ([eb34070](https://github.com/ipfs/js-ipns/commit/eb340700da56d89c0dc0e81d2da6dde1ed2d8ed9)), closes [#208](https://github.com/ipfs/js-ipns/issues/208)
+
 ## [6.0.1](https://github.com/ipfs/js-ipns/compare/v6.0.0...v6.0.1) (2023-06-14)
 
 
