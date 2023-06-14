@@ -11,7 +11,6 @@
 
 - [Install](#install)
   - [Browser `<script>` tag](#browser-script-tag)
-- [Lead Maintainer <!-- omit in toc -->](#lead-maintainer----omit-in-toc---)
 - [Usage](#usage)
   - - [Create record](#create-record)
     - [Validate record](#validate-record)
@@ -87,7 +86,7 @@ const ipnsEntryWithEmbedPublicKey = await ipns.embedPublicKey(publicKey, ipnsEnt
 ```js
 import * as ipns from 'ipns'
 
-const publicKey = ipns.extractPublicKey(peerId, ipnsEntry)
+const publicKey = await ipns.extractPublicKey(peerId, ipnsEntry)
 ```
 
 #### Datastore key
@@ -182,16 +181,6 @@ Validate an IPNS record previously stored in a protocol buffer.
 
 Returns a `Promise`, which may be rejected if the validation was not successful.
 
-#### Datastore key
-
-```js
-ipns.getDatastoreKey(peerId)
-```
-
-Get a key for storing the ipns entry in the datastore.
-
-- `peerId` (`Uint8Array`): peer identifier.
-
 #### Marshal data with proto buffer
 
 ```js
@@ -212,31 +201,18 @@ Returns the entry data structure after being serialized.
 
 - `storedData` (Uint8Array): ipns entry record serialized.
 
-#### Embed public key to record
-
-```js
-const recordWithPublicKey = await ipns.embedPublicKey(publicKey, ipnsEntry)
-```
-
-Embed a public key in an IPNS entry. If it is possible to extract the public key from the `peer-id`, there is no need to embed.
-
-- `publicKey` (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
-- `ipnsEntry` (Object): ipns entry record (obtained using the create function).
-
-Returns a `Promise`. If the promise resolves to null it means the public key can be extracted directly from the `peer-id`.
-
 #### Extract public key from record
 
 ```js
-ipns.extractPublicKey(peerId, ipnsEntry, [callback])
+const publicKey = await ipns.extractPublicKey(peerId, ipnsEntry)
 ```
 
 Extract a public key from an IPNS entry.
 
-- `peerId` (`PeerId` [Instance](https://github.com/libp2p/js-peer-id)): peer identifier object.
+- `peerId` (`PeerId` [Instance](https://github.com/libp2p/js-libp2p-peer-id/tree/master/packages/libp2p-peer-id)): peer identifier object.
 - `ipnsEntry` (Object): ipns entry record (obtained using the create function).
 
-The returned public key (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): may be used for cryptographic operations.
+Returns a `Promise` which resolves to public key ([`PublicKey`](https://github.com/libp2p/js-libp2p-interfaces/blob/master/packages/interface-keys/src/index.ts) ): may be used for cryptographic operations.
 
 #### Namespace
 
@@ -253,15 +229,6 @@ ipns.namespaceLength
 
 // 6
 ```
-
-## Contribute
-
-Feel free to join in. All welcome. Open an [issue](https://github.com/ipfs/js-ipns/issues)!
-
-This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
-
-[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/CONTRIBUTING.md)
-
 ## API Docs
 
 - <https://ipfs.github.io/js-ipns>
