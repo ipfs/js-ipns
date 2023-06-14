@@ -1,3 +1,10 @@
+## [6.0.1](https://github.com/ipfs/js-ipns/compare/v6.0.0...v6.0.1) (2023-06-14)
+
+
+### Dependencies
+
+* **dev:** bump aegir from 38.1.8 to 39.0.10 ([#225](https://github.com/ipfs/js-ipns/issues/225)) ([1c9fce1](https://github.com/ipfs/js-ipns/commit/1c9fce138abaefbe6e704261aa10705ce9b39b1b))
+
 ## [6.0.0](https://github.com/ipfs/js-ipns/compare/v5.0.2...v6.0.0) (2023-03-21)
 
 
