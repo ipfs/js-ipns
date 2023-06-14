@@ -1,3 +1,15 @@
+## [6.0.3](https://github.com/ipfs/js-ipns/compare/v6.0.2...v6.0.3) (2023-06-14)
+
+
+### Bug Fixes
+
+* limit valid message size ([#226](https://github.com/ipfs/js-ipns/issues/226)) ([8a3e4f4](https://github.com/ipfs/js-ipns/commit/8a3e4f434701abf4ea997f50674a9659b2774c29))
+
+
+### Documentation
+
+* update readme and project ([#227](https://github.com/ipfs/js-ipns/issues/227)) ([3b587c2](https://github.com/ipfs/js-ipns/commit/3b587c2b7fa50501385a176a882e27d24ea6b6df))
+
 ## [6.0.2](https://github.com/ipfs/js-ipns/compare/v6.0.1...v6.0.2) (2023-06-14)
 
 
