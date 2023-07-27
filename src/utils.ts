@@ -7,7 +7,7 @@ import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
-import type { IPNSEntry, IPNSEntryData } from './index.js'
+import { IPNSRecord } from './index.js'
 import type { PublicKey } from '@libp2p/interface-keys'
 import type { PeerId } from '@libp2p/interface-peer-id'
 
@@ -65,8 +65,8 @@ export function parseRFC3339 (time: string): Date {
  * Extracts a public key from the passed PeerId, falling
  * back to the pubKey embedded in the ipns record
  */
-export const extractPublicKey = async (peerId: PeerId, entry: IpnsEntry): Promise<PublicKey> => {
-  if (entry == null || peerId == null) {
+export const extractPublicKey = async (peerId: PeerId, record: IPNSRecord): Promise<PublicKey> => {
+  if (record == null || peerId == null) {
     const error = new Error('one or more of the provided parameters are not defined')
 
     log.error(error)
@@ -75,15 +75,15 @@ export const extractPublicKey = async (peerId: PeerId, entry: IpnsEntry): Promis
 
   let pubKey: PublicKey | undefined
 
-  if (entry.pubKey != null) {
+  if (record.pb.pubKey != null) {
     try {
-      pubKey = unmarshalPublicKey(entry.pubKey)
+      pubKey = unmarshalPublicKey(record.pb.pubKey)
     } catch (err) {
       log.error(err)
       throw err
     }
 
-    const otherId = await peerIdFromKeys(entry.pubKey)
+    const otherId = await peerIdFromKeys(record.pb.pubKey)
 
     if (!otherId.equals(peerId)) {
       throw errCode(new Error('Embedded public key did not match PeerID'), ERRORS.ERR_INVALID_EMBEDDED_KEY)
@@ -102,7 +102,7 @@ export const extractPublicKey = async (peerId: PeerId, entry: IpnsEntry): Promis
 /**
  * Utility for creating the record data for being signed
  */
-export const ipnsEntryDataForV1Sig = (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array): Uint8Array => {
+export const ipnsRecordDataForV1Sig = (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array): Uint8Array => {
   const validityTypeBuffer = uint8ArrayFromString(validityType)
 
   return uint8ArrayConcat([value, validity, validityTypeBuffer])
@@ -111,17 +111,17 @@ export const ipnsEntryDataForV1Sig = (value: Uint8Array, validityType: IpnsEntry
 /**
  * Utility for creating the record data for being signed
  */
-export const ipnsEntryDataForV2Sig = (data: Uint8Array): Uint8Array => {
+export const ipnsRecordDataForV2Sig = (data: Uint8Array): Uint8Array => {
   const entryData = uint8ArrayFromString('ipns-signature:')
 
   return uint8ArrayConcat([entryData, data])
 }
 
-export const marshal = (obj: IPNSEntry): Uint8Array => {
-  return IpnsEntry.encode(obj)
+export const marshal = (obj: IPNSRecord): Uint8Array => {
+  return IpnsEntry.encode(obj.pb)
 }
 
-export const unmarshal = (buf: Uint8Array): IPNSEntry => {
+export const unmarshal = (buf: Uint8Array): IPNSRecord => {
   const message = IpnsEntry.decode(buf)
 
   // protobufjs returns bigints as numbers
@@ -134,17 +134,7 @@ export const unmarshal = (buf: Uint8Array): IPNSEntry => {
     message.ttl = BigInt(message.ttl)
   }
 
-  return {
-    value: message.value ?? new Uint8Array(0),
-    signature: message.signature ?? new Uint8Array(0),
-    validityType: message.validityType ?? IpnsEntry.ValidityType.EOL,
-    validity: message.validity ?? new Uint8Array(0),
-    sequence: message.sequence ?? 0n,
-    pubKey: message.pubKey,
-    ttl: message.ttl ?? undefined,
-    signatureV2: message.signatureV2,
-    data: message.data
-  }
+  return new IPNSRecord(message)
 }
 
 export const peerIdToRoutingKey = (peerId: PeerId): Uint8Array => {
@@ -176,26 +166,4 @@ export const createCborData = (value: Uint8Array, validity: Uint8Array, validity
   }
 
   return cborg.encode(data)
-}
-
-export const parseCborData = (buf: Uint8Array): IPNSEntryData => {
-  const data = cborg.decode(buf)
-
-  if (data.ValidityType === 0) {
-    data.ValidityType = IpnsEntry.ValidityType.EOL
-  } else {
-    throw errCode(new Error('Unknown validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
-  }
-
-  if (Number.isInteger(data.Sequence)) {
-    // sequence must be a BigInt, but DAG-CBOR doesn't preserve this for Numbers within the safe-integer range
-    data.Sequence = BigInt(data.Sequence)
-  }
-
-  if (Number.isInteger(data.TTL)) {
-    // ttl must be a BigInt, but DAG-CBOR doesn't preserve this for Numbers within the safe-integer range
-    data.TTL = BigInt(data.TTL)
-  }
-
-  return data
 }

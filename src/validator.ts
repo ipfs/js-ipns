@@ -1,11 +1,12 @@
 import { logger } from '@libp2p/logger'
+import * as cborg from 'cborg'
 import errCode from 'err-code'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
-import { parseRFC3339, extractPublicKey, ipnsEntryDataForV2Sig, unmarshal, peerIdFromRoutingKey, parseCborData } from './utils.js'
-import type { IPNSEntry } from './index.js'
+import { parseRFC3339, extractPublicKey, ipnsRecordDataForV2Sig, unmarshal, peerIdFromRoutingKey } from './utils.js'
+import type { IPNSRecord } from './index.js'
 import type { ValidateFn } from '@libp2p/interface-dht'
 import type { PublicKey } from '@libp2p/interface-keys'
 
@@ -17,27 +18,26 @@ const log = logger('ipns:validator')
 const MAX_RECORD_SIZE = 1024 * 10
 
 /**
- * Validates the given ipns entry against the given public key
+ * Validates the given IPNS record against the given public key
  */
-export const validate = async (publicKey: PublicKey, entry: IPNSEntry): Promise<void> => {
-  const { value, validityType, validity } = entry
+export const validate = async (publicKey: PublicKey, record: IPNSRecord): Promise<void> => {
+  const { value, validityType, validity } = record.pb
 
-  let dataForSignature: Uint8Array
-  let signature: Uint8Array
-
-  // Check v2 signature if it's available, otherwise use the v1 signature
-  if ((entry.signatureV2 != null) && (entry.data != null)) {
-    signature = entry.signatureV2
-    dataForSignature = ipnsEntryDataForV2Sig(entry.data)
-
-    validateCborDataMatchesPbData(entry)
-  } else {
+  // Ensure Signature V2 and Data are present and not empty.
+  if ((record.pb.signatureV2 == null) || (record.pb.data == null)) {
     throw errCode(new Error('missing data or signatureV2'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
-  // Validate Signature
+  // If Signature V1 is present, ensure that CBOR data matches Protobuf data.
+  if (record.pb.signature != null || record.pb.value != null) {
+    validateCborDataMatchesPbData(record)
+  }
+
+  // Validate Signature V2
   let isValid
   try {
+    const signature = record.pb.signatureV2
+    const dataForSignature = ipnsRecordDataForV2Sig(record.pb.data)
     isValid = await publicKey.verify(dataForSignature, signature)
   } catch (err) {
     isValid = false
@@ -67,33 +67,49 @@ export const validate = async (publicKey: PublicKey, entry: IPNSEntry): Promise<
     throw errCode(new Error('unrecognized validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
   }
 
-  log('ipns entry for %b is valid', value)
+  log('ipns record for %b is valid', value)
 }
 
-const validateCborDataMatchesPbData = (entry: IPNSEntry): void => {
-  if (entry.data == null) {
+const validateCborDataMatchesPbData = (record: IPNSRecord): void => {
+  if (record.pb.data == null) {
     throw errCode(new Error('Record data is missing'), ERRORS.ERR_INVALID_RECORD_DATA)
   }
 
-  const data = parseCborData(entry.data)
+  const data = cborg.decode(record.pb.data)
 
-  if (!uint8ArrayEquals(data.Value, entry.value)) {
+  if (!uint8ArrayEquals(data.Value, record.pb.value ?? new Uint8Array(0))) {
     throw errCode(new Error('Field "value" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
-  if (!uint8ArrayEquals(data.Validity, entry.validity)) {
+  if (!uint8ArrayEquals(data.Validity, record.pb.validity ?? new Uint8Array(0))) {
     throw errCode(new Error('Field "validity" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
-  if (data.ValidityType !== entry.validityType) {
+  if (data.ValidityType === 0) {
+    data.ValidityType = IpnsEntry.ValidityType.EOL
+  } else {
+    throw errCode(new Error('Unknown validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
+  }
+
+  if (data.ValidityType !== record.pb.validityType) {
     throw errCode(new Error('Field "validityType" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
-  if (data.Sequence !== entry.sequence) {
+  if (Number.isInteger(data.Sequence)) {
+    // sequence must be a BigInt, but DAG-CBOR doesn't preserve this for Numbers within the safe-integer range
+    data.Sequence = BigInt(data.Sequence)
+  }
+
+  if (data.Sequence !== record.pb.sequence) {
     throw errCode(new Error('Field "sequence" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
-  if (data.TTL !== entry.ttl) {
+  if (Number.isInteger(data.TTL)) {
+    // ttl must be a BigInt, but DAG-CBOR doesn't preserve this for Numbers within the safe-integer range
+    data.TTL = BigInt(data.TTL)
+  }
+
+  if (data.TTL !== record.pb.ttl) {
     throw errCode(new Error('Field "ttl" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 }
@@ -104,11 +120,11 @@ export const ipnsValidator: ValidateFn = async (key, marshalledData) => {
   }
 
   const peerId = peerIdFromRoutingKey(key)
-  const receivedEntry = unmarshal(marshalledData)
+  const receivedRecord = unmarshal(marshalledData)
 
   // extract public key
-  const pubKey = await extractPublicKey(peerId, receivedEntry)
+  const pubKey = await extractPublicKey(peerId, receivedRecord)
 
   // Record validation
-  await validate(pubKey, receivedEntry)
+  await validate(pubKey, receivedRecord)
 }

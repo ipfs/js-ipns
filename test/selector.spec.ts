@@ -24,11 +24,11 @@ describe('selector', function () {
     const sequence = 0
     const lifetime = 1000000
 
-    const entry = await ipns.create(peerId, cid, sequence, lifetime)
-    const newEntry = await ipns.create(peerId, cid, (sequence + 1), lifetime)
+    const record = await ipns.create(peerId, cid, sequence, lifetime)
+    const newRecord = await ipns.create(peerId, cid, (sequence + 1), lifetime)
 
-    const marshalledData = marshal(entry)
-    const marshalledNewData = marshal(newEntry)
+    const marshalledData = marshal(record)
+    const marshalledNewData = marshal(newRecord)
 
     const key = peerIdToRoutingKey(peerId)
 
@@ -43,11 +43,11 @@ describe('selector', function () {
     const sequence = 0
     const lifetime = 1000000
 
-    const entry = await ipns.create(peerId, cid, sequence, lifetime)
-    const newEntry = await ipns.create(peerId, cid, sequence, (lifetime + 1))
+    const record = await ipns.create(peerId, cid, sequence, lifetime)
+    const newRecord = await ipns.create(peerId, cid, sequence, (lifetime + 1))
 
-    const marshalledData = marshal(entry)
-    const marshalledNewData = marshal(newEntry)
+    const marshalledData = marshal(record)
+    const marshalledNewData = marshal(newRecord)
 
     const key = peerIdToRoutingKey(peerId)
 
@@ -62,13 +62,13 @@ describe('selector', function () {
     const sequence = 0
     const lifetime = 1000000
 
-    const entry = await ipns.create(peerId, cid, sequence, lifetime)
+    const record = await ipns.create(peerId, cid, sequence, lifetime)
 
-    const newEntry = await ipns.create(peerId, cid, sequence + 1, lifetime)
-    delete newEntry.signatureV2
+    const newRecord = await ipns.create(peerId, cid, sequence + 1, lifetime)
+    delete newRecord.pb.signatureV2
 
-    const marshalledData = marshal(entry)
-    const marshalledNewData = marshal(newEntry)
+    const marshalledData = marshal(record)
+    const marshalledNewData = marshal(newRecord)
 
     const key = peerIdToRoutingKey(peerId)
 

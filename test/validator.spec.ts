@@ -32,8 +32,8 @@ describe('validator', function () {
     const sequence = 0
     const validity = 1000000
 
-    const entry = await ipns.create(peerId1, cid, sequence, validity)
-    const marshalledData = marshal(entry)
+    const record = await ipns.create(peerId1, cid, sequence, validity)
+    const marshalledData = marshal(record)
 
     const keyBytes = base58btc.decode(`z${peerId1.toString()}`)
     const key = uint8ArrayConcat([uint8ArrayFromString('/ipns/'), keyBytes])
@@ -45,11 +45,11 @@ describe('validator', function () {
     const sequence = 0
     const validity = 1000000
 
-    const entry = await ipns.create(peerId1, cid, sequence, validity)
+    const record = await ipns.create(peerId1, cid, sequence, validity)
 
     // corrupt the record by changing the value to random bytes
-    entry.value = randomBytes(entry.value.length)
-    const marshalledData = marshal(entry)
+    record.pb.value = randomBytes(record.pb.value?.length ?? 0)
+    const marshalledData = marshal(record)
 
     const key = peerIdToRoutingKey(peerId1)
 
@@ -60,8 +60,8 @@ describe('validator', function () {
     const sequence = 0
     const validity = 1000000
 
-    const entry = await ipns.create(peerId1, cid, sequence, validity)
-    const marshalledData = marshal(entry)
+    const record = await ipns.create(peerId1, cid, sequence, validity)
+    const marshalledData = marshal(record)
 
     const key = peerIdToRoutingKey(peerId2)
 
@@ -72,9 +72,9 @@ describe('validator', function () {
     const sequence = 0
     const validity = 1000000
 
-    const entry = await ipns.create(peerId1, cid, sequence, validity)
-    entry.pubKey = peerId2.publicKey
-    const marshalledData = marshal(entry)
+    const record = await ipns.create(peerId1, cid, sequence, validity)
+    record.pb.pubKey = peerId2.publicKey
+    const marshalledData = marshal(record)
 
     const key = peerIdToRoutingKey(peerId1)
 
