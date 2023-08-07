@@ -181,7 +181,7 @@
     "uint8arrays": "^4.0.2"
   },
   "devDependencies": {
-    "@libp2p/peer-id-factory": "^2.0.0",
+    "@libp2p/peer-id-factory": "^3.0.2",
     "aegir": "^39.0.10",
     "protons": "^7.0.2"
   }
