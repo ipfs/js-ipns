@@ -165,7 +165,7 @@
     "docs": "aegir docs"
   },
   "dependencies": {
-    "@libp2p/crypto": "^1.0.0",
+    "@libp2p/crypto": "^2.0.2",
     "@libp2p/interface-dht": "^2.0.0",
     "@libp2p/interface-keys": "^1.0.3",
     "@libp2p/interface-peer-id": "^2.0.0",
