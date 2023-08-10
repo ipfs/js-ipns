@@ -117,7 +117,7 @@ import * as ipns from 'ipns'
 const ipnsRecord = ipns.unmarshal(storedData)
 ```
 
-Returns the `IPNSRecord` after being serialized.
+Returns the `IPNSRecord` after being deserialized.
 
 ### Validator
 
@@ -161,7 +161,7 @@ ipns.validate(publicKey, ipnsRecord)
 Validate an IPNS record previously stored in a protocol buffer.
 
 - `publicKey` (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
-- `ipnsRecord` (`IPNSRecord`): ipns record record (obtained using the create function).
+- `ipnsRecord` (`IPNSRecord`): IPNS record (obtained using the create function).
 
 Returns a `Promise`, which may be rejected if the validation was not successful.
 

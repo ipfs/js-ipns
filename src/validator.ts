@@ -28,7 +28,7 @@ export const validate = async (publicKey: PublicKey, record: IPNSRecord): Promis
     throw errCode(new Error('missing data or signatureV2'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
-  // If Signature V1 is present, ensure that CBOR data matches Protobuf data.
+  // If Signature V1 is present, ensure that CBOR data matches Protobuf data (IPIP-428).
   if (record.pb.signature != null || record.pb.value != null) {
     validateCborDataMatchesPbData(record)
   }
