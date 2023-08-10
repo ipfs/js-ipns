@@ -28,11 +28,24 @@ describe('validator', function () {
     peerId2 = await peerIdFromKeys(rsa2.public.bytes, rsa2.bytes)
   })
 
-  it('should validate a record', async () => {
+  it('should validate a (V2) record', async () => {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId1, cid, sequence, validity)
+    const record = await ipns.create(peerId1, cid, sequence, validity, { v1Compatible: false })
+    const marshalledData = marshal(record)
+
+    const keyBytes = base58btc.decode(`z${peerId1.toString()}`)
+    const key = uint8ArrayConcat([uint8ArrayFromString('/ipns/'), keyBytes])
+
+    await ipnsValidator(key, marshalledData)
+  })
+
+  it('should validate a (V1+V2) record', async () => {
+    const sequence = 0
+    const validity = 1000000
+
+    const record = await ipns.create(peerId1, cid, sequence, validity, { v1Compatible: true })
     const marshalledData = marshal(record)
 
     const keyBytes = base58btc.decode(`z${peerId1.toString()}`)
