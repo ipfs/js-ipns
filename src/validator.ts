@@ -29,7 +29,7 @@ export const validate = async (publicKey: PublicKey, record: IPNSRecord): Promis
   }
 
   // If Signature V1 is present, ensure that CBOR data matches Protobuf data (IPIP-428).
-  if (record.pb.signature != null || record.pb.value != null) {
+  if (record.pb.signatureV1 != null || record.pb.value != null) {
     validateCborDataMatchesPbData(record)
   }
 

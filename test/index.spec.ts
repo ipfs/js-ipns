@@ -43,7 +43,7 @@ describe('ipns', function () {
       sequence: BigInt(sequence)
     })
     expect(record.pb).to.have.property('validity')
-    expect(record.pb).to.have.property('signature')
+    expect(record.pb).to.have.property('signatureV1')
     expect(record.pb).to.have.property('validityType')
     expect(record.pb).to.have.property('signatureV2')
     expect(record.pb).to.have.property('data')
@@ -64,7 +64,7 @@ describe('ipns', function () {
     expect(record.pb).to.not.have.property('value')
     expect(record.pb).to.not.have.property('sequence')
     expect(record.pb).to.not.have.property('validity')
-    expect(record.pb).to.not.have.property('signature')
+    expect(record.pb).to.not.have.property('signatureV1')
     expect(record.pb).to.not.have.property('validityType')
     expect(record.pb).to.have.property('signatureV2')
     expect(record.pb).to.have.property('data')
@@ -121,7 +121,7 @@ describe('ipns', function () {
     delete record.pb.signatureV2
 
     // confirm a v1 exists
-    expect(record.pb).to.have.property('signature')
+    expect(record.pb).to.have.property('signatureV1')
 
     await expect(ipnsValidator(peerIdToRoutingKey(peerId), marshal(record))).to.eventually.be.rejected().with.property('code', ERRORS.ERR_INVALID_RECORD_DATA)
   })
@@ -136,7 +136,7 @@ describe('ipns', function () {
     delete record.pb.signatureV2
 
     // confirm a v1 exists
-    expect(record.pb).to.have.property('signature')
+    expect(record.pb).to.have.property('signatureV1')
 
     await expect(ipnsValidator(peerIdToRoutingKey(peerId), marshal(record))).to.eventually.be.rejected().with.property('code', ERRORS.ERR_SIGNATURE_VERIFICATION)
   })
@@ -176,7 +176,7 @@ describe('ipns', function () {
     expect(createdRecord.pb.value).to.equalBytes(unmarshalledData.pb.value)
     expect(createdRecord.pb.validity).to.equalBytes(unmarshalledData.pb.validity)
     expect(createdRecord.pb.validityType).to.equal(unmarshalledData.pb.validityType)
-    expect(createdRecord.pb.signature).to.equalBytes(unmarshalledData.pb.signature)
+    expect(createdRecord.pb.signatureV1).to.equalBytes(unmarshalledData.pb.signatureV1)
     expect(createdRecord.pb.sequence).to.equal(unmarshalledData.pb.sequence)
     expect(createdRecord.pb.ttl).to.equal(unmarshalledData.pb.ttl)
 

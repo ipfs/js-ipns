@@ -146,7 +146,7 @@ const _create = async (peerId: PeerId, value: Uint8Array, seq: number | bigint, 
     pb.value = value
     pb.validity = isoValidity
     pb.validityType = validityType
-    pb.signature = signatureV1
+    pb.signatureV1 = signatureV1
     pb.sequence = seq
     pb.ttl = ttl
   }
