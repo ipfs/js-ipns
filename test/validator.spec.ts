@@ -16,7 +16,7 @@ import type { PeerId } from '@libp2p/interface-peer-id'
 describe('validator', function () {
   this.timeout(20 * 1000)
 
-  const cid = uint8ArrayFromString('QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq')
+  const contentPath = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
   let peerId1: PeerId
   let peerId2: PeerId
 
@@ -32,7 +32,7 @@ describe('validator', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId1, cid, sequence, validity, { v1Compatible: false })
+    const record = await ipns.create(peerId1, contentPath, sequence, validity, { v1Compatible: false })
     const marshalledData = marshal(record)
 
     const keyBytes = base58btc.decode(`z${peerId1.toString()}`)
@@ -45,7 +45,7 @@ describe('validator', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId1, cid, sequence, validity, { v1Compatible: true })
+    const record = await ipns.create(peerId1, contentPath, sequence, validity, { v1Compatible: true })
     const marshalledData = marshal(record)
 
     const keyBytes = base58btc.decode(`z${peerId1.toString()}`)
@@ -58,7 +58,7 @@ describe('validator', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId1, cid, sequence, validity)
+    const record = await ipns.create(peerId1, contentPath, sequence, validity)
 
     // corrupt the record by changing the value to random bytes
     record.pb.value = randomBytes(record.pb.value?.length ?? 0)
@@ -73,7 +73,7 @@ describe('validator', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId1, cid, sequence, validity)
+    const record = await ipns.create(peerId1, contentPath, sequence, validity)
     const marshalledData = marshal(record)
 
     const key = peerIdToRoutingKey(peerId2)
@@ -85,7 +85,7 @@ describe('validator', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId1, cid, sequence, validity)
+    const record = await ipns.create(peerId1, contentPath, sequence, validity)
     record.pb.pubKey = peerId2.publicKey
     const marshalledData = marshal(record)
 

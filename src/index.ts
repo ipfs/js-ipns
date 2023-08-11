@@ -88,12 +88,12 @@ const defaultCreateOptions: CreateOptions = {
  * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
  *
  * @param {PeerId} peerId - peer id containing private key for signing the record.
- * @param {Uint8Array} value - value to be stored in the record.
+ * @param {string} value - value to be stored in the record.
  * @param {number | bigint} seq - number representing the current version of the record.
  * @param {number} lifetime - lifetime of the record (in milliseconds).
  * @param {CreateOptions} options - additional create options.
  */
-export const create = async (peerId: PeerId, value: Uint8Array, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+export const create = async (peerId: PeerId, value: string, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = IpnsEntry.ValidityType.EOL
@@ -108,12 +108,12 @@ export const create = async (peerId: PeerId, value: Uint8Array, seq: number | bi
  * WARNING: nano precision is not standard, make sure the value in seconds is 9 orders of magnitude lesser than the one provided.
  *
  * @param {PeerId} peerId - PeerId containing private key for signing the record.
- * @param {Uint8Array} value - value to be stored in the record.
+ * @param {string} value - value to be stored in the record.
  * @param {number | bigint} seq - number representing the current version of the record.
  * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * @param {CreateOptions} options - additional creation options.
  */
-export const createWithExpiration = async (peerId: PeerId, value: Uint8Array, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+export const createWithExpiration = async (peerId: PeerId, value: string, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
   const expirationDate = NanoDate.fromString(expiration)
   const validityType = IpnsEntry.ValidityType.EOL
 
@@ -123,16 +123,17 @@ export const createWithExpiration = async (peerId: PeerId, value: Uint8Array, se
   return _create(peerId, value, seq, validityType, expirationDate, ttlNs, options)
 }
 
-const _create = async (peerId: PeerId, value: Uint8Array, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+const _create = async (peerId: PeerId, value: string, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
   seq = BigInt(seq)
   const isoValidity = uint8ArrayFromString(expirationDate.toString())
+  const encodedValue = uint8ArrayFromString(value)
 
   if (peerId.privateKey == null) {
     throw errCode(new Error('Missing private key'), ERRORS.ERR_MISSING_PRIVATE_KEY)
   }
 
   const privateKey = await unmarshalPrivateKey(peerId.privateKey)
-  const data = createCborData(value, isoValidity, validityType, seq, ttl)
+  const data = createCborData(encodedValue, isoValidity, validityType, seq, ttl)
   const sigData = ipnsRecordDataForV2Sig(data)
   const signatureV2 = await privateKey.sign(sigData)
 
@@ -142,8 +143,8 @@ const _create = async (peerId: PeerId, value: Uint8Array, seq: number | bigint, 
   }
 
   if (options.v1Compatible === true) {
-    const signatureV1 = await signLegacyV1(privateKey, value, validityType, isoValidity)
-    pb.value = value
+    const signatureV1 = await signLegacyV1(privateKey, encodedValue, validityType, isoValidity)
+    pb.value = encodedValue
     pb.validity = isoValidity
     pb.validityType = validityType
     pb.signatureV1 = signatureV1

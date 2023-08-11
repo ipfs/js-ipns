@@ -3,7 +3,6 @@
 import { generateKeyPair } from '@libp2p/crypto/keys'
 import { peerIdFromKeys } from '@libp2p/peer-id'
 import { expect } from 'aegir/chai'
-import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import * as ipns from '../src/index.js'
 import { ipnsSelector } from '../src/selector.js'
 import { marshal, peerIdToRoutingKey } from '../src/utils.js'
@@ -12,7 +11,7 @@ import type { PeerId } from '@libp2p/interface-peer-id'
 describe('selector', function () {
   this.timeout(20 * 1000)
 
-  const cid = uint8ArrayFromString('QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq')
+  const contentPath = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
   let peerId: PeerId
 
   before(async () => {
@@ -24,8 +23,8 @@ describe('selector', function () {
     const sequence = 0
     const lifetime = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, lifetime)
-    const newRecord = await ipns.create(peerId, cid, (sequence + 1), lifetime)
+    const record = await ipns.create(peerId, contentPath, sequence, lifetime)
+    const newRecord = await ipns.create(peerId, contentPath, (sequence + 1), lifetime)
 
     const marshalledData = marshal(record)
     const marshalledNewData = marshal(newRecord)
@@ -43,8 +42,8 @@ describe('selector', function () {
     const sequence = 0
     const lifetime = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, lifetime)
-    const newRecord = await ipns.create(peerId, cid, sequence, (lifetime + 1))
+    const record = await ipns.create(peerId, contentPath, sequence, lifetime)
+    const newRecord = await ipns.create(peerId, contentPath, sequence, (lifetime + 1))
 
     const marshalledData = marshal(record)
     const marshalledNewData = marshal(newRecord)
@@ -62,9 +61,9 @@ describe('selector', function () {
     const sequence = 0
     const lifetime = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, lifetime)
+    const record = await ipns.create(peerId, contentPath, sequence, lifetime)
 
-    const newRecord = await ipns.create(peerId, cid, sequence + 1, lifetime)
+    const newRecord = await ipns.create(peerId, contentPath, sequence + 1, lifetime)
     delete newRecord.pb.signatureV2
 
     const marshalledData = marshal(record)

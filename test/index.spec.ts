@@ -7,7 +7,6 @@ import { createEd25519PeerId } from '@libp2p/peer-id-factory'
 import { expect } from 'aegir/chai'
 import { base58btc } from 'multiformats/bases/base58'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
-import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import * as ERRORS from '../src/errors.js'
 import * as ipns from '../src/index.js'
 import { IpnsEntry } from '../src/pb/ipns.js'
@@ -18,7 +17,7 @@ import type { PeerId } from '@libp2p/interface-peer-id'
 describe('ipns', function () {
   this.timeout(20 * 1000)
 
-  const cid = uint8ArrayFromString('QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq')
+  const contentPath = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
   let peerId: PeerId
 
   before(async () => {
@@ -30,16 +29,16 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, validity)
+    const record = await ipns.create(peerId, contentPath, sequence, validity)
 
-    expect(record.value()).to.equal(uint8ArrayToString(cid))
+    expect(record.value()).to.equal(contentPath)
     expect(record.sequence()).to.equal(BigInt(0))
     expect(record.validityType()).to.equal(IpnsEntry.ValidityType.EOL)
     expect(record.validity()).to.exist()
     expect(record.ttl()).to.equal(BigInt(validity * 100000))
 
     expect(record.pb).to.deep.include({
-      value: cid,
+      value: uint8ArrayFromString(contentPath),
       sequence: BigInt(sequence)
     })
     expect(record.pb).to.have.property('validity')
@@ -53,9 +52,9 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, validity, { v1Compatible: false })
+    const record = await ipns.create(peerId, contentPath, sequence, validity, { v1Compatible: false })
 
-    expect(record.value()).to.equal(uint8ArrayToString(cid))
+    expect(record.value()).to.equal(contentPath)
     expect(record.sequence()).to.equal(BigInt(0))
     expect(record.validityType()).to.equal(IpnsEntry.ValidityType.EOL)
     expect(record.validity()).to.exist()
@@ -75,7 +74,7 @@ describe('ipns', function () {
     // 2033-05-18T03:33:20.000000000Z
     const expiration = '2033-05-18T03:33:20.000000000Z'
 
-    const record = await ipns.createWithExpiration(peerId, cid, sequence, expiration)
+    const record = await ipns.createWithExpiration(peerId, contentPath, sequence, expiration)
 
     await ipnsValidator(peerIdToRoutingKey(peerId), marshal(record))
     expect(record.pb).to.have.property('validity')
@@ -87,7 +86,7 @@ describe('ipns', function () {
     // 2033-05-18T03:33:20.000000000Z
     const expiration = '2033-05-18T03:33:20.000000000Z'
 
-    const record = await ipns.createWithExpiration(peerId, cid, sequence, expiration, { v1Compatible: false })
+    const record = await ipns.createWithExpiration(peerId, contentPath, sequence, expiration, { v1Compatible: false })
 
     await ipnsValidator(peerIdToRoutingKey(peerId), marshal(record))
     expect(record.pb).to.not.have.property('validity')
@@ -98,7 +97,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, validity)
+    const record = await ipns.create(peerId, contentPath, sequence, validity)
     await ipnsValidator(peerIdToRoutingKey(peerId), marshal(record))
   })
 
@@ -106,7 +105,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, validity, { v1Compatible: false })
+    const record = await ipns.create(peerId, contentPath, sequence, validity, { v1Compatible: false })
     await ipnsValidator(peerIdToRoutingKey(peerId), marshal(record))
   })
 
@@ -114,7 +113,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, validity)
+    const record = await ipns.create(peerId, contentPath, sequence, validity)
 
     // remove the extra fields added for v2 sigs
     delete record.pb.data
@@ -130,7 +129,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, validity)
+    const record = await ipns.create(peerId, contentPath, sequence, validity)
 
     // remove v2 sig
     delete record.pb.signatureV2
@@ -145,7 +144,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, validity)
+    const record = await ipns.create(peerId, contentPath, sequence, validity)
 
     // corrupt the record by changing the value to random bytes
     record.pb.value = randomBytes(46)
@@ -157,7 +156,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 0.00001
 
-    const record = await ipns.create(peerId, cid, sequence, validity)
+    const record = await ipns.create(peerId, contentPath, sequence, validity)
 
     await new Promise(resolve => setTimeout(resolve, 1))
 
@@ -168,7 +167,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const createdRecord = await ipns.create(peerId, cid, sequence, validity)
+    const createdRecord = await ipns.create(peerId, contentPath, sequence, validity)
 
     const marshalledData = marshal(createdRecord)
     const unmarshalledData = unmarshal(marshalledData)
@@ -220,7 +219,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, validity)
+    const record = await ipns.create(peerId, contentPath, sequence, validity)
 
     expect(record.pb).to.deep.include({
       pubKey: peerId.publicKey
@@ -238,7 +237,7 @@ describe('ipns', function () {
     const validity = 1000000
 
     const ed25519 = await createEd25519PeerId()
-    const record = await ipns.create(ed25519, cid, sequence, validity)
+    const record = await ipns.create(ed25519, contentPath, sequence, validity)
 
     expect(record.pb).to.not.have.property('pubKey') // ed25519 keys should not be embedded
   })
@@ -247,7 +246,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, validity)
+    const record = await ipns.create(peerId, contentPath, sequence, validity)
     delete record.pb.pubKey
 
     const marshalledData = marshal(record)
@@ -260,7 +259,7 @@ describe('ipns', function () {
     const sequence = 0
     const validity = 1000000
 
-    const record = await ipns.create(peerId, cid, sequence, validity)
+    const record = await ipns.create(peerId, contentPath, sequence, validity)
 
     const publicKey = await extractPublicKey(peerId, record)
     expect(publicKey).to.deep.include({
