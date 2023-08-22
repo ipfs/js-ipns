@@ -109,6 +109,86 @@ describe('ipns', function () {
     await ipnsValidator(peerIdToRoutingKey(peerId), marshal(record))
   })
 
+  it('should normalize value when creating an ipns record (string v0 cid)', async () => {
+    const inputValue = 'QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq'
+    const expectedValue = '/ipfs/bafybeidvkqhl6dwsdzx5km7tupo33ywt7czkl5topwogxx6lybko2d7pua'
+    const record = await ipns.create(peerId, inputValue, 0, 1000000)
+    expect(record.value()).to.equal(expectedValue)
+    expect(record.pb).to.deep.include({
+      value: uint8ArrayFromString(expectedValue)
+    })
+  })
+
+  it('should normalize value when creating an ipns record (string v1 cid)', async () => {
+    const inputValue = 'bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
+    const expectedValue = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
+    const record = await ipns.create(peerId, inputValue, 0, 1000000)
+    expect(record.value()).to.equal(expectedValue)
+    expect(record.pb).to.deep.include({
+      value: uint8ArrayFromString(expectedValue)
+    })
+  })
+
+  it('should normalize value when creating an ipns record (bytes v0 cid)', async () => {
+    const inputValue = uint8ArrayFromString('QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq')
+    const expectedValue = '/ipfs/bafybeidvkqhl6dwsdzx5km7tupo33ywt7czkl5topwogxx6lybko2d7pua'
+    const record = await ipns.create(peerId, inputValue, 0, 1000000)
+    expect(record.value()).to.equal(expectedValue)
+    expect(record.pb).to.deep.include({
+      value: uint8ArrayFromString(expectedValue)
+    })
+  })
+
+  it('should normalize value when creating an ipns record (bytes v1 cid)', async () => {
+    const inputValue = uint8ArrayFromString('bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu')
+    const expectedValue = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
+    const record = await ipns.create(peerId, inputValue, 0, 1000000)
+    expect(record.value()).to.equal(expectedValue)
+    expect(record.pb).to.deep.include({
+      value: uint8ArrayFromString(expectedValue)
+    })
+  })
+
+  it('should normalize value when reading an ipns record (string v0 cid)', async () => {
+    const inputValue = 'QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq'
+    const expectedValue = '/ipfs/bafybeidvkqhl6dwsdzx5km7tupo33ywt7czkl5topwogxx6lybko2d7pua'
+    const record = await ipns.create(peerId, inputValue, 0, 1000000)
+
+    // Force old value type.
+    record.data.Value = inputValue
+    expect(record.value()).to.equal(expectedValue)
+  })
+
+  it('should normalize value when reading an ipns record (string v1 cid)', async () => {
+    const inputValue = 'bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
+    const expectedValue = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
+    const record = await ipns.create(peerId, inputValue, 0, 1000000)
+
+    // Force old value type.
+    record.data.Value = inputValue
+    expect(record.value()).to.equal(expectedValue)
+  })
+
+  it('should normalize value when reading an ipns record (bytes v0 cid)', async () => {
+    const inputValue = uint8ArrayFromString('QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq')
+    const expectedValue = '/ipfs/bafybeidvkqhl6dwsdzx5km7tupo33ywt7czkl5topwogxx6lybko2d7pua'
+    const record = await ipns.create(peerId, inputValue, 0, 1000000)
+
+    // Force old value type.
+    record.data.Value = inputValue
+    expect(record.value()).to.equal(expectedValue)
+  })
+
+  it('should normalize value when reading an ipns record (bytes v1 cid)', async () => {
+    const inputValue = uint8ArrayFromString('bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu')
+    const expectedValue = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
+    const record = await ipns.create(peerId, inputValue, 0, 1000000)
+
+    // Force old value type.
+    record.data.Value = inputValue
+    expect(record.value()).to.equal(expectedValue)
+  })
+
   it('should fail to validate a v1 (deprecated legacy) message', async () => {
     const sequence = 0
     const validity = 1000000

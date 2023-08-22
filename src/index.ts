@@ -4,6 +4,7 @@ import * as cborg from 'cborg'
 import errCode from 'err-code'
 import { Key } from 'interface-datastore/key'
 import { base32upper } from 'multiformats/bases/base32'
+import { CID } from 'multiformats/cid'
 import * as Digest from 'multiformats/hashes/digest'
 import { identity } from 'multiformats/hashes/identity'
 import NanoDate from 'timestamp-nano'
@@ -24,7 +25,7 @@ export const namespaceLength = namespace.length
 
 export class IPNSRecord {
   readonly pb: IpnsEntry
-  private readonly data: any
+  readonly data: any
 
   constructor (pb: IpnsEntry) {
     this.pb = pb
@@ -37,7 +38,7 @@ export class IPNSRecord {
   }
 
   value (): string {
-    return uint8ArrayToString(this.data.Value)
+    return normalizeValue(this.data.Value)
   }
 
   validityType (): IpnsEntry.ValidityType {
@@ -93,7 +94,7 @@ const defaultCreateOptions: CreateOptions = {
  * @param {number} lifetime - lifetime of the record (in milliseconds).
  * @param {CreateOptions} options - additional create options.
  */
-export const create = async (peerId: PeerId, value: string, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+export const create = async (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = IpnsEntry.ValidityType.EOL
@@ -113,7 +114,7 @@ export const create = async (peerId: PeerId, value: string, seq: number | bigint
  * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * @param {CreateOptions} options - additional creation options.
  */
-export const createWithExpiration = async (peerId: PeerId, value: string, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+export const createWithExpiration = async (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
   const expirationDate = NanoDate.fromString(expiration)
   const validityType = IpnsEntry.ValidityType.EOL
 
@@ -123,10 +124,10 @@ export const createWithExpiration = async (peerId: PeerId, value: string, seq: n
   return _create(peerId, value, seq, validityType, expirationDate, ttlNs, options)
 }
 
-const _create = async (peerId: PeerId, value: string, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+const _create = async (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
   seq = BigInt(seq)
   const isoValidity = uint8ArrayFromString(expirationDate.toString())
-  const encodedValue = uint8ArrayFromString(value)
+  const encodedValue = uint8ArrayFromString(normalizeValue(value))
 
   if (peerId.privateKey == null) {
     throw errCode(new Error('Missing private key'), ERRORS.ERR_MISSING_PRIVATE_KEY)
@@ -196,5 +197,24 @@ const signLegacyV1 = async (privateKey: PrivateKey, value: Uint8Array, validityT
   } catch (error: any) {
     log.error('record signature creation failed', error)
     throw errCode(new Error('record signature creation failed'), ERRORS.ERR_SIGNATURE_CREATION)
+  }
+}
+
+/**
+ * Normalizes the given record value. It ensures it is a string starting with '/'.
+ * If the given value is a cid, the returned path will be '/ipfs/{cid}'.
+ */
+const normalizeValue = (value: string | Uint8Array): string => {
+  const str = typeof value === 'string' ? value : uint8ArrayToString(value)
+
+  if (str.startsWith('/')) {
+    return str
+  }
+
+  try {
+    const cid = CID.parse(str)
+    return '/ipfs/' + cid.toV1().toString()
+  } catch (_) {
+    throw errCode(new Error('Value must be a valid content path starting with /'), ERRORS.ERR_INVALID_VALUE)
   }
 }
