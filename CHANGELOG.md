@@ -1,3 +1,23 @@
+## [6.0.4](https://github.com/ipfs/js-ipns/compare/v6.0.3...v6.0.4) (2023-08-24)
+
+
+### Trivial Changes
+
+* add or force update .github/workflows/js-test-and-release.yml ([#247](https://github.com/ipfs/js-ipns/issues/247)) ([3d3807f](https://github.com/ipfs/js-ipns/commit/3d3807f9a0ed5b1d5b06990c916a426d7c9200d0))
+* delete templates [skip ci] ([#246](https://github.com/ipfs/js-ipns/issues/246)) ([c57dd46](https://github.com/ipfs/js-ipns/commit/c57dd46147816b78513ee0f22858fd8d12f2ec93))
+* Update .github/workflows/stale.yml [skip ci] ([5139ee5](https://github.com/ipfs/js-ipns/commit/5139ee50b97670a1d713e891178cc6216f41a362))
+* Update .github/workflows/stale.yml [skip ci] ([70735d1](https://github.com/ipfs/js-ipns/commit/70735d1d1f502f1b49b83433ca74ba30067fc23c))
+
+
+### Dependencies
+
+* bump @libp2p/crypto from 1.0.17 to 2.0.3 ([#249](https://github.com/ipfs/js-ipns/issues/249)) ([b12b1f7](https://github.com/ipfs/js-ipns/commit/b12b1f791eb0516a1357d95f91f3b1193013be08))
+* bump @libp2p/logger from 2.1.1 to 3.0.2 ([#254](https://github.com/ipfs/js-ipns/issues/254)) ([73ba154](https://github.com/ipfs/js-ipns/commit/73ba154e73652731858cc836d2598f9bcaf4ac0b))
+* bump cborg from 1.10.2 to 2.0.4 ([#252](https://github.com/ipfs/js-ipns/issues/252)) ([2c4d575](https://github.com/ipfs/js-ipns/commit/2c4d575aefd776dfe845699cfac6e5cab9800034))
+* bump multiformats from 11.0.2 to 12.0.1 ([#229](https://github.com/ipfs/js-ipns/issues/229)) ([656fe3d](https://github.com/ipfs/js-ipns/commit/656fe3d13742fa1d6f33ce326631a2fd52dbf799))
+* **dev:** bump @libp2p/peer-id-factory from 2.0.4 to 3.0.3 ([#251](https://github.com/ipfs/js-ipns/issues/251)) ([c6acf18](https://github.com/ipfs/js-ipns/commit/c6acf189dd81921e9416298e144e7047b0f175a2))
+* **dev:** bump aegir from 39.0.13 to 40.0.11 ([#253](https://github.com/ipfs/js-ipns/issues/253)) ([45d81d7](https://github.com/ipfs/js-ipns/commit/45d81d743f33d638f624ae0e8a449f995c25578d))
+
 ## [6.0.3](https://github.com/ipfs/js-ipns/compare/v6.0.2...v6.0.3) (2023-06-14)
 
 
