@@ -1,3 +1,10 @@
+## [6.0.5](https://github.com/ipfs/js-ipns/compare/v6.0.4...v6.0.5) (2023-08-24)
+
+
+### Dependencies
+
+* bump @libp2p/peer-id from 2.0.4 to 3.0.2 ([#250](https://github.com/ipfs/js-ipns/issues/250)) ([69c52d7](https://github.com/ipfs/js-ipns/commit/69c52d70058172d6c61388b010f1e5c7f9b663e8))
+
 ## [6.0.4](https://github.com/ipfs/js-ipns/compare/v6.0.3...v6.0.4) (2023-08-24)
 
 
