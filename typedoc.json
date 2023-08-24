@@ -1,0 +1,7 @@
+{
+  "entryPoints": [
+    "./src/index.ts",
+    "./src/selector.ts",
+    "./src/validator.ts"
+  ]
+}
