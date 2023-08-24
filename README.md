@@ -92,7 +92,9 @@ ipns.getLocalKey(peerId)
 
 Returns a key to be used for storing the ipns entry locally, that is:
 
-    /ipns/${base32(<HASH>)}
+```
+/ipns/${base32(<HASH>)}
+```
 
 ### Marshal data with proto buffer
 
