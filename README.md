@@ -5,7 +5,7 @@
 [![codecov](https://img.shields.io/codecov/c/github/ipfs/js-ipns.svg?style=flat-square)](https://codecov.io/gh/ipfs/js-ipns)
 [![CI](https://img.shields.io/github/actions/workflow/status/ipfs/js-ipns/js-test-and-release.yml?branch=master\&style=flat-square)](https://github.com/ipfs/js-ipns/actions/workflows/js-test-and-release.yml?query=branch%3Amaster)
 
-> IPNS Record definitions.
+> IPNS Record definitions
 
 ## Table of contents <!-- omit in toc -->
 
@@ -62,7 +62,7 @@ const ipnsRecord = await ipns.create(privateKey, value, sequenceNumber, lifetime
 ```js
 import * as ipns from 'ipns'
 
-await ipns.validate(publicKey, ipnsRecord)
+await ipns.validate(publicKey, marshalledData)
 // if no error thrown, the record is valid
 ```
 

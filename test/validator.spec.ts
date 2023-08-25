@@ -7,6 +7,7 @@ import { expect } from 'aegir/chai'
 import { base58btc } from 'multiformats/bases/base58'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
+import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import * as ERRORS from '../src/errors.js'
 import * as ipns from '../src/index.js'
 import { marshal, peerIdToRoutingKey } from '../src/utils.js'
@@ -61,7 +62,7 @@ describe('validator', function () {
     const record = await ipns.create(peerId1, contentPath, sequence, validity)
 
     // corrupt the record by changing the value to random bytes
-    record.pb.value = randomBytes(record.pb.value?.length ?? 0)
+    record.value = uint8ArrayToString(randomBytes(record.value?.length ?? 0))
     const marshalledData = marshal(record)
 
     const key = peerIdToRoutingKey(peerId1)
@@ -86,7 +87,7 @@ describe('validator', function () {
     const validity = 1000000
 
     const record = await ipns.create(peerId1, contentPath, sequence, validity)
-    record.pb.pubKey = peerId2.publicKey
+    record.pubKey = peerId2.publicKey
     const marshalledData = marshal(record)
 
     const key = peerIdToRoutingKey(peerId1)

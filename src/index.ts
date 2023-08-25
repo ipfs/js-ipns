@@ -1,19 +1,16 @@
 import { unmarshalPrivateKey } from '@libp2p/crypto/keys'
 import { logger } from '@libp2p/logger'
-import * as cborg from 'cborg'
 import errCode from 'err-code'
 import { Key } from 'interface-datastore/key'
 import { base32upper } from 'multiformats/bases/base32'
-import { CID } from 'multiformats/cid'
 import * as Digest from 'multiformats/hashes/digest'
 import { identity } from 'multiformats/hashes/identity'
 import NanoDate from 'timestamp-nano'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
-import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
-import { createCborData, ipnsRecordDataForV1Sig, ipnsRecordDataForV2Sig, parseRFC3339 } from './utils.js'
+import { createCborData, ipnsRecordDataForV1Sig, ipnsRecordDataForV2Sig, normalizeValue } from './utils.js'
 import type { PrivateKey } from '@libp2p/interface-keys'
 import type { PeerId } from '@libp2p/interface-peer-id'
 
@@ -23,49 +20,35 @@ const ID_MULTIHASH_CODE = identity.code
 export const namespace = '/ipns/'
 export const namespaceLength = namespace.length
 
-export class IPNSRecord {
-  readonly pb: IpnsEntry
-  readonly data: any
+export interface IPNSRecord {
+  value: string
+  signatureV1: Uint8Array // signature of the record
+  validityType: IpnsEntry.ValidityType // Type of validation being used
+  validity: NanoDate // expiration datetime for the record in RFC3339 format
+  sequence: bigint // number representing the version of the record
+  ttl?: bigint // ttl in nanoseconds
+  pubKey?: Uint8Array // the public portion of the key that signed this record (only present if it was not embedded in the IPNS key)
+  signatureV2: Uint8Array // the v2 signature of the record
+  data: Uint8Array // extensible data
+}
 
-  constructor (pb: IpnsEntry) {
-    this.pb = pb
+export interface IPNSRecordV2 {
+  value: string
+  signatureV2: Uint8Array
+  validityType: IpnsEntry.ValidityType
+  validity: NanoDate
+  sequence: bigint
+  ttl?: bigint
+  pubKey?: Uint8Array
+  data: Uint8Array
+}
 
-    if (pb.data == null) {
-      throw errCode(new Error('Record data is missing'), ERRORS.ERR_INVALID_RECORD_DATA)
-    }
-
-    this.data = cborg.decode(pb.data)
-  }
-
-  value (): string {
-    return normalizeValue(this.data.Value)
-  }
-
-  validityType (): IpnsEntry.ValidityType {
-    if (this.data.ValidityType === 0) {
-      return IpnsEntry.ValidityType.EOL
-    } else {
-      throw errCode(new Error('Unknown validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
-    }
-  }
-
-  validity (): Date {
-    const validityType = this.validityType()
-    switch (validityType) {
-      case IpnsEntry.ValidityType.EOL:
-        return parseRFC3339(uint8ArrayToString(this.data.Validity))
-      default:
-        throw errCode(new Error('Unknown validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
-    }
-  }
-
-  sequence (): bigint {
-    return BigInt(this.data.Sequence ?? 0n)
-  }
-
-  ttl (): bigint {
-    return BigInt(this.data.TTL ?? 0n)
-  }
+export interface IPNSRecordData {
+  Value: Uint8Array
+  Validity: Uint8Array
+  ValidityType: IpnsEntry.ValidityType
+  Sequence: bigint
+  TTL: bigint
 }
 
 export interface IDKeys {
@@ -79,6 +62,14 @@ export interface CreateOptions {
   v1Compatible?: boolean
 }
 
+export interface CreateV2OrV1Options {
+  v1Compatible: true
+}
+
+export interface CreateV2Options {
+  v1Compatible: false
+}
+
 const defaultCreateOptions: CreateOptions = {
   v1Compatible: true
 }
@@ -89,12 +80,14 @@ const defaultCreateOptions: CreateOptions = {
  * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
  *
  * @param {PeerId} peerId - peer id containing private key for signing the record.
- * @param {string} value - value to be stored in the record.
+ * @param {string | Uint8Array} value - content path to be stored in the record.
  * @param {number | bigint} seq - number representing the current version of the record.
  * @param {number} lifetime - lifetime of the record (in milliseconds).
  * @param {CreateOptions} options - additional create options.
  */
-export const create = async (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+export async function create (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, lifetime: number, options?: CreateV2OrV1Options): Promise<IPNSRecord>
+export async function create (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, lifetime: number, options: CreateV2Options): Promise<IPNSRecordV2>
+export async function create (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = IpnsEntry.ValidityType.EOL
@@ -109,12 +102,14 @@ export const create = async (peerId: PeerId, value: string | Uint8Array, seq: nu
  * WARNING: nano precision is not standard, make sure the value in seconds is 9 orders of magnitude lesser than the one provided.
  *
  * @param {PeerId} peerId - PeerId containing private key for signing the record.
- * @param {string} value - value to be stored in the record.
+ * @param {string | Uint8Array} value - content path to be stored in the record.
  * @param {number | bigint} seq - number representing the current version of the record.
  * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * @param {CreateOptions} options - additional creation options.
  */
-export const createWithExpiration = async (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+export async function createWithExpiration (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, expiration: string, options?: CreateV2OrV1Options): Promise<IPNSRecord>
+export async function createWithExpiration (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, expiration: string, options: CreateV2Options): Promise<IPNSRecordV2>
+export async function createWithExpiration (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> {
   const expirationDate = NanoDate.fromString(expiration)
   const validityType = IpnsEntry.ValidityType.EOL
 
@@ -124,10 +119,11 @@ export const createWithExpiration = async (peerId: PeerId, value: string | Uint8
   return _create(peerId, value, seq, validityType, expirationDate, ttlNs, options)
 }
 
-const _create = async (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+const _create = async (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> => {
   seq = BigInt(seq)
   const isoValidity = uint8ArrayFromString(expirationDate.toString())
-  const encodedValue = uint8ArrayFromString(normalizeValue(value))
+  const normalizedValue = normalizeValue(value)
+  const encodedValue = uint8ArrayFromString(normalizedValue)
 
   if (peerId.privateKey == null) {
     throw errCode(new Error('Missing private key'), ERRORS.ERR_MISSING_PRIVATE_KEY)
@@ -137,21 +133,7 @@ const _create = async (peerId: PeerId, value: string | Uint8Array, seq: number |
   const data = createCborData(encodedValue, isoValidity, validityType, seq, ttl)
   const sigData = ipnsRecordDataForV2Sig(data)
   const signatureV2 = await privateKey.sign(sigData)
-
-  const pb: IpnsEntry = {
-    signatureV2,
-    data
-  }
-
-  if (options.v1Compatible === true) {
-    const signatureV1 = await signLegacyV1(privateKey, encodedValue, validityType, isoValidity)
-    pb.value = encodedValue
-    pb.validity = isoValidity
-    pb.validityType = validityType
-    pb.signatureV1 = signatureV1
-    pb.sequence = seq
-    pb.ttl = ttl
-  }
+  let pubKey: Uint8Array | undefined
 
   // if we cannot derive the public key from the PeerId (e.g. RSA PeerIDs),
   // we have to embed it in the IPNS record
@@ -159,12 +141,46 @@ const _create = async (peerId: PeerId, value: string | Uint8Array, seq: number |
     const digest = Digest.decode(peerId.toBytes())
 
     if (digest.code !== ID_MULTIHASH_CODE || !uint8ArrayEquals(peerId.publicKey, digest.digest)) {
-      pb.pubKey = peerId.publicKey
+      pubKey = peerId.publicKey
     }
   }
 
-  log('ipns record for %b created', value)
-  return new IPNSRecord(pb)
+  if (options.v1Compatible === true) {
+    const signatureV1 = await signLegacyV1(privateKey, encodedValue, validityType, isoValidity)
+
+    const record: IPNSRecord = {
+      value: normalizedValue,
+      signatureV1,
+      validity: expirationDate,
+      validityType,
+      sequence: seq,
+      ttl,
+      signatureV2,
+      data
+    }
+
+    if (pubKey != null) {
+      record.pubKey = pubKey
+    }
+
+    return record
+  } else {
+    const record: IPNSRecordV2 = {
+      value: normalizedValue,
+      validity: expirationDate,
+      validityType,
+      sequence: seq,
+      ttl,
+      signatureV2,
+      data
+    }
+
+    if (pubKey != null) {
+      record.pubKey = pubKey
+    }
+
+    return record
+  }
 }
 
 /**
@@ -197,24 +213,5 @@ const signLegacyV1 = async (privateKey: PrivateKey, value: Uint8Array, validityT
   } catch (error: any) {
     log.error('record signature creation failed', error)
     throw errCode(new Error('record signature creation failed'), ERRORS.ERR_SIGNATURE_CREATION)
-  }
-}
-
-/**
- * Normalizes the given record value. It ensures it is a string starting with '/'.
- * If the given value is a cid, the returned path will be '/ipfs/{cid}'.
- */
-const normalizeValue = (value: string | Uint8Array): string => {
-  const str = typeof value === 'string' ? value : uint8ArrayToString(value)
-
-  if (str.startsWith('/')) {
-    return str
-  }
-
-  try {
-    const cid = CID.parse(str)
-    return '/ipfs/' + cid.toV1().toString()
-  } catch (_) {
-    throw errCode(new Error('Value must be a valid content path starting with /'), ERRORS.ERR_INVALID_VALUE)
   }
 }

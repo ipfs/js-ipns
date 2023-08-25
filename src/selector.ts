@@ -8,15 +8,12 @@ export const ipnsSelector: SelectFn = (key, data) => {
   }))
 
   entries.sort((a, b) => {
-    // having a newer signature version is better than an older signature version
-    if (a.record.pb.signatureV2 != null && b.record.pb.signatureV2 == null) {
-      return -1
-    } else if (a.record.pb.signatureV2 == null && b.record.pb.signatureV2 != null) {
-      return 1
-    }
+    // Before we'd sort based on the signature version. Unmarshal now fails if
+    // a record does not have SignatureV2, so that is no longer needed. V1-only
+    // records haven't been issues in a long time.
 
-    const aSeq = a.record.sequence()
-    const bSeq = b.record.sequence()
+    const aSeq = a.record.sequence
+    const bSeq = b.record.sequence
 
     // choose later sequence number
     if (aSeq > bSeq) {
@@ -26,8 +23,8 @@ export const ipnsSelector: SelectFn = (key, data) => {
     }
 
     // choose longer lived record if sequence numbers the same
-    const recordAValidityDate = a.record.validity()
-    const recordBValidityDate = b.record.validity()
+    const recordAValidityDate = a.record.validity.toDate()
+    const recordBValidityDate = b.record.validity.toDate()
 
     if (recordAValidityDate.getTime() > recordBValidityDate.getTime()) {
       return -1

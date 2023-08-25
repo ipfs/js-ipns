@@ -56,25 +56,4 @@ describe('selector', function () {
     valid = ipnsSelector(key, [marshalledData, marshalledNewData])
     expect(valid).to.equal(1) // new data is the selected one
   })
-
-  it('should use validator.select to select an older record with a v2 sig when the newer record only uses v1', async () => {
-    const sequence = 0
-    const lifetime = 1000000
-
-    const record = await ipns.create(peerId, contentPath, sequence, lifetime)
-
-    const newRecord = await ipns.create(peerId, contentPath, sequence + 1, lifetime)
-    delete newRecord.pb.signatureV2
-
-    const marshalledData = marshal(record)
-    const marshalledNewData = marshal(newRecord)
-
-    const key = peerIdToRoutingKey(peerId)
-
-    let valid = ipnsSelector(key, [marshalledNewData, marshalledData])
-    expect(valid).to.equal(1) // old data is the selected one
-
-    valid = ipnsSelector(key, [marshalledData, marshalledNewData])
-    expect(valid).to.equal(0) // old data is the selected one
-  })
 })

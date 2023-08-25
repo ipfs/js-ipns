@@ -1,7 +1,7 @@
 {
   "name": "ipns",
   "version": "6.0.5",
-  "description": "ipns record definitions",
+  "description": "IPNS Record definitions",
   "author": "Vasco Santos <vasco.santos@moxy.studio>",
   "license": "Apache-2.0 OR MIT",
   "homepage": "https://github.com/ipfs/js-ipns#readme",
