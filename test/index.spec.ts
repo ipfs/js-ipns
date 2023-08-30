@@ -1,17 +1,19 @@
 /* eslint-env mocha */
 
 import { randomBytes } from '@libp2p/crypto'
-import { generateKeyPair } from '@libp2p/crypto/keys'
+import { generateKeyPair, unmarshalPrivateKey } from '@libp2p/crypto/keys'
 import { peerIdFromKeys, peerIdFromString } from '@libp2p/peer-id'
 import { createEd25519PeerId } from '@libp2p/peer-id-factory'
 import { expect } from 'aegir/chai'
+import * as cbor from 'cborg'
 import { base58btc } from 'multiformats/bases/base58'
+import { CID } from 'multiformats/cid'
 import { toString as uint8ArrayToString } from 'uint8arrays'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import * as ERRORS from '../src/errors.js'
 import * as ipns from '../src/index.js'
 import { IpnsEntry } from '../src/pb/ipns.js'
-import { extractPublicKey, peerIdToRoutingKey, parseCborData, createCborData } from '../src/utils.js'
+import { extractPublicKey, peerIdToRoutingKey, parseCborData, createCborData, ipnsRecordDataForV2Sig } from '../src/utils.js'
 import { ipnsValidator } from '../src/validator.js'
 import type { PeerId } from '@libp2p/interface-peer-id'
 
@@ -142,37 +144,37 @@ describe('ipns', function () {
     await ipnsValidator(peerIdToRoutingKey(peerId), ipns.marshal(record))
   })
 
-  it('should normalize value when creating an ipns record (string v0 cid)', async () => {
-    const inputValue = 'QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq'
+  it('should normalize value when creating an ipns record (arbitrary string path)', async () => {
+    const inputValue = '/foo/bar/baz'
+    const expectedValue = '/foo/bar/baz'
+    const record = await ipns.create(peerId, inputValue, 0, 1000000)
+    expect(record.value).to.equal(expectedValue)
+  })
+
+  it('should normalize value when creating a recursive ipns record (peer id)', async () => {
+    const inputValue = await createEd25519PeerId()
+    const expectedValue = `/ipns/${inputValue.toString()}`
+    const record = await ipns.create(peerId, inputValue, 0, 1000000)
+    expect(record.value).to.equal(expectedValue)
+  })
+
+  it('should normalize value when creating an ipns record (v0 cid)', async () => {
+    const inputValue = CID.parse('QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq')
     const expectedValue = '/ipfs/bafybeidvkqhl6dwsdzx5km7tupo33ywt7czkl5topwogxx6lybko2d7pua'
     const record = await ipns.create(peerId, inputValue, 0, 1000000)
     expect(record.value).to.equal(expectedValue)
   })
 
-  it('should normalize value when creating an ipns record (string v1 cid)', async () => {
-    const inputValue = 'bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
+  it('should normalize value when creating an ipns record (v1 cid)', async () => {
+    const inputValue = CID.parse('bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu')
     const expectedValue = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
     const record = await ipns.create(peerId, inputValue, 0, 1000000)
     expect(record.value).to.equal(expectedValue)
   })
 
-  it('should normalize value when creating an ipns record (bytes v0 cid)', async () => {
-    const inputValue = uint8ArrayFromString('QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq')
-    const expectedValue = '/ipfs/bafybeidvkqhl6dwsdzx5km7tupo33ywt7czkl5topwogxx6lybko2d7pua'
-    const record = await ipns.create(peerId, inputValue, 0, 1000000)
-    expect(record.value).to.equal(expectedValue)
-  })
-
-  it('should normalize value when creating an ipns record (bytes v1 cid)', async () => {
-    const inputValue = uint8ArrayFromString('bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu')
-    const expectedValue = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
-    const record = await ipns.create(peerId, inputValue, 0, 1000000)
-    expect(record.value).to.equal(expectedValue)
-  })
-
-  it('should normalize value when reading an ipns record (bytes v0 cid)', async () => {
-    const inputValue = 'QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq'
-    const expectedValue = '/ipfs/bafybeidvkqhl6dwsdzx5km7tupo33ywt7czkl5topwogxx6lybko2d7pua'
+  it('should normalize value when reading an ipns record (string v0 cid path)', async () => {
+    const inputValue = '/ipfs/QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq'
+    const expectedValue = '/ipfs/QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq'
     const record = await ipns.create(peerId, inputValue, 0, 1000000)
 
     const pb = IpnsEntry.decode(ipns.marshal(record))
@@ -183,8 +185,8 @@ describe('ipns', function () {
     expect(modifiedRecord.value).to.equal(expectedValue)
   })
 
-  it('should normalize value when reading an ipns record (bytes v1 cid)', async () => {
-    const inputValue = 'bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
+  it('should normalize value when reading an ipns record (string v1 cid path)', async () => {
+    const inputValue = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
     const expectedValue = '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu'
     const record = await ipns.create(peerId, inputValue, 0, 1000000)
 
@@ -194,6 +196,20 @@ describe('ipns', function () {
 
     const modifiedRecord = ipns.unmarshal(IpnsEntry.encode(pb))
     expect(modifiedRecord.value).to.equal(expectedValue)
+  })
+
+  it('should fail to normalize non-path value', async () => {
+    const inputValue = 'hello'
+
+    await expect(ipns.create(peerId, inputValue, 0, 1000000)).to.eventually.be.rejected
+      .with.property('code', ERRORS.ERR_INVALID_VALUE)
+  })
+
+  it('should fail to normalize path value that is too short', async () => {
+    const inputValue = '/'
+
+    await expect(ipns.create(peerId, inputValue, 0, 1000000)).to.eventually.be.rejected
+      .with.property('code', ERRORS.ERR_INVALID_VALUE)
   })
 
   it('should fail to validate a v1 (deprecated legacy) message', async () => {
@@ -344,5 +360,33 @@ describe('ipns', function () {
     expect(publicKey).to.deep.include({
       bytes: peerId.publicKey
     })
+  })
+
+  it('should unmarshal a record with raw CID bytes', async () => {
+    // we may encounter these in the wild due to older versions of this module
+    // but IPNS records should have string path values
+
+    // create a dummy record with an arbitrary string path
+    const input = await ipns.create(peerId, '/foo', 0n, 10000, {
+      v1Compatible: false
+    })
+
+    // we will store the raw bytes from this CID
+    const cid = CID.parse('bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu')
+
+    // override data with raw CID bytes
+    const data = cbor.decode(input.data)
+    data.Value = cid.bytes
+    input.data = cbor.encode(data)
+
+    // re-sign record
+    const privateKey = await unmarshalPrivateKey(peerId.privateKey ?? new Uint8Array(0))
+    const sigData = ipnsRecordDataForV2Sig(input.data)
+    input.signatureV2 = await privateKey.sign(sigData)
+
+    const buf = ipns.marshal(input)
+    const record = ipns.unmarshal(buf)
+
+    expect(record).to.have.property('value', '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu')
   })
 })

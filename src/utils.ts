@@ -1,4 +1,5 @@
 import { unmarshalPublicKey } from '@libp2p/crypto/keys'
+import { isPeerId, type PeerId } from '@libp2p/interface-peer-id'
 import { logger } from '@libp2p/logger'
 import { peerIdFromBytes, peerIdFromKeys } from '@libp2p/peer-id'
 import * as cborg from 'cborg'
@@ -13,7 +14,6 @@ import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import type { IPNSRecord, IPNSRecordV2, IPNSRecordData } from './index.js'
 import type { PublicKey } from '@libp2p/interface-keys'
-import type { PeerId } from '@libp2p/interface-peer-id'
 
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
@@ -164,7 +164,7 @@ export const unmarshal = (buf: Uint8Array): (IPNSRecord | IPNSRecordV2) => {
   }
 
   const data = parseCborData(message.data)
-  const value = normalizeValue(data.Value ?? new Uint8Array(0))
+  const value = normalizeValue(data.Value)
 
   let validity
   try {
@@ -259,22 +259,51 @@ export const parseCborData = (buf: Uint8Array): IPNSRecordData => {
 }
 
 /**
- * Normalizes the given record value. It ensures it is a string starting with '/'.
- * If the given value is a cid, the returned path will be '/ipfs/{cid}'.
+ * Normalizes the given record value. It ensures it is a PeerID, a CID or a
+ * string starting with '/'. PeerIDs become `/ipns/${peerId}`, CIDs become
+ * `/ipfs/${cidAsV1}`.
  */
-export const normalizeValue = (value: string | Uint8Array): string => {
-  const str = typeof value === 'string' ? value : uint8ArrayToString(value)
+export const normalizeValue = (value?: CID | PeerId | string | Uint8Array): string => {
+  if (value != null) {
+    // if we have a PeerId, turn it into an ipns path
+    if (isPeerId(value)) {
+      return `/ipns/${value.toString()}`
+    }
 
-  if (str.startsWith('/')) {
-    return str
+    // if the value is bytes, stringify it and see if we have a path
+    if (value instanceof Uint8Array) {
+      const string = uint8ArrayToString(value)
+
+      if (string.startsWith('/')) {
+        value = string
+      }
+    }
+
+    // if we have a path, check it is a valid path
+    const string = value.toString().trim()
+    if (string.startsWith('/') && string.length > 1) {
+      return string
+    }
+
+    // if we have a CID, turn it into an ipfs path
+    const cid = CID.asCID(value)
+    if (cid != null) {
+      return `/ipfs/${cid.toV1().toString()}`
+    }
+
+    // try parsing what we have as CID bytes or a CID string
+    try {
+      if (value instanceof Uint8Array) {
+        return `/ipfs/${CID.decode(value).toV1().toString()}`
+      }
+
+      return `/ipfs/${CID.parse(string).toV1().toString()}`
+    } catch {
+      // fall through
+    }
   }
 
-  try {
-    const cid = CID.parse(str)
-    return '/ipfs/' + cid.toV1().toString()
-  } catch (_) {
-    throw errCode(new Error('Value must be a valid content path starting with /'), ERRORS.ERR_INVALID_VALUE)
-  }
+  throw errCode(new Error('Value must be a valid content path starting with /'), ERRORS.ERR_INVALID_VALUE)
 }
 
 const validateCborDataMatchesPbData = (entry: IpnsEntry): void => {
