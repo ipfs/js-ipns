@@ -4,6 +4,7 @@ import { logger } from '@libp2p/logger'
 import { peerIdFromBytes, peerIdFromKeys } from '@libp2p/peer-id'
 import * as cborg from 'cborg'
 import errCode from 'err-code'
+import { base58btc } from 'multiformats/bases/base58'
 import { CID } from 'multiformats/cid'
 import NanoDate from 'timestamp-nano'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
@@ -17,6 +18,7 @@ import type { PublicKey } from '@libp2p/interface-keys'
 
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
+const LIBP2P_CID_CODEC = 114
 
 /**
  * Convert a JavaScript date into an `RFC3339Nano` formatted
@@ -288,6 +290,11 @@ export const normalizeValue = (value?: CID | PeerId | string | Uint8Array): stri
     // if we have a CID, turn it into an ipfs path
     const cid = CID.asCID(value)
     if (cid != null) {
+      // PeerID encoded as a CID
+      if (cid.code === LIBP2P_CID_CODEC) {
+        return `/ipns/${base58btc.encode(cid.multihash.bytes).substring(1)}`
+      }
+
       return `/ipfs/${cid.toV1().toString()}`
     }
 

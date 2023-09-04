@@ -158,6 +158,13 @@ describe('ipns', function () {
     expect(record.value).to.equal(expectedValue)
   })
 
+  it('should normalize value when creating a recursive ipns record (peer id as CID)', async () => {
+    const inputValue = await createEd25519PeerId()
+    const expectedValue = `/ipns/${inputValue.toString()}`
+    const record = await ipns.create(peerId, inputValue.toCID(), 0, 1000000)
+    expect(record.value).to.equal(expectedValue)
+  })
+
   it('should normalize value when creating an ipns record (v0 cid)', async () => {
     const inputValue = CID.parse('QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq')
     const expectedValue = '/ipfs/bafybeidvkqhl6dwsdzx5km7tupo33ywt7czkl5topwogxx6lybko2d7pua'
