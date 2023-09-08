@@ -4,7 +4,7 @@ import { logger } from '@libp2p/logger'
 import { peerIdFromBytes, peerIdFromKeys } from '@libp2p/peer-id'
 import * as cborg from 'cborg'
 import errCode from 'err-code'
-import { base58btc } from 'multiformats/bases/base58'
+import { base36 } from 'multiformats/bases/base36'
 import { CID } from 'multiformats/cid'
 import NanoDate from 'timestamp-nano'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
@@ -269,7 +269,7 @@ export const normalizeValue = (value?: CID | PeerId | string | Uint8Array): stri
   if (value != null) {
     // if we have a PeerId, turn it into an ipns path
     if (isPeerId(value)) {
-      return `/ipns/${value.toString()}`
+      return `/ipns/${value.toCID().toString(base36)}`
     }
 
     // if the value is bytes, stringify it and see if we have a path
@@ -292,7 +292,7 @@ export const normalizeValue = (value?: CID | PeerId | string | Uint8Array): stri
     if (cid != null) {
       // PeerID encoded as a CID
       if (cid.code === LIBP2P_CID_CODEC) {
-        return `/ipns/${base58btc.encode(cid.multihash.bytes).substring(1)}`
+        return `/ipns/${cid.toString(base36)}`
       }
 
       return `/ipfs/${cid.toV1().toString()}`

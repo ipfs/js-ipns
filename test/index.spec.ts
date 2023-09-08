@@ -6,6 +6,7 @@ import { peerIdFromKeys, peerIdFromString } from '@libp2p/peer-id'
 import { createEd25519PeerId } from '@libp2p/peer-id-factory'
 import { expect } from 'aegir/chai'
 import * as cbor from 'cborg'
+import { base36 } from 'multiformats/bases/base36'
 import { base58btc } from 'multiformats/bases/base58'
 import { CID } from 'multiformats/cid'
 import { toString as uint8ArrayToString } from 'uint8arrays'
@@ -153,14 +154,14 @@ describe('ipns', function () {
 
   it('should normalize value when creating a recursive ipns record (peer id)', async () => {
     const inputValue = await createEd25519PeerId()
-    const expectedValue = `/ipns/${inputValue.toString()}`
+    const expectedValue = `/ipns/${inputValue.toCID().toString(base36)}`
     const record = await ipns.create(peerId, inputValue, 0, 1000000)
     expect(record.value).to.equal(expectedValue)
   })
 
   it('should normalize value when creating a recursive ipns record (peer id as CID)', async () => {
     const inputValue = await createEd25519PeerId()
-    const expectedValue = `/ipns/${inputValue.toString()}`
+    const expectedValue = `/ipns/${inputValue.toCID().toString(base36)}`
     const record = await ipns.create(peerId, inputValue.toCID(), 0, 1000000)
     expect(record.value).to.equal(expectedValue)
   })
