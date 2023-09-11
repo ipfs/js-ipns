@@ -171,7 +171,7 @@
     "@libp2p/interface-peer-id": "^2.0.0",
     "@libp2p/logger": "^3.0.2",
     "@libp2p/peer-id": "^3.0.2",
-    "cborg": "^2.0.4",
+    "cborg": "^3.0.0",
     "err-code": "^3.0.1",
     "interface-datastore": "^8.1.0",
     "multiformats": "^12.0.1",
