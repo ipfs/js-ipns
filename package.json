@@ -162,7 +162,8 @@
     "test:electron-main": "aegir test -t electron-main",
     "release": "aegir release",
     "generate": "protons src/pb/ipns.proto",
-    "docs": "aegir docs"
+    "docs": "NODE_OPTIONS=--max_old_space_size=8192 aegir docs",
+    "docs:no-publish": "NODE_OPTIONS=--max_old_space_size=8192 aegir docs --publish false"
   },
   "dependencies": {
     "@libp2p/crypto": "^2.0.3",
