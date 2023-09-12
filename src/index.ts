@@ -13,6 +13,7 @@ import { IpnsEntry } from './pb/ipns.js'
 import { createCborData, ipnsRecordDataForV1Sig, ipnsRecordDataForV2Sig, normalizeValue } from './utils.js'
 import type { PrivateKey } from '@libp2p/interface-keys'
 import type { PeerId } from '@libp2p/interface-peer-id'
+import type { CID } from 'multiformats/cid'
 
 const log = logger('ipns')
 const ID_MULTIHASH_CODE = identity.code
@@ -79,15 +80,21 @@ const defaultCreateOptions: CreateOptions = {
  * The IPNS Record validity should follow the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
  *
+ * The passed value can be a CID, a PeerID or an arbitrary string path.
+ *
+ * * CIDs will be converted to v1 and stored in the record as a string similar to: `/ipfs/${cid}`
+ * * PeerIDs will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
+ * * String paths will be stored in the record as-is, but they must start with `"/"`
+ *
  * @param {PeerId} peerId - peer id containing private key for signing the record.
- * @param {string | Uint8Array} value - content path to be stored in the record.
+ * @param {CID | PeerId | string} value - content to be stored in the record.
  * @param {number | bigint} seq - number representing the current version of the record.
  * @param {number} lifetime - lifetime of the record (in milliseconds).
  * @param {CreateOptions} options - additional create options.
  */
-export async function create (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, lifetime: number, options?: CreateV2OrV1Options): Promise<IPNSRecord>
-export async function create (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, lifetime: number, options: CreateV2Options): Promise<IPNSRecordV2>
-export async function create (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> {
+export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options?: CreateV2OrV1Options): Promise<IPNSRecord>
+export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateV2Options): Promise<IPNSRecordV2>
+export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = IpnsEntry.ValidityType.EOL
@@ -101,15 +108,21 @@ export async function create (peerId: PeerId, value: string | Uint8Array, seq: n
  * Same as create(), but instead of generating a new Date, it receives the intended expiration time
  * WARNING: nano precision is not standard, make sure the value in seconds is 9 orders of magnitude lesser than the one provided.
  *
+ * The passed value can be a CID, a PeerID or an arbitrary string path.
+ *
+ * * CIDs will be converted to v1 and stored in the record as a string similar to: `/ipfs/${cid}`
+ * * PeerIDs will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
+ * * String paths will be stored in the record as-is, but they must start with `"/"`
+ *
  * @param {PeerId} peerId - PeerId containing private key for signing the record.
- * @param {string | Uint8Array} value - content path to be stored in the record.
+ * @param {CID | PeerId | string} value - content to be stored in the record.
  * @param {number | bigint} seq - number representing the current version of the record.
  * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * @param {CreateOptions} options - additional creation options.
  */
-export async function createWithExpiration (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, expiration: string, options?: CreateV2OrV1Options): Promise<IPNSRecord>
-export async function createWithExpiration (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, expiration: string, options: CreateV2Options): Promise<IPNSRecordV2>
-export async function createWithExpiration (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> {
+export async function createWithExpiration (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, expiration: string, options?: CreateV2OrV1Options): Promise<IPNSRecord>
+export async function createWithExpiration (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, expiration: string, options: CreateV2Options): Promise<IPNSRecordV2>
+export async function createWithExpiration (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> {
   const expirationDate = NanoDate.fromString(expiration)
   const validityType = IpnsEntry.ValidityType.EOL
 
@@ -119,7 +132,7 @@ export async function createWithExpiration (peerId: PeerId, value: string | Uint
   return _create(peerId, value, seq, validityType, expirationDate, ttlNs, options)
 }
 
-const _create = async (peerId: PeerId, value: string | Uint8Array, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> => {
+const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> => {
   seq = BigInt(seq)
   const isoValidity = uint8ArrayFromString(expirationDate.toString())
   const normalizedValue = normalizeValue(value)
