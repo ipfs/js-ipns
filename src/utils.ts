@@ -262,8 +262,8 @@ export const parseCborData = (buf: Uint8Array): IPNSRecordData => {
 
 /**
  * Normalizes the given record value. It ensures it is a PeerID, a CID or a
- * string starting with '/'. PeerIDs become `/ipns/${peerId}`, CIDs become
- * `/ipfs/${cidAsV1}`.
+ * string starting with '/'. PeerIDs become `/ipns/${cidV1Libp2pKey}`,
+ * CIDs become `/ipfs/${cidAsV1}`.
  */
 export const normalizeValue = (value?: CID | PeerId | string | Uint8Array): string => {
   if (value != null) {

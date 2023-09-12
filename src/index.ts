@@ -83,7 +83,7 @@ const defaultCreateOptions: CreateOptions = {
  * The passed value can be a CID, a PeerID or an arbitrary string path.
  *
  * * CIDs will be converted to v1 and stored in the record as a string similar to: `/ipfs/${cid}`
- * * PeerIDs will create recursive records, eg. the record value will be `/ipns/${peerId}`
+ * * PeerIDs will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
  * * String paths will be stored in the record as-is, but they must start with `"/"`
  *
  * @param {PeerId} peerId - peer id containing private key for signing the record.
@@ -111,7 +111,7 @@ export async function create (peerId: PeerId, value: CID | PeerId | string, seq:
  * The passed value can be a CID, a PeerID or an arbitrary string path.
  *
  * * CIDs will be converted to v1 and stored in the record as a string similar to: `/ipfs/${cid}`
- * * PeerIDs will create recursive records, eg. the record value will be `/ipns/${peerId}`
+ * * PeerIDs will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
  * * String paths will be stored in the record as-is, but they must start with `"/"`
  *
  * @param {PeerId} peerId - PeerId containing private key for signing the record.
