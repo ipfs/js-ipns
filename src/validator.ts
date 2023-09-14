@@ -97,7 +97,7 @@ const validateCborDataMatchesPbData = (entry: IPNSEntry): void => {
   }
 }
 
-export async function ipnsValidator (key: Uint8Array, marshalledData: Uint8Array): Promise<void>  {
+export async function ipnsValidator (key: Uint8Array, marshalledData: Uint8Array): Promise<void> {
   if (marshalledData.byteLength > MAX_RECORD_SIZE) {
     throw errCode(new Error('record too large'), ERRORS.ERR_RECORD_TOO_LARGE)
   }
