@@ -62,7 +62,7 @@ export function parseRFC3339 (time: string): Date {
   const hour = parseInt(m[4], 10)
   const minute = parseInt(m[5], 10)
   const second = parseInt(m[6], 10)
-  const millisecond = parseInt(m[7].slice(0, -6), 10)
+  const millisecond = parseInt(m[7].padEnd(6, '0').slice(0, 3), 10)
 
   return new Date(Date.UTC(year, month, date, hour, minute, second, millisecond))
 }
