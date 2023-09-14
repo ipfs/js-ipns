@@ -1,3 +1,15 @@
+## [6.0.7](https://github.com/ipfs/js-ipns/compare/v6.0.6...v6.0.7) (2023-09-14)
+
+
+### Bug Fixes
+
+* update libp2p interfaces to the latest version ([#259](https://github.com/ipfs/js-ipns/issues/259)) ([65f9d9b](https://github.com/ipfs/js-ipns/commit/65f9d9b328451d997ab99e3f5b7964ce4f7357f0))
+
+
+### Trivial Changes
+
+* update docs command ([#258](https://github.com/ipfs/js-ipns/issues/258)) ([705ef3e](https://github.com/ipfs/js-ipns/commit/705ef3efb94b76a598d9738612b8e83880eb87c9))
+
 ## [6.0.6](https://github.com/ipfs/js-ipns/compare/v6.0.5...v6.0.6) (2023-09-14)
 
 
