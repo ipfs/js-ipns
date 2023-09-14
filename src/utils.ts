@@ -8,8 +8,8 @@ import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import type { IPNSEntry, IPNSEntryData } from './index.js'
-import type { PublicKey } from '@libp2p/interface-keys'
-import type { PeerId } from '@libp2p/interface-peer-id'
+import type { PublicKey } from '@libp2p/interface/keys'
+import type { PeerId } from '@libp2p/interface/peer-id'
 
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
