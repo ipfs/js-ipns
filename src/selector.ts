@@ -1,7 +1,6 @@
 import { unmarshal } from './utils.js'
-import type { SelectFn } from '@libp2p/interface-dht'
 
-export const ipnsSelector: SelectFn = (key, data) => {
+export function ipnsSelector (key: Uint8Array, data: Uint8Array[]): number {
   const entries = data.map((buf, index) => ({
     record: unmarshal(buf),
     index

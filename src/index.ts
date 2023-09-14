@@ -11,8 +11,8 @@ import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import { createCborData, ipnsRecordDataForV1Sig, ipnsRecordDataForV2Sig, normalizeValue } from './utils.js'
-import type { PrivateKey } from '@libp2p/interface-keys'
-import type { PeerId } from '@libp2p/interface-peer-id'
+import type { PrivateKey } from '@libp2p/interface/keys'
+import type { PeerId } from '@libp2p/interface/peer-id'
 import type { CID } from 'multiformats/cid'
 
 const log = logger('ipns')

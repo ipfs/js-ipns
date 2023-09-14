@@ -1,3 +1,10 @@
+## [6.0.6](https://github.com/ipfs/js-ipns/compare/v6.0.5...v6.0.6) (2023-09-14)
+
+
+### Dependencies
+
+* bump cborg from 2.0.5 to 4.0.1 ([#257](https://github.com/ipfs/js-ipns/issues/257)) ([c51dc2f](https://github.com/ipfs/js-ipns/commit/c51dc2ff4d7b0e75ab51bb82f898e0b5f3acdd5d))
+
 ## [6.0.5](https://github.com/ipfs/js-ipns/compare/v6.0.4...v6.0.5) (2023-08-24)
 
 

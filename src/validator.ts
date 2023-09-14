@@ -3,8 +3,7 @@ import errCode from 'err-code'
 import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import { extractPublicKey, ipnsRecordDataForV2Sig, unmarshal, peerIdFromRoutingKey } from './utils.js'
-import type { ValidateFn } from '@libp2p/interface-dht'
-import type { PublicKey } from '@libp2p/interface-keys'
+import type { PublicKey } from '@libp2p/interface/keys'
 
 const log = logger('ipns:validator')
 
@@ -50,7 +49,7 @@ export const validate = async (publicKey: PublicKey, buf: Uint8Array): Promise<v
   log('ipns record for %b is valid', record.value)
 }
 
-export const ipnsValidator: ValidateFn = async (key, marshalledData) => {
+export async function ipnsValidator (key: Uint8Array, marshalledData: Uint8Array): Promise<void> {
   if (marshalledData.byteLength > MAX_RECORD_SIZE) {
     throw errCode(new Error('record too large'), ERRORS.ERR_RECORD_TOO_LARGE)
   }

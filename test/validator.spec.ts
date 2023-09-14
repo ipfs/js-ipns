@@ -12,7 +12,7 @@ import * as ERRORS from '../src/errors.js'
 import * as ipns from '../src/index.js'
 import { marshal, peerIdToRoutingKey } from '../src/utils.js'
 import { ipnsValidator } from '../src/validator.js'
-import type { PeerId } from '@libp2p/interface-peer-id'
+import type { PeerId } from '@libp2p/interface/peer-id'
 
 describe('validator', function () {
   this.timeout(20 * 1000)

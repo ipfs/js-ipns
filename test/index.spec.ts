@@ -16,7 +16,7 @@ import * as ipns from '../src/index.js'
 import { IpnsEntry } from '../src/pb/ipns.js'
 import { extractPublicKey, peerIdToRoutingKey, parseCborData, createCborData, ipnsRecordDataForV2Sig } from '../src/utils.js'
 import { ipnsValidator } from '../src/validator.js'
-import type { PeerId } from '@libp2p/interface-peer-id'
+import type { PeerId } from '@libp2p/interface/peer-id'
 
 describe('ipns', function () {
   this.timeout(20 * 1000)

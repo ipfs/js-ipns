@@ -1,6 +1,6 @@
 {
   "name": "ipns",
-  "version": "6.0.5",
+  "version": "6.0.6",
   "description": "IPNS Record definitions",
   "author": "Vasco Santos <vasco.santos@moxy.studio>",
   "license": "Apache-2.0 OR MIT",
@@ -162,16 +162,15 @@
     "test:electron-main": "aegir test -t electron-main",
     "release": "aegir release",
     "generate": "protons src/pb/ipns.proto",
-    "docs": "aegir docs"
+    "docs": "NODE_OPTIONS=--max_old_space_size=8192 aegir docs",
+    "docs:no-publish": "NODE_OPTIONS=--max_old_space_size=8192 aegir docs --publish false"
   },
   "dependencies": {
     "@libp2p/crypto": "^2.0.3",
-    "@libp2p/interface-dht": "^2.0.0",
-    "@libp2p/interface-keys": "^1.0.3",
-    "@libp2p/interface-peer-id": "^2.0.0",
+    "@libp2p/interface": "^0.1.2",
     "@libp2p/logger": "^3.0.2",
     "@libp2p/peer-id": "^3.0.2",
-    "cborg": "^2.0.4",
+    "cborg": "^4.0.1",
     "err-code": "^3.0.1",
     "interface-datastore": "^8.1.0",
     "multiformats": "^12.0.1",
