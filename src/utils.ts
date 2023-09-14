@@ -145,7 +145,7 @@ export const marshal = (obj: IPNSRecord | IPNSRecordV2): Uint8Array => {
   }
 }
 
-export const unmarshal = (buf: Uint8Array): (IPNSRecord | IPNSRecordV2) => {
+export function unmarshal (buf: Uint8Array): IPNSRecord {
   const message = IpnsEntry.decode(buf)
 
   // protobufjs returns bigints as numbers
@@ -159,9 +159,9 @@ export const unmarshal = (buf: Uint8Array): (IPNSRecord | IPNSRecordV2) => {
   }
 
   // Check if we have the data field. If we don't, we fail. We've been producing
-  // V1+V2 records for quite a while and we don't support V1-only records anymore
-  // during validation.
-  if ((message.signatureV2 == null) || (message.data == null)) {
+  // V1+V2 records for quite a while and we don't support V1-only records during
+  // validation any more
+  if (message.signatureV2 == null || message.data == null) {
     throw errCode(new Error('missing data or signatureV2'), ERRORS.ERR_SIGNATURE_VERIFICATION)
   }
 
@@ -179,6 +179,7 @@ export const unmarshal = (buf: Uint8Array): (IPNSRecord | IPNSRecordV2) => {
   if (message.value != null && message.signatureV1 != null) {
     // V1+V2
     validateCborDataMatchesPbData(message)
+
     return {
       value,
       validityType: IpnsEntry.ValidityType.EOL,

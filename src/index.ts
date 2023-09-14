@@ -21,28 +21,96 @@ const ID_MULTIHASH_CODE = identity.code
 export const namespace = '/ipns/'
 export const namespaceLength = namespace.length
 
-export interface IPNSRecord {
+export interface IPNSRecordV1 {
+  /**
+   * value of the record
+   */
   value: string
-  signatureV1: Uint8Array // signature of the record
-  validityType: IpnsEntry.ValidityType // Type of validation being used
-  validity: NanoDate // expiration datetime for the record in RFC3339 format
-  sequence: bigint // number representing the version of the record
-  ttl?: bigint // ttl in nanoseconds
-  pubKey?: Uint8Array // the public portion of the key that signed this record (only present if it was not embedded in the IPNS key)
-  signatureV2: Uint8Array // the v2 signature of the record
-  data: Uint8Array // extensible data
+
+  /**
+   * signature of the record
+   */
+  signatureV1: Uint8Array
+
+  /**
+   * Type of validation being used
+   */
+  validityType: IpnsEntry.ValidityType
+
+  /**
+   * expiration datetime for the record in RFC3339 format
+   */
+  validity: NanoDate
+
+  /**
+   * number representing the version of the record
+   */
+  sequence: bigint
+
+  /**
+   * ttl in nanoseconds
+   */
+  ttl?: bigint
+
+  /**
+   * the public portion of the key that signed this record (only present if it was not embedded in the IPNS key)
+   */
+  pubKey?: Uint8Array
+
+  /**
+   * the v2 signature of the record
+   */
+  signatureV2: Uint8Array
+
+  /**
+   * extensible data
+   */
+  data: Uint8Array
 }
 
 export interface IPNSRecordV2 {
+  /**
+   * value of the record
+   */
   value: string
+
+  /**
+   * the v2 signature of the record
+   */
   signatureV2: Uint8Array
+
+  /**
+   * Type of validation being used
+   */
   validityType: IpnsEntry.ValidityType
+
+  /**
+   * expiration datetime for the record in RFC3339 format
+   */
   validity: NanoDate
+
+  /**
+   * number representing the version of the record
+   */
   sequence: bigint
+
+  /**
+   * ttl in nanoseconds
+   */
   ttl?: bigint
+
+  /**
+   * the public portion of the key that signed this record (only present if it was not embedded in the IPNS key)
+   */
   pubKey?: Uint8Array
+
+  /**
+   * extensible data
+   */
   data: Uint8Array
 }
+
+export type IPNSRecord = IPNSRecordV1 | IPNSRecordV2
 
 export interface IPNSRecordData {
   Value: Uint8Array
@@ -92,9 +160,9 @@ const defaultCreateOptions: CreateOptions = {
  * @param {number} lifetime - lifetime of the record (in milliseconds).
  * @param {CreateOptions} options - additional create options.
  */
-export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options?: CreateV2OrV1Options): Promise<IPNSRecord>
+export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options?: CreateV2OrV1Options): Promise<IPNSRecordV1>
 export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateV2Options): Promise<IPNSRecordV2>
-export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> {
+export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = IpnsEntry.ValidityType.EOL
@@ -120,9 +188,9 @@ export async function create (peerId: PeerId, value: CID | PeerId | string, seq:
  * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * @param {CreateOptions} options - additional creation options.
  */
-export async function createWithExpiration (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, expiration: string, options?: CreateV2OrV1Options): Promise<IPNSRecord>
+export async function createWithExpiration (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, expiration: string, options?: CreateV2OrV1Options): Promise<IPNSRecordV1>
 export async function createWithExpiration (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, expiration: string, options: CreateV2Options): Promise<IPNSRecordV2>
-export async function createWithExpiration (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> {
+export async function createWithExpiration (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> {
   const expirationDate = NanoDate.fromString(expiration)
   const validityType = IpnsEntry.ValidityType.EOL
 
@@ -132,7 +200,7 @@ export async function createWithExpiration (peerId: PeerId, value: CID | PeerId 
   return _create(peerId, value, seq, validityType, expirationDate, ttlNs, options)
 }
 
-const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord | IPNSRecordV2> => {
+const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
   seq = BigInt(seq)
   const isoValidity = uint8ArrayFromString(expirationDate.toString())
   const normalizedValue = normalizeValue(value)
