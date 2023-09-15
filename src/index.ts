@@ -21,7 +21,7 @@ const ID_MULTIHASH_CODE = identity.code
 export const namespace = '/ipns/'
 export const namespaceLength = namespace.length
 
-export interface IPNSRecordV1 {
+export interface IPNSRecordV1V2 {
   /**
    * value of the record
    */
