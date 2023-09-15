@@ -1,3 +1,10 @@
+## [7.0.1](https://github.com/ipfs/js-ipns/compare/v7.0.0...v7.0.1) (2023-09-15)
+
+
+### Bug Fixes
+
+* add extra signature for empty options object ([#260](https://github.com/ipfs/js-ipns/issues/260)) ([ecbc699](https://github.com/ipfs/js-ipns/commit/ecbc699db81b0979520ed736df3550b2360d6d0e))
+
 ## [7.0.0](https://github.com/ipfs/js-ipns/compare/v6.0.7...v7.0.0) (2023-09-15)
 
 
