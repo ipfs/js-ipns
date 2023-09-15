@@ -1,3 +1,14 @@
+## [7.0.0](https://github.com/ipfs/js-ipns/compare/v6.0.7...v7.0.0) (2023-09-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* all /ipns/* keys are now encoded as base36 encoded CIDv1 libp2p-cid
+
+### Features
+
+* opt-in V2-only records, IPIP-428 verification ([#234](https://github.com/ipfs/js-ipns/issues/234)) ([df71fed](https://github.com/ipfs/js-ipns/commit/df71fedd29f15c4f5a93d3d6aaa4dc895e98ddc9)), closes [#217](https://github.com/ipfs/js-ipns/issues/217)
+
 ## [6.0.7](https://github.com/ipfs/js-ipns/compare/v6.0.6...v6.0.7) (2023-09-14)
 
 
