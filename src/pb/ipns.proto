@@ -1,39 +1,39 @@
-// https://github.com/ipfs/go-ipns/blob/master/pb/ipns.proto
+// https://github.com/ipfs/boxo/blob/main/ipns/pb/record.proto
 
 syntax = "proto3";
 
 message IpnsEntry {
-  enum ValidityType {
-		EOL = 0; // setting an EOL says "this record is valid until..."
+	enum ValidityType {
+		// setting an EOL says "this record is valid until..."
+		EOL = 0;
 	}
 
-	// value to be stored in the record
-  optional bytes value = 1;
+	// legacy V1 copy of data[Value]
+	optional bytes value = 1;
 
-	// signature of the record
-	optional bytes signature = 2;
+	// legacy V1 field, verify 'signatureV2' instead
+	optional bytes signatureV1 = 2;
 
-	// Type of validation being used
+	// legacy V1 copies of data[ValidityType] and data[Validity]
 	optional ValidityType validityType = 3;
-
-	// expiration datetime for the record in RFC3339 format
 	optional bytes validity = 4;
 
-	// number representing the version of the record
+	// legacy V1 copy of data[Sequence]
 	optional uint64 sequence = 5;
 
-	// ttl in nanoseconds
+	// legacy V1 copy copy of data[TTL]
 	optional uint64 ttl = 6;
 
-	// in order for nodes to properly validate a record upon receipt, they need the public
-	// key associated with it. For old RSA keys, its easiest if we just send this as part of
-	// the record itself. For newer ed25519 keys, the public key can be embedded in the
-	// peerID, making this field unnecessary.
+	// Optional Public Key to be used for signature verification.
+	// Used for big keys such as old RSA keys. Including the public key as part of
+	// the record itself makes it verifiable in offline mode, without any additional lookup.
+	// For newer Ed25519 keys, the public key is small enough that it can be embedded in the
+	// IPNS Name itself, making this field unnecessary.
 	optional bytes pubKey = 7;
 
-	// the v2 signature of the record
+	// (mandatory V2) signature of the IPNS record
 	optional bytes signatureV2 = 8;
 
-	// extensible data
+	// (mandatory V2) extensible record data in DAG-CBOR format
 	optional bytes data = 9;
 }

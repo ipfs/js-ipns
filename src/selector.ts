@@ -1,23 +1,18 @@
-import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
-import { IpnsEntry } from './pb/ipns.js'
-import { parseRFC3339 } from './utils.js'
+import { unmarshal } from './utils.js'
 
 export function ipnsSelector (key: Uint8Array, data: Uint8Array[]): number {
   const entries = data.map((buf, index) => ({
-    entry: IpnsEntry.decode(buf),
+    record: unmarshal(buf),
     index
   }))
 
   entries.sort((a, b) => {
-    // having a newer signature version is better than an older signature version
-    if (a.entry.signatureV2 != null && b.entry.signatureV2 == null) {
-      return -1
-    } else if (a.entry.signatureV2 == null && b.entry.signatureV2 != null) {
-      return 1
-    }
+    // Before we'd sort based on the signature version. Unmarshal now fails if
+    // a record does not have SignatureV2, so that is no longer needed. V1-only
+    // records haven't been issues in a long time.
 
-    const aSeq = a.entry.sequence ?? 0n
-    const bSeq = b.entry.sequence ?? 0n
+    const aSeq = a.record.sequence
+    const bSeq = b.record.sequence
 
     // choose later sequence number
     if (aSeq > bSeq) {
@@ -26,18 +21,15 @@ export function ipnsSelector (key: Uint8Array, data: Uint8Array[]): number {
       return 1
     }
 
-    const aValidty = a.entry.validity ?? new Uint8Array(0)
-    const bValidty = b.entry.validity ?? new Uint8Array(0)
-
     // choose longer lived record if sequence numbers the same
-    const entryAValidityDate = parseRFC3339(uint8ArrayToString(aValidty))
-    const entryBValidityDate = parseRFC3339(uint8ArrayToString(bValidty))
+    const recordAValidityDate = a.record.validity.toDate()
+    const recordBValidityDate = b.record.validity.toDate()
 
-    if (entryAValidityDate.getTime() > entryBValidityDate.getTime()) {
+    if (recordAValidityDate.getTime() > recordBValidityDate.getTime()) {
       return -1
     }
 
-    if (entryAValidityDate.getTime() < entryBValidityDate.getTime()) {
+    if (recordAValidityDate.getTime() < recordBValidityDate.getTime()) {
       return 1
     }
 

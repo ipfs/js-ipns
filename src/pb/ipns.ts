@@ -10,7 +10,7 @@ import type { Uint8ArrayList } from 'uint8arraylist'
 
 export interface IpnsEntry {
   value?: Uint8Array
-  signature?: Uint8Array
+  signatureV1?: Uint8Array
   validityType?: IpnsEntry.ValidityType
   validity?: Uint8Array
   sequence?: bigint
@@ -49,9 +49,9 @@ export namespace IpnsEntry {
           w.bytes(obj.value)
         }
 
-        if (obj.signature != null) {
+        if (obj.signatureV1 != null) {
           w.uint32(18)
-          w.bytes(obj.signature)
+          w.bytes(obj.signatureV1)
         }
 
         if (obj.validityType != null) {
@@ -105,7 +105,7 @@ export namespace IpnsEntry {
               obj.value = reader.bytes()
               break
             case 2:
-              obj.signature = reader.bytes()
+              obj.signatureV1 = reader.bytes()
               break
             case 3:
               obj.validityType = IpnsEntry.ValidityType.codec().decode(reader)
