@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>createWithExpiration | ipns - v6.0.6</title><meta name="description" content="Documentation for ipns"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>createWithExpiration | ipns - v7.0.0</title><meta name="description" content="Documentation for ipns"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -6,7 +6,7 @@
 <div id="tsd-toolbar-links"></div></div>
 <ul class="results">
 <li class="state loading">Preparing search index...</li>
-<li class="state failure">The search index is not available</li></ul><a href="../index.html" class="title">ipns - v6.0.6</a></div>
+<li class="state failure">The search index is not available</li></ul><a href="../index.html" class="title">ipns - v7.0.0</a></div>
 <div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="#icon-menu"></use></svg></a></div></div></header>
 <div class="container container-main">
 <div class="col-content">
@@ -18,10 +18,16 @@
 <h1>Function createWithExpiration</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="createWithExpiration"><span class="tsd-kind-call-signature">create<wbr/>With<wbr/>Expiration</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">peerId</span>, <span class="tsd-kind-parameter">value</span>, <span class="tsd-kind-parameter">seq</span>, <span class="tsd-kind-parameter">expiration</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="tsd-signature-type external" target="_blank">Promise</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/index.IPNSEntry.html" class="tsd-signature-type tsd-kind-interface">IPNSEntry</a><span class="tsd-signature-symbol">&gt;</span><a href="#createWithExpiration" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="createWithExpiration"><span class="tsd-kind-call-signature">create<wbr/>With<wbr/>Expiration</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">peerId</span>, <span class="tsd-kind-parameter">value</span>, <span class="tsd-kind-parameter">seq</span>, <span class="tsd-kind-parameter">expiration</span>, <span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="tsd-signature-type external" target="_blank">Promise</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/index.IPNSRecordV1V2.html" class="tsd-signature-type tsd-kind-interface">IPNSRecordV1V2</a><span class="tsd-signature-symbol">&gt;</span><a href="#createWithExpiration" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Same as create(), but instead of generating a new Date, it receives the intended expiration time
 WARNING: nano precision is not standard, make sure the value in seconds is 9 orders of magnitude lesser than the one provided.</p>
+<p>The passed value can be a CID, a PeerID or an arbitrary string path.</p>
+<ul>
+<li>CIDs will be converted to v1 and stored in the record as a string similar to: <code>/ipfs/${cid}</code></li>
+<li>PeerIDs will create recursive records, eg. the record value will be <code>/ipns/${cidV1Libp2pKey}</code></li>
+<li>String paths will be stored in the record as-is, but they must start with <code>&quot;/&quot;</code></li>
+</ul>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -32,8 +38,8 @@ WARNING: nano precision is not standard, make sure the value in seconds is 9 ord
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li>
-<h5><span class="tsd-kind-parameter">value</span>: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array" class="tsd-signature-type external" target="_blank">Uint8Array</a></h5>
-<div class="tsd-comment tsd-typography"><p>value to be stored in the record.</p>
+<h5><span class="tsd-kind-parameter">value</span>: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="https://libp2p.github.io/js-libp2p/types/_libp2p_interface.peer_id.PeerId.html" class="tsd-signature-type external" target="_blank">PeerId</a><span class="tsd-signature-symbol"> | </span><a href="https://multiformats.github.io/js-multiformats/classes/cid.CID.html" class="tsd-signature-type external" target="_blank">CID</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><a href="https://multiformats.github.io/js-multiformats/types/index.Version.html" class="tsd-signature-type external" target="_blank">Version</a><span class="tsd-signature-symbol">&gt;</span></h5>
+<div class="tsd-comment tsd-typography"><p>content to be stored in the record.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li>
@@ -45,11 +51,34 @@ WARNING: nano precision is not standard, make sure the value in seconds is 9 ord
 <h5><span class="tsd-kind-parameter">expiration</span>: <span class="tsd-signature-type">string</span></h5>
 <div class="tsd-comment tsd-typography"><p>expiration datetime for record in the [RFC3339]<a href="https://www.ietf.org/rfc/rfc3339.txt">https://www.ietf.org/rfc/rfc3339.txt</a> with nanoseconds precision.</p>
 </div>
+<div class="tsd-comment tsd-typography"></div></li>
+<li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">options</span>: <a href="../interfaces/index.CreateV2OrV1Options.html" class="tsd-signature-type tsd-kind-interface">CreateV2OrV1Options</a></h5>
+<div class="tsd-comment tsd-typography"><p>additional creation options.</p>
+</div>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="tsd-signature-type external" target="_blank">Promise</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/index.IPNSEntry.html" class="tsd-signature-type tsd-kind-interface">IPNSEntry</a><span class="tsd-signature-symbol">&gt;</span></h4>
+<h4 class="tsd-returns-title">Returns <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="tsd-signature-type external" target="_blank">Promise</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/index.IPNSRecordV1V2.html" class="tsd-signature-type tsd-kind-interface">IPNSRecordV1V2</a><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/ipfs/js-ipns/blob/master/src/index.ts#L79">index.ts:79</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/ipfs/js-ipns/blob/master/src/index.ts#L191">index.ts:191</a></li></ul></aside></li>
+<li class="tsd-signature tsd-anchor-link" id="createWithExpiration-1"><span class="tsd-kind-call-signature">create<wbr/>With<wbr/>Expiration</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">peerId</span>, <span class="tsd-kind-parameter">value</span>, <span class="tsd-kind-parameter">seq</span>, <span class="tsd-kind-parameter">expiration</span>, <span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="tsd-signature-type external" target="_blank">Promise</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/index.IPNSRecordV2.html" class="tsd-signature-type tsd-kind-interface">IPNSRecordV2</a><span class="tsd-signature-symbol">&gt;</span><a href="#createWithExpiration-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">peerId</span>: <a href="https://libp2p.github.io/js-libp2p/types/_libp2p_interface.peer_id.PeerId.html" class="tsd-signature-type external" target="_blank">PeerId</a></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">value</span>: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="https://libp2p.github.io/js-libp2p/types/_libp2p_interface.peer_id.PeerId.html" class="tsd-signature-type external" target="_blank">PeerId</a><span class="tsd-signature-symbol"> | </span><a href="https://multiformats.github.io/js-multiformats/classes/cid.CID.html" class="tsd-signature-type external" target="_blank">CID</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><a href="https://multiformats.github.io/js-multiformats/types/index.Version.html" class="tsd-signature-type external" target="_blank">Version</a><span class="tsd-signature-symbol">&gt;</span></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">seq</span>: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">bigint</span></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">expiration</span>: <span class="tsd-signature-type">string</span></h5></li>
+<li>
+<h5><span class="tsd-kind-parameter">options</span>: <a href="../interfaces/index.CreateV2Options.html" class="tsd-signature-type tsd-kind-interface">CreateV2Options</a></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="tsd-signature-type external" target="_blank">Promise</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/index.IPNSRecordV2.html" class="tsd-signature-type tsd-kind-interface">IPNSRecordV2</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/ipfs/js-ipns/blob/master/src/index.ts#L192">index.ts:192</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -66,7 +95,7 @@ WARNING: nano precision is not standard, make sure the value in seconds is 9 ord
 <div class="tsd-theme-toggle">
 <h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div></div>
 <div class="site-menu">
-<nav class="tsd-navigation"><a href="../index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1"></use></svg><span>ipns - v6.0.6</span></a>
+<nav class="tsd-navigation"><a href="../index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1"></use></svg><span>ipns - v7.0.0</span></a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="..">
 <li><a href="../modules/index.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>index</a></li>
 <li><a href="../modules/selector.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2"></use></svg>selector</a></li>
