@@ -177,7 +177,7 @@
     "protons-runtime": "^5.0.0",
     "timestamp-nano": "^1.0.0",
     "uint8arraylist": "^2.4.3",
-    "uint8arrays": "^4.0.2"
+    "uint8arrays": "^5.0.0"
   },
   "devDependencies": {
     "@libp2p/peer-id-factory": "^3.0.3",
