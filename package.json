@@ -166,7 +166,7 @@
     "docs:no-publish": "NODE_OPTIONS=--max_old_space_size=8192 aegir docs --publish false"
   },
   "dependencies": {
-    "@libp2p/crypto": "^2.0.3",
+    "@libp2p/crypto": "^3.0.2",
     "@libp2p/interface": "^0.1.2",
     "@libp2p/logger": "^3.0.2",
     "@libp2p/peer-id": "^3.0.2",
