@@ -1,3 +1,19 @@
+## [8.0.0](https://github.com/ipfs/js-ipns/compare/v7.0.2...v8.0.0) (2023-12-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* requires libp2p v1 or later
+
+### Trivial Changes
+
+* rename master to main ([4f520b1](https://github.com/ipfs/js-ipns/commit/4f520b1946eacbed5ddb3dc567d2ba5423034ca0))
+
+
+### Dependencies
+
+* update libp2p deps to v1 ([#299](https://github.com/ipfs/js-ipns/issues/299)) ([5ae5b93](https://github.com/ipfs/js-ipns/commit/5ae5b934c391d652462765c102b6d01997a4d090))
+
 ## [7.0.2](https://github.com/ipfs/js-ipns/compare/v7.0.1...v7.0.2) (2023-12-30)
 
 
