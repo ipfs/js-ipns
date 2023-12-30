@@ -3,7 +3,7 @@ import errCode from 'err-code'
 import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import { extractPublicKey, ipnsRecordDataForV2Sig, unmarshal, peerIdFromRoutingKey } from './utils.js'
-import type { PublicKey } from '@libp2p/interface/keys'
+import type { PublicKey } from '@libp2p/interface'
 
 const log = logger('ipns:validator')
 

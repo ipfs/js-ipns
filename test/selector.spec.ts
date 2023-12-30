@@ -6,7 +6,7 @@ import { expect } from 'aegir/chai'
 import * as ipns from '../src/index.js'
 import { ipnsSelector } from '../src/selector.js'
 import { marshal, peerIdToRoutingKey } from '../src/utils.js'
-import type { PeerId } from '@libp2p/interface/peer-id'
+import type { PeerId } from '@libp2p/interface'
 
 describe('selector', function () {
   this.timeout(20 * 1000)
