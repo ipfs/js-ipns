@@ -3,7 +3,7 @@
 [![ipfs.tech](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](https://ipfs.tech)
 [![Discuss](https://img.shields.io/discourse/https/discuss.ipfs.tech/posts.svg?style=flat-square)](https://discuss.ipfs.tech)
 [![codecov](https://img.shields.io/codecov/c/github/ipfs/js-ipns.svg?style=flat-square)](https://codecov.io/gh/ipfs/js-ipns)
-[![CI](https://img.shields.io/github/actions/workflow/status/ipfs/js-ipns/js-test-and-release.yml?branch=master\&style=flat-square)](https://github.com/ipfs/js-ipns/actions/workflows/js-test-and-release.yml?query=branch%3Amaster)
+[![CI](https://img.shields.io/github/actions/workflow/status/ipfs/js-ipns/js-test-and-release.yml?branch=main\&style=flat-square)](https://github.com/ipfs/js-ipns/actions/workflows/js-test-and-release.yml?query=branch%3Amain)
 
 > IPNS Record definitions
 
@@ -144,7 +144,7 @@ ipns.create(privateKey, value, sequenceNumber, lifetime, options)
 
 Create an IPNS record for being stored in a protocol buffer.
 
-- `privateKey` (`PrivKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
+- `privateKey` ([PrivateKey](https://libp2p.github.io/js-libp2p/interfaces/_libp2p_interface.keys.PrivateKey.html)): key to be used for cryptographic operations.
 - `value` (string): IPFS path of the object to be published.
 - `sequenceNumber` (Number): number representing the current version of the record.
 - `lifetime` (Number): lifetime of the record (in milliseconds).
@@ -160,7 +160,7 @@ ipns.validate(publicKey, ipnsRecord)
 
 Validate an IPNS record previously stored in a protocol buffer.
 
-- `publicKey` (`PubKey` [RSA Instance](https://github.com/libp2p/js-libp2p-crypto/blob/master/src/keys/rsa-class.js)): key to be used for cryptographic operations.
+- `publicKey` ([PublicKey](https://libp2p.github.io/js-libp2p/interfaces/_libp2p_interface.keys.PublicKey.html)): key to be used for cryptographic operations.
 - `ipnsRecord` (`IPNSRecord`): IPNS record (obtained using the create function).
 
 Returns a `Promise`, which may be rejected if the validation was not successful.
@@ -193,7 +193,7 @@ const publicKey = await ipns.extractPublicKey(peerId, ipnsRecord)
 
 Extract a public key from an IPNS record.
 
-- `peerId` (`PeerId` [Instance](https://github.com/libp2p/js-libp2p-peer-id/tree/master/packages/libp2p-peer-id)): peer identifier object.
+- `peerId` ([PeerId](https://libp2p.github.io/js-libp2p/types/_libp2p_interface.peer_id.PeerId.html)): peer identifier object.
 - `ipnsRecord` (`IPNSRecord`): ipns record (obtained using the create function).
 
 Returns a `Promise` which resolves to public key ([`PublicKey`](https://github.com/libp2p/js-libp2p-interfaces/blob/master/packages/interface-keys/src/index.ts) ): may be used for cryptographic operations.
