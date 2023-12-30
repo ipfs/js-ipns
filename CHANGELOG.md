@@ -1,3 +1,10 @@
+## [7.0.2](https://github.com/ipfs/js-ipns/compare/v7.0.1...v7.0.2) (2023-12-30)
+
+
+### Dependencies
+
+* bump uint8arrays from 4.0.10 to 5.0.1 ([#297](https://github.com/ipfs/js-ipns/issues/297)) ([6043eab](https://github.com/ipfs/js-ipns/commit/6043eabe135c1659001a27657a602ca34c6ba3bc))
+
 ## [7.0.1](https://github.com/ipfs/js-ipns/compare/v7.0.0...v7.0.1) (2023-09-15)
 
 
