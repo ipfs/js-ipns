@@ -1,3 +1,15 @@
+## [8.0.1](https://github.com/ipfs/js-ipns/compare/v8.0.0...v8.0.1) (2024-01-12)
+
+
+### Trivial Changes
+
+* Update .github/workflows/stale.yml [skip ci] ([e612553](https://github.com/ipfs/js-ipns/commit/e612553dab45bf102ef1f5b239fc4e13c0f96f3f))
+
+
+### Dependencies
+
+* **dev:** bump aegir from 41.3.5 to 42.1.1 ([#303](https://github.com/ipfs/js-ipns/issues/303)) ([9f0ab52](https://github.com/ipfs/js-ipns/commit/9f0ab52009d8163311fb116a87ebd5a3876c48c9))
+
 ## [8.0.0](https://github.com/ipfs/js-ipns/compare/v7.0.2...v8.0.0) (2023-12-30)
 
 
