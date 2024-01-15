@@ -1,3 +1,10 @@
+## [8.0.2](https://github.com/ipfs/js-ipns/compare/v8.0.1...v8.0.2) (2024-01-15)
+
+
+### Dependencies
+
+* bump @libp2p/crypto from 3.0.4 to 4.0.0 ([#304](https://github.com/ipfs/js-ipns/issues/304)) ([ed83244](https://github.com/ipfs/js-ipns/commit/ed832448a9c903dc2ea0dd6158cc73211eacded7))
+
 ## [8.0.1](https://github.com/ipfs/js-ipns/compare/v8.0.0...v8.0.1) (2024-01-12)
 
 
