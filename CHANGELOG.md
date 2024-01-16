@@ -1,3 +1,10 @@
+## [8.0.3](https://github.com/ipfs/js-ipns/compare/v8.0.2...v8.0.3) (2024-01-16)
+
+
+### Bug Fixes
+
+* mark package as side-effect free ([#305](https://github.com/ipfs/js-ipns/issues/305)) ([a389fe8](https://github.com/ipfs/js-ipns/commit/a389fe8f0e6dff4867ef22b6ddada43880476754))
+
 ## [8.0.2](https://github.com/ipfs/js-ipns/compare/v8.0.1...v8.0.2) (2024-01-15)
 
 
