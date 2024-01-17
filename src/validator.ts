@@ -46,7 +46,7 @@ export const validate = async (publicKey: PublicKey, buf: Uint8Array): Promise<v
     throw errCode(new Error('unrecognized validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
   }
 
-  log('ipns record for %b is valid', record.value)
+  log('ipns record for %s is valid', record.value)
 }
 
 export async function ipnsValidator (key: Uint8Array, marshalledData: Uint8Array): Promise<void> {
