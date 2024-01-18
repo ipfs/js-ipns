@@ -1,3 +1,5 @@
+import NanoDate from 'timestamp-nano'
+import { IpnsEntry } from './pb/ipns.js'
 import { unmarshal } from './utils.js'
 
 export function ipnsSelector (key: Uint8Array, data: Uint8Array[]): number {
@@ -21,16 +23,18 @@ export function ipnsSelector (key: Uint8Array, data: Uint8Array[]): number {
       return 1
     }
 
-    // choose longer lived record if sequence numbers the same
-    const recordAValidityDate = a.record.validity.toDate()
-    const recordBValidityDate = b.record.validity.toDate()
+    if (a.record.validityType === IpnsEntry.ValidityType.EOL && b.record.validityType === IpnsEntry.ValidityType.EOL) {
+      // choose longer lived record if sequence numbers the same
+      const recordAValidityDate = NanoDate.fromString(a.record.validity).toDate()
+      const recordBValidityDate = NanoDate.fromString(b.record.validity).toDate()
 
-    if (recordAValidityDate.getTime() > recordBValidityDate.getTime()) {
-      return -1
-    }
+      if (recordAValidityDate.getTime() > recordBValidityDate.getTime()) {
+        return -1
+      }
 
-    if (recordAValidityDate.getTime() < recordBValidityDate.getTime()) {
-      return 1
+      if (recordAValidityDate.getTime() < recordBValidityDate.getTime()) {
+        return 1
+      }
     }
 
     return 0

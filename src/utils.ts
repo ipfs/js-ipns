@@ -6,7 +6,6 @@ import * as cborg from 'cborg'
 import errCode from 'err-code'
 import { base36 } from 'multiformats/bases/base36'
 import { CID } from 'multiformats/cid'
-import NanoDate from 'timestamp-nano'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
@@ -19,53 +18,6 @@ import type { PublicKey, PeerId } from '@libp2p/interface'
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
 const LIBP2P_CID_CODEC = 114
-
-/**
- * Convert a JavaScript date into an `RFC3339Nano` formatted
- * string
- */
-export function toRFC3339 (time: Date): string {
-  const year = time.getUTCFullYear()
-  const month = String(time.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(time.getUTCDate()).padStart(2, '0')
-  const hour = String(time.getUTCHours()).padStart(2, '0')
-  const minute = String(time.getUTCMinutes()).padStart(2, '0')
-  const seconds = String(time.getUTCSeconds()).padStart(2, '0')
-  const milliseconds = time.getUTCMilliseconds()
-  const nanoseconds = milliseconds * 1000 * 1000
-
-  return `${year}-${month}-${day}T${hour}:${minute}:${seconds}.${nanoseconds}Z`
-}
-
-/**
- * Parses a date string formatted as `RFC3339Nano` into a
- * JavaScript Date object
- */
-export function parseRFC3339 (time: string): Date {
-  const rfc3339Matcher = new RegExp(
-    // 2006-01-02T
-    '(\\d{4})-(\\d{2})-(\\d{2})T' +
-    // 15:04:05
-    '(\\d{2}):(\\d{2}):(\\d{2})' +
-    // .999999999Z
-    '\\.(\\d+)Z'
-  )
-  const m = String(time).trim().match(rfc3339Matcher)
-
-  if (m == null) {
-    throw new Error('Invalid format')
-  }
-
-  const year = parseInt(m[1], 10)
-  const month = parseInt(m[2], 10) - 1
-  const date = parseInt(m[3], 10)
-  const hour = parseInt(m[4], 10)
-  const minute = parseInt(m[5], 10)
-  const second = parseInt(m[6], 10)
-  const millisecond = parseInt(m[7].padEnd(6, '0').slice(0, 3), 10)
-
-  return new Date(Date.UTC(year, month, date, hour, minute, second, millisecond))
-}
 
 /**
  * Extracts a public key from the passed PeerId, falling
@@ -129,7 +81,7 @@ export const marshal = (obj: IPNSRecord | IPNSRecordV2): Uint8Array => {
       value: uint8ArrayFromString(obj.value),
       signatureV1: obj.signatureV1,
       validityType: obj.validityType,
-      validity: uint8ArrayFromString(obj.validity.toString()),
+      validity: uint8ArrayFromString(obj.validity),
       sequence: obj.sequence,
       ttl: obj.ttl,
       pubKey: obj.pubKey,
@@ -167,14 +119,7 @@ export function unmarshal (buf: Uint8Array): IPNSRecord {
 
   const data = parseCborData(message.data)
   const value = normalizeValue(data.Value)
-
-  let validity
-  try {
-    validity = NanoDate.fromDate(parseRFC3339(uint8ArrayToString(data.Validity)))
-  } catch (e) {
-    log.error('unrecognized validity format (not an rfc3339 format)')
-    throw errCode(new Error('unrecognized validity format (not an rfc3339 format)'), ERRORS.ERR_UNRECOGNIZED_FORMAT)
-  }
+  const validity = uint8ArrayToString(data.Validity)
 
   if (message.value != null && message.signatureV1 != null) {
     // V1+V2
@@ -219,7 +164,7 @@ export const peerIdFromRoutingKey = (key: Uint8Array): PeerId => {
   return peerIdFromBytes(key.slice(IPNS_PREFIX.length))
 }
 
-export const createCborData = (value: Uint8Array, validity: Uint8Array, validityType: string, sequence: bigint, ttl: bigint): Uint8Array => {
+export const createCborData = (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array, sequence: bigint, ttl: bigint): Uint8Array => {
   let ValidityType
 
   if (validityType === IpnsEntry.ValidityType.EOL) {
