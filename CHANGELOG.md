@@ -1,3 +1,10 @@
+## [8.0.4](https://github.com/ipfs/js-ipns/compare/v8.0.3...v8.0.4) (2024-01-18)
+
+
+### Bug Fixes
+
+* log type as string ([#306](https://github.com/ipfs/js-ipns/issues/306)) ([de68e4c](https://github.com/ipfs/js-ipns/commit/de68e4c0601702fb5d567a97e305b26f65c34fc2))
+
 ## [8.0.3](https://github.com/ipfs/js-ipns/compare/v8.0.2...v8.0.3) (2024-01-16)
 
 
