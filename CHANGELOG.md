@@ -1,3 +1,14 @@
+## [9.0.0](https://github.com/ipfs/js-ipns/compare/v8.0.4...v9.0.0) (2024-01-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* the validity field is now a string
+
+### Bug Fixes
+
+* treat validity as opaque ([#307](https://github.com/ipfs/js-ipns/issues/307)) ([461190e](https://github.com/ipfs/js-ipns/commit/461190e215173e0ac2aad1dca107de5cb65a52ef))
+
 ## [8.0.4](https://github.com/ipfs/js-ipns/compare/v8.0.3...v8.0.4) (2024-01-18)
 
 
