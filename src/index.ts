@@ -40,7 +40,7 @@ export interface IPNSRecordV1V2 {
   /**
    * expiration datetime for the record in RFC3339 format
    */
-  validity: NanoDate
+  validity: string
 
   /**
    * number representing the version of the record
@@ -85,9 +85,10 @@ export interface IPNSRecordV2 {
   validityType: IpnsEntry.ValidityType
 
   /**
-   * expiration datetime for the record in RFC3339 format
+   * If the validity type is EOL, this is the expiration datetime for the record
+   * in RFC3339 format
    */
-  validity: NanoDate
+  validity: string
 
   /**
    * number representing the version of the record
@@ -171,7 +172,7 @@ export async function create (peerId: PeerId, value: CID | PeerId | string, seq:
   const validityType = IpnsEntry.ValidityType.EOL
   const lifetimeNs = typeof options.lifetimeNs === "bigint" ? options.lifetimeNs : DEFAULT_TTL
 
-  return _create(peerId, value, seq, validityType, expirationDate, lifetimeNs, options)
+  return _create(peerId, value, seq, validityType, expirationDate.toString(), lifetimeNs, options)
 }
 
 /**
@@ -198,12 +199,12 @@ export async function createWithExpiration (peerId: PeerId, value: CID | PeerId 
   const validityType = IpnsEntry.ValidityType.EOL
   const lifetimeNs = typeof options.lifetimeNs === "bigint" ? options.lifetimeNs : DEFAULT_TTL
 
-  return _create(peerId, value, seq, validityType, expirationDate, lifetimeNs, options)
+  return _create(peerId, value, seq, validityType, expirationDate.toString(), lifetimeNs, options)
 }
 
-const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, validityType: IpnsEntry.ValidityType, validity: string, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
   seq = BigInt(seq)
-  const isoValidity = uint8ArrayFromString(expirationDate.toString())
+  const isoValidity = uint8ArrayFromString(validity)
   const normalizedValue = normalizeValue(value)
   const encodedValue = uint8ArrayFromString(normalizedValue)
 
@@ -212,7 +213,7 @@ const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number
   }
 
   const privateKey = await unmarshalPrivateKey(peerId.privateKey)
-  const data = createCborData(encodedValue, isoValidity, validityType, seq, ttl)
+  const data = createCborData(encodedValue, validityType, isoValidity, seq, ttl)
   const sigData = ipnsRecordDataForV2Sig(data)
   const signatureV2 = await privateKey.sign(sigData)
   let pubKey: Uint8Array | undefined
@@ -233,7 +234,7 @@ const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number
     const record: IPNSRecord = {
       value: normalizedValue,
       signatureV1,
-      validity: expirationDate,
+      validity,
       validityType,
       sequence: seq,
       ttl,
@@ -249,7 +250,7 @@ const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number
   } else {
     const record: IPNSRecordV2 = {
       value: normalizedValue,
-      validity: expirationDate,
+      validity,
       validityType,
       sequence: seq,
       ttl,

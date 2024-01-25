@@ -1,5 +1,6 @@
 import { logger } from '@libp2p/logger'
 import errCode from 'err-code'
+import NanoDate from 'timestamp-nano'
 import * as ERRORS from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import { extractPublicKey, ipnsRecordDataForV2Sig, unmarshal, peerIdFromRoutingKey } from './utils.js'
@@ -37,7 +38,7 @@ export const validate = async (publicKey: PublicKey, buf: Uint8Array): Promise<v
 
   // Validate according to the validity type
   if (record.validityType === IpnsEntry.ValidityType.EOL) {
-    if (record.validity.toDate().getTime() < Date.now()) {
+    if (NanoDate.fromString(record.validity).toDate().getTime() < Date.now()) {
       log.error('record has expired')
       throw errCode(new Error('record has expired'), ERRORS.ERR_IPNS_EXPIRED_RECORD)
     }
@@ -46,7 +47,7 @@ export const validate = async (publicKey: PublicKey, buf: Uint8Array): Promise<v
     throw errCode(new Error('unrecognized validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
   }
 
-  log('ipns record for %b is valid', record.value)
+  log('ipns record for %s is valid', record.value)
 }
 
 export async function ipnsValidator (key: Uint8Array, marshalledData: Uint8Array): Promise<void> {

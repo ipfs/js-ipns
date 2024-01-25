@@ -16,6 +16,7 @@ import * as ipns from '../src/index.js'
 import { IpnsEntry } from '../src/pb/ipns.js'
 import { extractPublicKey, peerIdToRoutingKey, parseCborData, createCborData, ipnsRecordDataForV2Sig } from '../src/utils.js'
 import { ipnsValidator } from '../src/validator.js'
+import { kuboRecord } from './fixtures/records.js'
 import type { PeerId } from '@libp2p/interface'
 
 describe('ipns', function () {
@@ -186,7 +187,7 @@ describe('ipns', function () {
     const record = await ipns.create(peerId, inputValue, 0, 1000000)
 
     const pb = IpnsEntry.decode(ipns.marshal(record))
-    pb.data = createCborData(uint8ArrayFromString(inputValue), pb.validity ?? new Uint8Array(0), pb.validityType ?? '', pb.sequence ?? 0n, pb.ttl ?? 0n)
+    pb.data = createCborData(uint8ArrayFromString(inputValue), pb.validityType ?? IpnsEntry.ValidityType.EOL, pb.validity ?? new Uint8Array(0), pb.sequence ?? 0n, pb.ttl ?? 0n)
     pb.value = uint8ArrayFromString(inputValue)
 
     const modifiedRecord = ipns.unmarshal(IpnsEntry.encode(pb))
@@ -199,7 +200,7 @@ describe('ipns', function () {
     const record = await ipns.create(peerId, inputValue, 0, 1000000)
 
     const pb = IpnsEntry.decode(ipns.marshal(record))
-    pb.data = createCborData(uint8ArrayFromString(inputValue), pb.validity ?? new Uint8Array(0), pb.validityType ?? '', pb.sequence ?? 0n, pb.ttl ?? 0n)
+    pb.data = createCborData(uint8ArrayFromString(inputValue), pb.validityType ?? IpnsEntry.ValidityType.EOL, pb.validity ?? new Uint8Array(0), pb.sequence ?? 0n, pb.ttl ?? 0n)
     pb.value = uint8ArrayFromString(inputValue)
 
     const modifiedRecord = ipns.unmarshal(IpnsEntry.encode(pb))
@@ -396,5 +397,20 @@ describe('ipns', function () {
     const record = ipns.unmarshal(buf)
 
     expect(record).to.have.property('value', '/ipfs/bafkqae3imvwgy3zamzzg63janjzs22lqnzzqu')
+  })
+
+  it('should round trip kubo records to bytes and back', async () => {
+    // the IPNS spec gives an example for the Validity field as
+    // 1970-01-01T00:00:00.000000001Z - e.g. nanosecond precision but Kubo only
+    // uses microsecond precision. The value is a timestamp as defined by
+    // rfc3339 which doesn't have a strong opinion on fractions of seconds so
+    // both are valid but we must be able to round trip them intact.
+    const unmarshalled = ipns.unmarshal(kuboRecord.bytes)
+    const remarhshalled = ipns.marshal(unmarshalled)
+
+    const reUnmarshalled = ipns.unmarshal(remarhshalled)
+
+    expect(unmarshalled).to.deep.equal(reUnmarshalled)
+    expect(remarhshalled).to.equalBytes(kuboRecord.bytes)
   })
 })

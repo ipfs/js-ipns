@@ -1,6 +1,6 @@
 {
   "name": "ipns",
-  "version": "8.0.1",
+  "version": "9.0.0",
   "description": "IPNS record definitions",
   "author": "Vasco Santos <vasco.santos@moxy.studio>",
   "license": "Apache-2.0 OR MIT",
@@ -166,7 +166,7 @@
     "docs:no-publish": "NODE_OPTIONS=--max_old_space_size=8192 aegir docs --publish false"
   },
   "dependencies": {
-    "@libp2p/crypto": "^3.0.3",
+    "@libp2p/crypto": "^4.0.0",
     "@libp2p/interface": "^1.1.0",
     "@libp2p/logger": "^4.0.3",
     "@libp2p/peer-id": "^4.0.3",
@@ -183,5 +183,6 @@
     "@libp2p/peer-id-factory": "^4.0.2",
     "aegir": "^42.1.1",
     "protons": "^7.3.3"
-  }
+  },
+  "sideEffects": false
 }

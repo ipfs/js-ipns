@@ -1,3 +1,35 @@
+## [9.0.0](https://github.com/ipfs/js-ipns/compare/v8.0.4...v9.0.0) (2024-01-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* the validity field is now a string
+
+### Bug Fixes
+
+* treat validity as opaque ([#307](https://github.com/ipfs/js-ipns/issues/307)) ([461190e](https://github.com/ipfs/js-ipns/commit/461190e215173e0ac2aad1dca107de5cb65a52ef))
+
+## [8.0.4](https://github.com/ipfs/js-ipns/compare/v8.0.3...v8.0.4) (2024-01-18)
+
+
+### Bug Fixes
+
+* log type as string ([#306](https://github.com/ipfs/js-ipns/issues/306)) ([de68e4c](https://github.com/ipfs/js-ipns/commit/de68e4c0601702fb5d567a97e305b26f65c34fc2))
+
+## [8.0.3](https://github.com/ipfs/js-ipns/compare/v8.0.2...v8.0.3) (2024-01-16)
+
+
+### Bug Fixes
+
+* mark package as side-effect free ([#305](https://github.com/ipfs/js-ipns/issues/305)) ([a389fe8](https://github.com/ipfs/js-ipns/commit/a389fe8f0e6dff4867ef22b6ddada43880476754))
+
+## [8.0.2](https://github.com/ipfs/js-ipns/compare/v8.0.1...v8.0.2) (2024-01-15)
+
+
+### Dependencies
+
+* bump @libp2p/crypto from 3.0.4 to 4.0.0 ([#304](https://github.com/ipfs/js-ipns/issues/304)) ([ed83244](https://github.com/ipfs/js-ipns/commit/ed832448a9c903dc2ea0dd6158cc73211eacded7))
+
 ## [8.0.1](https://github.com/ipfs/js-ipns/compare/v8.0.0...v8.0.1) (2024-01-12)
 
 

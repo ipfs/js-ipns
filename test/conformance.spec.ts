@@ -65,4 +65,21 @@ describe('conformance', function () {
 
     expect(record.value).to.equal('/ipfs/bafkqadtwgiww63tmpeqhezldn5zgi')
   })
+
+  it('should round trip fixtures', () => {
+    const fixtures = [
+      'test/fixtures/k51qzi5uqu5dlkw8pxuw9qmqayfdeh4kfebhmreauqdc6a7c3y7d5i9fi8mk9w_v1-v2.ipns-record',
+      'test/fixtures/k51qzi5uqu5diamp7qnnvs1p1gzmku3eijkeijs3418j23j077zrkok63xdm8c_v1-v2-broken-signature-v2.ipns-record',
+      'test/fixtures/k51qzi5uqu5dilgf7gorsh9vcqqq4myo6jd4zmqkuy9pxyxi5fua3uf7axph4y_v1-v2-broken-signature-v1.ipns-record',
+      'test/fixtures/k51qzi5uqu5dit2ku9mutlfgwyz8u730on38kd10m97m36bjt66my99hb6103f_v2.ipns-record'
+    ]
+
+    for (const fixture of fixtures) {
+      const buf = loadFixture(fixture)
+      const record = ipns.unmarshal(buf)
+      const marshalled = ipns.marshal(record)
+
+      expect(buf).to.equalBytes(marshalled)
+    }
+  })
 })
