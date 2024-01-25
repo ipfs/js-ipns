@@ -16,6 +16,7 @@ import type { CID } from 'multiformats/cid'
 
 const log = logger('ipns')
 const ID_MULTIHASH_CODE = identity.code
+const DEFAULT_TTL = BigInt(3.6e+12) // 1 Hour or 3600 Seconds
 
 export const namespace = '/ipns/'
 export const namespaceLength = namespace.length
@@ -127,6 +128,7 @@ export interface IDKeys {
 }
 
 export interface CreateOptions {
+  lifetimeNs?: bigint
   v1Compatible?: boolean
 }
 
@@ -139,7 +141,8 @@ export interface CreateV2Options {
 }
 
 const defaultCreateOptions: CreateOptions = {
-  v1Compatible: true
+  v1Compatible: true,
+  lifetimeNs: DEFAULT_TTL
 }
 
 /**
@@ -166,8 +169,7 @@ export async function create (peerId: PeerId, value: CID | PeerId | string, seq:
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = IpnsEntry.ValidityType.EOL
-  const [ms, ns] = lifetime.toString().split('.')
-  const lifetimeNs = (BigInt(ms) * BigInt(100000)) + BigInt(ns ?? '0')
+  const lifetimeNs = typeof options.lifetimeNs === "bigint" ? options.lifetimeNs : DEFAULT_TTL
 
   return _create(peerId, value, seq, validityType, expirationDate, lifetimeNs, options)
 }
@@ -194,11 +196,9 @@ export async function createWithExpiration (peerId: PeerId, value: CID | PeerId 
 export async function createWithExpiration (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> {
   const expirationDate = NanoDate.fromString(expiration)
   const validityType = IpnsEntry.ValidityType.EOL
+  const lifetimeNs = typeof options.lifetimeNs === "bigint" ? options.lifetimeNs : DEFAULT_TTL
 
-  const ttlMs = expirationDate.toDate().getTime() - Date.now()
-  const ttlNs = (BigInt(ttlMs) * BigInt(100000)) + BigInt(expirationDate.getNano())
-
-  return _create(peerId, value, seq, validityType, expirationDate, ttlNs, options)
+  return _create(peerId, value, seq, validityType, expirationDate, lifetimeNs, options)
 }
 
 const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, validityType: IpnsEntry.ValidityType, expirationDate: NanoDate, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
