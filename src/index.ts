@@ -160,17 +160,17 @@ const defaultCreateOptions: CreateOptions = {
  * @param {number} lifetime - lifetime of the record (in milliseconds).
  * @param {CreateOptions} options - additional create options.
  */
-export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options?: CreateV2OrV1Options): Promise<IPNSRecordV1V2>
-export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateV2Options): Promise<IPNSRecordV2>
-export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateOptions): Promise<IPNSRecordV1V2>
-export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> {
+export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options?: CreateV2OrV1Options, kv_data? : Object): Promise<IPNSRecordV1V2>
+export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateV2Options, kv_data? : Object): Promise<IPNSRecordV2>
+export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateOptions, kv_data? : Object): Promise<IPNSRecordV1V2>
+export async function create (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions, kv_data : Object = {}): Promise<IPNSRecord> {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = IpnsEntry.ValidityType.EOL
   const [ms, ns] = lifetime.toString().split('.')
   const lifetimeNs = (BigInt(ms) * BigInt(100000)) + BigInt(ns ?? '0')
 
-  return _create(peerId, value, seq, validityType, expirationDate.toString(), lifetimeNs, options)
+  return _create(peerId, value, seq, validityType, expirationDate.toString(), lifetimeNs, options, kv_data)
 }
 
 /**
@@ -202,7 +202,7 @@ export async function createWithExpiration (peerId: PeerId, value: CID | PeerId 
   return _create(peerId, value, seq, validityType, expirationDate.toString(), ttlNs, options)
 }
 
-const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, validityType: IpnsEntry.ValidityType, validity: string, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, validityType: IpnsEntry.ValidityType, validity: string, ttl: bigint, options: CreateOptions = defaultCreateOptions, kv_data: object = {}): Promise<IPNSRecord> => {
   seq = BigInt(seq)
   const isoValidity = uint8ArrayFromString(validity)
   const normalizedValue = normalizeValue(value)
@@ -213,7 +213,7 @@ const _create = async (peerId: PeerId, value: CID | PeerId | string, seq: number
   }
 
   const privateKey = await unmarshalPrivateKey(peerId.privateKey)
-  const data = createCborData(encodedValue, validityType, isoValidity, seq, ttl)
+  const data = createCborData(encodedValue, validityType, isoValidity, seq, ttl, kv_data)
   const sigData = ipnsRecordDataForV2Sig(data)
   const signatureV2 = await privateKey.sign(sigData)
   let pubKey: Uint8Array | undefined

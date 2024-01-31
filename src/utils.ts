@@ -164,7 +164,7 @@ export const peerIdFromRoutingKey = (key: Uint8Array): PeerId => {
   return peerIdFromBytes(key.slice(IPNS_PREFIX.length))
 }
 
-export const createCborData = (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array, sequence: bigint, ttl: bigint): Uint8Array => {
+export const createCborData = (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array, sequence: bigint, ttl: bigint, kv_data : object = {}): Uint8Array => {
   let ValidityType
 
   if (validityType === IpnsEntry.ValidityType.EOL) {
@@ -178,7 +178,8 @@ export const createCborData = (value: Uint8Array, validityType: IpnsEntry.Validi
     Validity: validity,
     ValidityType,
     Sequence: sequence,
-    TTL: ttl
+    TTL: ttl,
+    data : kv_data
   }
 
   return cborg.encode(data)
