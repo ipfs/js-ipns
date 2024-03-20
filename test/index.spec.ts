@@ -32,6 +32,7 @@ describe('ipns', function () {
 
   it('should create an ipns record (V1+V2) correctly', async () => {
     const sequence = 0
+    const ttl = BigInt(3.6e+12)
     const validity = 1000000
 
     const record = await ipns.create(peerId, contentPath, sequence, validity)
@@ -40,7 +41,7 @@ describe('ipns', function () {
     expect(record.validityType).to.equal(IpnsEntry.ValidityType.EOL)
     expect(record.validity).to.exist()
     expect(record.sequence).to.equal(BigInt(0))
-    expect(record.ttl).to.equal(BigInt(validity * 100000))
+    expect(record.ttl).to.equal(ttl)
     expect(record.signatureV1).to.exist()
     expect(record.signatureV2).to.exist()
     expect(record.data).to.exist()
@@ -51,7 +52,7 @@ describe('ipns', function () {
     expect(pb.validityType).to.equal(IpnsEntry.ValidityType.EOL)
     expect(pb.validity).to.exist()
     expect(pb.sequence).to.equal(BigInt(sequence))
-    expect(pb.ttl).to.equal(BigInt(validity * 100000))
+    expect(pb.ttl).to.equal(ttl)
     expect(pb.signatureV1).to.exist()
     expect(pb.signatureV2).to.exist()
     expect(pb.data).to.exist()
@@ -67,6 +68,7 @@ describe('ipns', function () {
 
   it('should create an ipns record (V2) correctly', async () => {
     const sequence = 0
+    const ttl = BigInt(3.6e+12)
     const validity = 1000000
 
     const record = await ipns.create(peerId, contentPath, sequence, validity, { v1Compatible: false })
@@ -75,7 +77,7 @@ describe('ipns', function () {
     expect(record.validityType).to.equal(IpnsEntry.ValidityType.EOL)
     expect(record.validity).to.exist()
     expect(record.sequence).to.equal(BigInt(0))
-    expect(record.ttl).to.equal(BigInt(validity * 100000))
+    expect(record.ttl).to.equal(ttl)
     expect(record.signatureV2).to.exist()
     expect(record).to.not.have.property('signatureV1')
     expect(record.data).to.exist()
@@ -97,7 +99,7 @@ describe('ipns', function () {
     expect(data.ValidityType).to.equal(IpnsEntry.ValidityType.EOL)
     expect(data.Validity).to.exist()
     expect(data.Sequence).to.equal(BigInt(sequence))
-    expect(data.TTL).to.equal(BigInt(validity * 100000))
+    expect(data.TTL).to.equal(ttl)
   })
 
   it('should be able to create a record (V1+V2) with a fixed expiration', async () => {
@@ -128,6 +130,43 @@ describe('ipns', function () {
 
     const data = parseCborData(pb.data ?? new Uint8Array(0))
     expect(data.Validity).to.equalBytes(uint8ArrayFromString(expiration))
+  })
+
+  it('should be able to create a record (V1+V2) with a fixed ttl', async () => {
+    const sequence = 0
+    const ttl = BigInt(0.6e+12)
+    const validity = 1000000
+
+    const record = await ipns.create(peerId, contentPath, sequence, validity, {
+      ttlNs: ttl,
+    })
+    const marshalledRecord = ipns.marshal(record)
+
+    await ipnsValidator(peerIdToRoutingKey(peerId), marshalledRecord)
+
+    const pb = IpnsEntry.decode(marshalledRecord)
+    const data = parseCborData(pb.data ?? new Uint8Array(0))
+    expect(data.TTL).to.equal(ttl)
+  })
+
+  it('should be able to create a record (V2) with a fixed ttl', async () => {
+    const sequence = 0
+    const ttl = BigInt(1.6e+12)
+    const validity = 1000000
+
+    const record = await ipns.create(peerId, contentPath, sequence, validity,{
+      ttlNs: ttl,
+      v1Compatible: false
+    })
+    const marshalledRecord = ipns.marshal(record)
+
+    await ipnsValidator(peerIdToRoutingKey(peerId), marshalledRecord)
+
+    const pb = IpnsEntry.decode(ipns.marshal(record))
+    expect(pb).to.not.have.property('ttl')
+
+    const data = parseCborData(pb.data ?? new Uint8Array(0))
+    expect(data.TTL).to.equal(ttl)
   })
 
   it('should create an ipns record (V1+V2) and validate it correctly', async () => {

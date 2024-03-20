@@ -170,7 +170,7 @@ export async function create (peerId: PeerId, value: CID | PeerId | string, seq:
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = IpnsEntry.ValidityType.EOL
-  const ttlNs = typeof options.ttlNs !== "undefined" ? BigInt(options.ttlNs) : DEFAULT_TTL_NS
+  const ttlNs = typeof options.ttlNs !== 'undefined' ? BigInt(options.ttlNs) : DEFAULT_TTL_NS
 
   return _create(peerId, value, seq, validityType, expirationDate.toString(), ttlNs, options)
 }
@@ -197,7 +197,7 @@ export async function createWithExpiration (peerId: PeerId, value: CID | PeerId 
 export async function createWithExpiration (peerId: PeerId, value: CID | PeerId | string, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> {
   const expirationDate = NanoDate.fromString(expiration)
   const validityType = IpnsEntry.ValidityType.EOL
-  const ttlNs = typeof options.ttlNs !== "undefined" ? BigInt(options.ttlNs) : DEFAULT_TTL_NS
+  const ttlNs = typeof options.ttlNs !== 'undefined' ? BigInt(options.ttlNs) : DEFAULT_TTL_NS
 
   return _create(peerId, value, seq, validityType, expirationDate.toString(), ttlNs, options)
 }
