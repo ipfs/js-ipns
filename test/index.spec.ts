@@ -138,7 +138,7 @@ describe('ipns', function () {
     const validity = 1000000
 
     const record = await ipns.create(peerId, contentPath, sequence, validity, {
-      ttlNs: ttl,
+      ttlNs: ttl
     })
     const marshalledRecord = ipns.marshal(record)
 
@@ -154,7 +154,7 @@ describe('ipns', function () {
     const ttl = BigInt(1.6e+12)
     const validity = 1000000
 
-    const record = await ipns.create(peerId, contentPath, sequence, validity,{
+    const record = await ipns.create(peerId, contentPath, sequence, validity, {
       ttlNs: ttl,
       v1Compatible: false
     })
