@@ -16,7 +16,7 @@ import type { CID } from 'multiformats/cid'
 
 const log = logger('ipns')
 const ID_MULTIHASH_CODE = identity.code
-const DEFAULT_TTL_NS = BigInt(3.6e+12) // 1 Hour or 3600 Seconds
+const DEFAULT_TTL_NS = 60 * 60 * 1e+9 // 1 Hour or 3600 Seconds
 
 export const namespace = '/ipns/'
 export const namespaceLength = namespace.length
@@ -129,7 +129,7 @@ export interface IDKeys {
 }
 
 export interface CreateOptions {
-  ttlNs?: bigint
+  ttlNs?: number | bigint
   v1Compatible?: boolean
 }
 
