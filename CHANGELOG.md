@@ -1,3 +1,18 @@
+## [9.1.0](https://github.com/ipfs/js-ipns/compare/v9.0.0...v9.1.0) (2024-04-02)
+
+
+### Features
+
+* change default TTL and add support for custom TTL ([#1](https://github.com/ipfs/js-ipns/issues/1)) ([#308](https://github.com/ipfs/js-ipns/issues/308)) ([d647529](https://github.com/ipfs/js-ipns/commit/d6475290941f356989847f6ab6b29c94a81039eb)), closes [/specs.ipfs.tech/ipns/ipns-record/#ttl-uint64](https://github.com/ipfs//specs.ipfs.tech/ipns/ipns-record//issues/ttl-uint64) [#310](https://github.com/ipfs/js-ipns/issues/310)
+
+
+### Trivial Changes
+
+* add or force update .github/workflows/js-test-and-release.yml ([#311](https://github.com/ipfs/js-ipns/issues/311)) ([0c5f3e1](https://github.com/ipfs/js-ipns/commit/0c5f3e1b22b2c8b7c2653eb1dc4db35050f14ba4))
+* add or force update .github/workflows/js-test-and-release.yml ([#312](https://github.com/ipfs/js-ipns/issues/312)) ([46a2b72](https://github.com/ipfs/js-ipns/commit/46a2b729fc984adea14d165dd800ec92abc45701))
+* add or force update .github/workflows/js-test-and-release.yml ([#313](https://github.com/ipfs/js-ipns/issues/313)) ([e933496](https://github.com/ipfs/js-ipns/commit/e933496d93e553662b968019b57a2f8413fbefc6))
+* Update .github/workflows/stale.yml [skip ci] ([16e0e10](https://github.com/ipfs/js-ipns/commit/16e0e10682fa9a663e0bb493a44d3e99a5200944))
+
 ## [9.0.0](https://github.com/ipfs/js-ipns/compare/v8.0.4...v9.0.0) (2024-01-18)
 
 
