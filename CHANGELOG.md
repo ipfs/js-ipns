@@ -1,3 +1,9 @@
+## [9.1.1](https://github.com/ipfs/js-ipns/compare/v9.1.0...v9.1.1) (2024-09-11)
+
+### Dependencies
+
+* **dev:** bump aegir from 42.2.11 to 44.1.1 ([#321](https://github.com/ipfs/js-ipns/issues/321)) ([e06942b](https://github.com/ipfs/js-ipns/commit/e06942b1bf8a73ac0f30137a285146f03868152a))
+
 ## [9.1.0](https://github.com/ipfs/js-ipns/compare/v9.0.0...v9.1.0) (2024-04-02)
 
 
