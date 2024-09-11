@@ -356,6 +356,7 @@ describe('ipns', function () {
 
     keys.forEach(key => {
       const digest = Digest.decode(base58btc.decode(`z${key}`))
+      // @ts-expect-error digest may have the wrong hash type
       const routingKey = multihashToIPNSRoutingKey(digest)
       const id = multihashFromIPNSRoutingKey(routingKey)
 

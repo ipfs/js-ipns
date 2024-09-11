@@ -139,7 +139,7 @@ export const publicKeyToIPNSRoutingKey = (publicKey: PublicKey): Uint8Array => {
   return multihashToIPNSRoutingKey(publicKey.toMultihash())
 }
 
-export const multihashToIPNSRoutingKey = (digest: MultihashDigest): Uint8Array => {
+export const multihashToIPNSRoutingKey = (digest: MultihashDigest<0x00 | 0x12>): Uint8Array => {
   return uint8ArrayConcat([
     IPNS_PREFIX,
     digest.bytes
@@ -153,7 +153,7 @@ export const publicKeyFromIPNSRoutingKey = (key: Uint8Array): Ed25519PublicKey |
   } catch {}
 }
 
-export const multihashFromIPNSRoutingKey = (key: Uint8Array): MultihashDigest<0x00> | MultihashDigest<0x12> => {
+export const multihashFromIPNSRoutingKey = (key: Uint8Array): MultihashDigest<0x00 | 0x12> => {
   const digest = Digest.decode(key.slice(IPNS_PREFIX.length))
 
   if (digest.code !== 0x00 && digest.code !== 0x12) {
