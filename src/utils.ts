@@ -1,60 +1,42 @@
-import { unmarshalPublicKey } from '@libp2p/crypto/keys'
-import { isPeerId } from '@libp2p/interface'
+import { publicKeyFromMultihash, publicKeyFromProtobuf } from '@libp2p/crypto/keys'
+import { InvalidMultihashError } from '@libp2p/interface'
 import { logger } from '@libp2p/logger'
-import { peerIdFromBytes, peerIdFromKeys } from '@libp2p/peer-id'
 import * as cborg from 'cborg'
-import errCode from 'err-code'
 import { base36 } from 'multiformats/bases/base36'
-import { CID } from 'multiformats/cid'
+import { CID, type MultihashDigest } from 'multiformats/cid'
+import * as Digest from 'multiformats/hashes/digest'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
-import * as ERRORS from './errors.js'
+import { InvalidRecordDataError, InvalidValueError, SignatureVerificationError, UnsupportedValidityError } from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import type { IPNSRecord, IPNSRecordV2, IPNSRecordData } from './index.js'
-import type { PublicKey, PeerId } from '@libp2p/interface'
+import type { PublicKey, Ed25519PublicKey, Secp256k1PublicKey } from '@libp2p/interface'
 
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
 const LIBP2P_CID_CODEC = 114
 
 /**
- * Extracts a public key from the passed PeerId, falling
- * back to the pubKey embedded in the ipns record
+ * Extracts a public key from the passed PeerId, falling back to the pubKey
+ * embedded in the ipns record
  */
-export const extractPublicKey = async (peerId: PeerId, record: IPNSRecord | IPNSRecordV2): Promise<PublicKey> => {
-  if (record == null || peerId == null) {
-    const error = new Error('one or more of the provided parameters are not defined')
-
-    log.error(error)
-    throw errCode(error, ERRORS.ERR_UNDEFINED_PARAMETER)
-  }
-
+export const extractPublicKeyFromIPNSRecord = (record: IPNSRecord | IPNSRecordV2): PublicKey | undefined => {
   let pubKey: PublicKey | undefined
 
   if (record.pubKey != null) {
     try {
-      pubKey = unmarshalPublicKey(record.pubKey)
+      pubKey = publicKeyFromProtobuf(record.pubKey)
     } catch (err) {
       log.error(err)
       throw err
     }
-
-    const otherId = await peerIdFromKeys(record.pubKey)
-
-    if (!otherId.equals(peerId)) {
-      throw errCode(new Error('Embedded public key did not match PeerID'), ERRORS.ERR_INVALID_EMBEDDED_KEY)
-    }
-  } else if (peerId.publicKey != null) {
-    pubKey = unmarshalPublicKey(peerId.publicKey)
   }
 
   if (pubKey != null) {
     return pubKey
   }
-
-  throw errCode(new Error('no public key is available'), ERRORS.ERR_UNDEFINED_PARAMETER)
 }
 
 /**
@@ -75,7 +57,7 @@ export const ipnsRecordDataForV2Sig = (data: Uint8Array): Uint8Array => {
   return uint8ArrayConcat([entryData, data])
 }
 
-export const marshal = (obj: IPNSRecord | IPNSRecordV2): Uint8Array => {
+export const marshalIPNSRecord = (obj: IPNSRecord | IPNSRecordV2): Uint8Array => {
   if ('signatureV1' in obj) {
     return IpnsEntry.encode({
       value: uint8ArrayFromString(obj.value),
@@ -97,7 +79,7 @@ export const marshal = (obj: IPNSRecord | IPNSRecordV2): Uint8Array => {
   }
 }
 
-export function unmarshal (buf: Uint8Array): IPNSRecord {
+export function unmarshalIPNSRecord (buf: Uint8Array): IPNSRecord {
   const message = IpnsEntry.decode(buf)
 
   // protobufjs returns bigints as numbers
@@ -114,7 +96,7 @@ export function unmarshal (buf: Uint8Array): IPNSRecord {
   // V1+V2 records for quite a while and we don't support V1-only records during
   // validation any more
   if (message.signatureV2 == null || message.data == null) {
-    throw errCode(new Error('missing data or signatureV2'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Missing data or signatureV2')
   }
 
   const data = parseCborData(message.data)
@@ -153,15 +135,33 @@ export function unmarshal (buf: Uint8Array): IPNSRecord {
   }
 }
 
-export const peerIdToRoutingKey = (peerId: PeerId): Uint8Array => {
+export const publicKeyToIPNSRoutingKey = (publicKey: PublicKey): Uint8Array => {
+  return multihashToIPNSRoutingKey(publicKey.toMultihash())
+}
+
+export const multihashToIPNSRoutingKey = (digest: MultihashDigest): Uint8Array => {
   return uint8ArrayConcat([
     IPNS_PREFIX,
-    peerId.toBytes()
+    digest.bytes
   ])
 }
 
-export const peerIdFromRoutingKey = (key: Uint8Array): PeerId => {
-  return peerIdFromBytes(key.slice(IPNS_PREFIX.length))
+export const publicKeyFromIPNSRoutingKey = (key: Uint8Array): Ed25519PublicKey | Secp256k1PublicKey | undefined => {
+  try {
+    // @ts-expect-error digest code may not be 0
+    return publicKeyFromMultihash(multihashFromIPNSRoutingKey(key))
+  } catch {}
+}
+
+export const multihashFromIPNSRoutingKey = (key: Uint8Array): MultihashDigest<0x00> | MultihashDigest<0x12> => {
+  const digest = Digest.decode(key.slice(IPNS_PREFIX.length))
+
+  if (digest.code !== 0x00 && digest.code !== 0x12) {
+    throw new InvalidMultihashError('Multihash in IPNS key was not identity or sha2-256')
+  }
+
+  // @ts-expect-error digest may not have correct code even though we just checked
+  return digest
 }
 
 export const createCborData = (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array, sequence: bigint, ttl: bigint): Uint8Array => {
@@ -170,7 +170,7 @@ export const createCborData = (value: Uint8Array, validityType: IpnsEntry.Validi
   if (validityType === IpnsEntry.ValidityType.EOL) {
     ValidityType = 0
   } else {
-    throw errCode(new Error('Unknown validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
+    throw new UnsupportedValidityError('The validity type is unsupported')
   }
 
   const data = {
@@ -190,7 +190,7 @@ export const parseCborData = (buf: Uint8Array): IPNSRecordData => {
   if (data.ValidityType === 0) {
     data.ValidityType = IpnsEntry.ValidityType.EOL
   } else {
-    throw errCode(new Error('Unknown validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
+    throw new UnsupportedValidityError('The validity type is unsupported')
   }
 
   if (Number.isInteger(data.Sequence)) {
@@ -211,10 +211,10 @@ export const parseCborData = (buf: Uint8Array): IPNSRecordData => {
  * string starting with '/'. PeerIDs become `/ipns/${cidV1Libp2pKey}`,
  * CIDs become `/ipfs/${cidAsV1}`.
  */
-export const normalizeValue = (value?: CID | PeerId | string | Uint8Array): string => {
+export const normalizeValue = (value?: CID | PublicKey | string | Uint8Array): string => {
   if (value != null) {
     // if we have a PeerId, turn it into an ipns path
-    if (isPeerId(value)) {
+    if (hasToCID(value)) {
       return `/ipns/${value.toCID().toString(base36)}`
     }
 
@@ -256,33 +256,37 @@ export const normalizeValue = (value?: CID | PeerId | string | Uint8Array): stri
     }
   }
 
-  throw errCode(new Error('Value must be a valid content path starting with /'), ERRORS.ERR_INVALID_VALUE)
+  throw new InvalidValueError('Value must be a valid content path starting with /')
 }
 
 const validateCborDataMatchesPbData = (entry: IpnsEntry): void => {
   if (entry.data == null) {
-    throw errCode(new Error('Record data is missing'), ERRORS.ERR_INVALID_RECORD_DATA)
+    throw new InvalidRecordDataError('Record data is missing')
   }
 
   const data = parseCborData(entry.data)
 
   if (!uint8ArrayEquals(data.Value, entry.value ?? new Uint8Array(0))) {
-    throw errCode(new Error('Field "value" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Field "value" did not match between protobuf and CBOR')
   }
 
   if (!uint8ArrayEquals(data.Validity, entry.validity ?? new Uint8Array(0))) {
-    throw errCode(new Error('Field "validity" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Field "validity" did not match between protobuf and CBOR')
   }
 
   if (data.ValidityType !== entry.validityType) {
-    throw errCode(new Error('Field "validityType" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Field "validityType" did not match between protobuf and CBOR')
   }
 
   if (data.Sequence !== entry.sequence) {
-    throw errCode(new Error('Field "sequence" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Field "sequence" did not match between protobuf and CBOR')
   }
 
   if (data.TTL !== entry.ttl) {
-    throw errCode(new Error('Field "ttl" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Field "ttl" did not match between protobuf and CBOR')
   }
+}
+
+function hasToCID (obj?: any): obj is { toCID(): CID } {
+  return typeof obj?.toCID === 'function'
 }

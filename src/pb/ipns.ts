@@ -4,8 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 /* eslint-disable @typescript-eslint/no-empty-interface */
 
-import { enumeration, encodeMessage, decodeMessage, message } from 'protons-runtime'
-import type { Codec } from 'protons-runtime'
+import { type Codec, decodeMessage, type DecodeOptions, encodeMessage, enumeration, message } from 'protons-runtime'
 import type { Uint8ArrayList } from 'uint8arraylist'
 
 export interface IpnsEntry {
@@ -92,7 +91,7 @@ export namespace IpnsEntry {
         if (opts.lengthDelimited !== false) {
           w.ldelim()
         }
-      }, (reader, length) => {
+      }, (reader, length, opts = {}) => {
         const obj: any = {}
 
         const end = length == null ? reader.len : reader.pos + length
@@ -101,36 +100,46 @@ export namespace IpnsEntry {
           const tag = reader.uint32()
 
           switch (tag >>> 3) {
-            case 1:
+            case 1: {
               obj.value = reader.bytes()
               break
-            case 2:
+            }
+            case 2: {
               obj.signatureV1 = reader.bytes()
               break
-            case 3:
+            }
+            case 3: {
               obj.validityType = IpnsEntry.ValidityType.codec().decode(reader)
               break
-            case 4:
+            }
+            case 4: {
               obj.validity = reader.bytes()
               break
-            case 5:
+            }
+            case 5: {
               obj.sequence = reader.uint64()
               break
-            case 6:
+            }
+            case 6: {
               obj.ttl = reader.uint64()
               break
-            case 7:
+            }
+            case 7: {
               obj.pubKey = reader.bytes()
               break
-            case 8:
+            }
+            case 8: {
               obj.signatureV2 = reader.bytes()
               break
-            case 9:
+            }
+            case 9: {
               obj.data = reader.bytes()
               break
-            default:
+            }
+            default: {
               reader.skipType(tag & 7)
               break
+            }
           }
         }
 
@@ -145,7 +154,7 @@ export namespace IpnsEntry {
     return encodeMessage(obj, IpnsEntry.codec())
   }
 
-  export const decode = (buf: Uint8Array | Uint8ArrayList): IpnsEntry => {
-    return decodeMessage(buf, IpnsEntry.codec())
+  export const decode = (buf: Uint8Array | Uint8ArrayList, opts?: DecodeOptions<IpnsEntry>): IpnsEntry => {
+    return decodeMessage(buf, IpnsEntry.codec(), opts)
   }
 }
