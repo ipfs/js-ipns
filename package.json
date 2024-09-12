@@ -166,23 +166,21 @@
     "docs:no-publish": "NODE_OPTIONS=--max_old_space_size=8192 aegir docs --publish false"
   },
   "dependencies": {
-    "@libp2p/crypto": "^4.0.0",
-    "@libp2p/interface": "^1.1.0",
-    "@libp2p/logger": "^4.0.3",
-    "@libp2p/peer-id": "^4.0.3",
-    "cborg": "^4.0.1",
-    "err-code": "^3.0.1",
-    "interface-datastore": "^8.1.0",
-    "multiformats": "^13.0.0",
-    "protons-runtime": "^5.2.1",
-    "timestamp-nano": "^1.0.0",
+    "@libp2p/crypto": "^5.0.0",
+    "@libp2p/interface": "^2.0.0",
+    "@libp2p/logger": "^5.0.0",
+    "cborg": "^4.2.3",
+    "interface-datastore": "^8.3.0",
+    "multiformats": "^13.2.2",
+    "protons-runtime": "^5.5.0",
+    "timestamp-nano": "^1.0.1",
     "uint8arraylist": "^2.4.8",
-    "uint8arrays": "^5.0.1"
+    "uint8arrays": "^5.1.0"
   },
   "devDependencies": {
-    "@libp2p/peer-id-factory": "^4.0.2",
+    "@libp2p/peer-id": "^5.0.0",
     "aegir": "^44.1.1",
-    "protons": "^7.3.3"
+    "protons": "^7.6.0"
   },
   "sideEffects": false
 }

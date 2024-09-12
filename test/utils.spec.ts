@@ -2,7 +2,7 @@ import { peerIdFromString } from '@libp2p/peer-id'
 import { expect } from 'aegir/chai'
 import { CID } from 'multiformats/cid'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
-import { normalizeValue, peerIdFromRoutingKey, peerIdToRoutingKey } from '../src/utils.js'
+import { normalizeValue, multihashFromIPNSRoutingKey, multihashToIPNSRoutingKey, normalizeByteValue } from '../src/utils.js'
 import type { PeerId } from '@libp2p/interface'
 
 describe('utils', () => {
@@ -40,8 +40,18 @@ describe('utils', () => {
       'string path': {
         input: '/hello',
         output: '/hello'
-      },
+      }
+    }
 
+    Object.entries(cases).forEach(([name, { input, output }]) => {
+      it(`should normalize a ${name}`, async () => {
+        expect(normalizeValue(await input)).to.equal(output)
+      })
+    })
+  })
+
+  describe('normalizeByteValue', () => {
+    const cases: Record<string, { input: Uint8Array, output: string }> = {
       // Uint8Array input
       'v0 CID bytes': {
         input: CID.parse('QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq').bytes,
@@ -74,8 +84,8 @@ describe('utils', () => {
     }
 
     Object.entries(cases).forEach(([name, { input, output }]) => {
-      it(`should normalize a ${name}`, async () => {
-        expect(normalizeValue(await input)).to.equal(output)
+      it(`should normalize a ${name}`, () => {
+        expect(normalizeByteValue(input)).to.equal(output)
       })
     })
   })
@@ -89,10 +99,10 @@ describe('utils', () => {
 
     Object.entries(cases).forEach(([name, input]) => {
       it(`should round trip a ${name} key`, async () => {
-        const key = peerIdToRoutingKey(input)
-        const output = peerIdFromRoutingKey(key)
+        const key = multihashToIPNSRoutingKey(input.toMultihash())
+        const output = multihashFromIPNSRoutingKey(key)
 
-        expect(input.equals(output)).to.be.true()
+        expect(input.toMultihash().bytes).to.equalBytes(output.bytes)
       })
     })
   })

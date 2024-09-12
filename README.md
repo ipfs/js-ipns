@@ -16,7 +16,6 @@
   - [Validate record](#validate-record)
   - [Embed public key to record](#embed-public-key-to-record)
   - [Extract public key from record](#extract-public-key-from-record)
-  - [Datastore key](#datastore-key)
   - [Marshal data with proto buffer](#marshal-data-with-proto-buffer)
   - [Unmarshal data from proto buffer](#unmarshal-data-from-proto-buffer)
   - [Validator](#validator)
@@ -80,20 +79,6 @@ const ipnsRecordWithEmbeddedPublicKey = await ipns.embedPublicKey(publicKey, ipn
 import * as ipns from 'ipns'
 
 const publicKey = await ipns.extractPublicKey(peerId, ipnsRecord)
-```
-
-### Datastore key
-
-```js
-import * as ipns from 'ipns'
-
-ipns.getLocalKey(peerId)
-```
-
-Returns a key to be used for storing the IPNS record locally, that is:
-
-```
-/ipns/${base32(<HASH>)}
 ```
 
 ### Marshal data with proto buffer

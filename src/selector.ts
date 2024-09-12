@@ -1,10 +1,10 @@
 import NanoDate from 'timestamp-nano'
 import { IpnsEntry } from './pb/ipns.js'
-import { unmarshal } from './utils.js'
+import { unmarshalIPNSRecord } from './utils.js'
 
 export function ipnsSelector (key: Uint8Array, data: Uint8Array[]): number {
   const entries = data.map((buf, index) => ({
-    record: unmarshal(buf),
+    record: unmarshalIPNSRecord(buf),
     index
   }))
 

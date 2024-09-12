@@ -1,13 +1,71 @@
-export const ERR_IPNS_EXPIRED_RECORD = 'ERR_IPNS_EXPIRED_RECORD'
-export const ERR_UNRECOGNIZED_VALIDITY = 'ERR_UNRECOGNIZED_VALIDITY'
-export const ERR_SIGNATURE_CREATION = 'ERR_SIGNATURE_CREATION'
-export const ERR_SIGNATURE_VERIFICATION = 'ERR_SIGNATURE_VERIFICATION'
-export const ERR_UNRECOGNIZED_FORMAT = 'ERR_UNRECOGNIZED_FORMAT'
-export const ERR_PEER_ID_FROM_PUBLIC_KEY = 'ERR_PEER_ID_FROM_PUBLIC_KEY'
-export const ERR_PUBLIC_KEY_FROM_ID = 'ERR_PUBLIC_KEY_FROM_ID'
-export const ERR_UNDEFINED_PARAMETER = 'ERR_UNDEFINED_PARAMETER'
-export const ERR_INVALID_RECORD_DATA = 'ERR_INVALID_RECORD_DATA'
-export const ERR_INVALID_VALUE = 'ERR_INVALID_VALUE'
-export const ERR_INVALID_EMBEDDED_KEY = 'ERR_INVALID_EMBEDDED_KEY'
-export const ERR_MISSING_PRIVATE_KEY = 'ERR_MISSING_PRIVATE_KEY'
-export const ERR_RECORD_TOO_LARGE = 'ERR_RECORD_TOO_LARGE'
+export class SignatureCreationError extends Error {
+  static name = 'SignatureCreationError'
+
+  constructor (message = 'Record signature creation failed') {
+    super(message)
+    this.name = 'SignatureCreationError'
+  }
+}
+
+export class SignatureVerificationError extends Error {
+  static name = 'SignatureVerificationError'
+
+  constructor (message = 'Record signature verification failed') {
+    super(message)
+    this.name = 'SignatureVerificationError'
+  }
+}
+
+export class RecordExpiredError extends Error {
+  static name = 'RecordExpiredError'
+
+  constructor (message = 'Record has expired') {
+    super(message)
+    this.name = 'RecordExpiredError'
+  }
+}
+
+export class UnsupportedValidityError extends Error {
+  static name = 'UnsupportedValidityError'
+
+  constructor (message = 'The validity type is unsupported') {
+    super(message)
+    this.name = 'UnsupportedValidityError'
+  }
+}
+
+export class RecordTooLargeError extends Error {
+  static name = 'RecordTooLargeError'
+
+  constructor (message = 'The record is too large') {
+    super(message)
+    this.name = 'RecordTooLargeError'
+  }
+}
+
+export class InvalidValueError extends Error {
+  static name = 'InvalidValueError'
+
+  constructor (message = 'Value must be a valid content path starting with /') {
+    super(message)
+    this.name = 'InvalidValueError'
+  }
+}
+
+export class InvalidRecordDataError extends Error {
+  static name = 'InvalidRecordDataError'
+
+  constructor (message = 'Invalid record data') {
+    super(message)
+    this.name = 'InvalidRecordDataError'
+  }
+}
+
+export class InvalidEmbeddedPublicKeyError extends Error {
+  static name = 'InvalidEmbeddedPublicKeyError'
+
+  constructor (message = 'Invalid embedded public key') {
+    super(message)
+    this.name = 'InvalidEmbeddedPublicKeyError'
+  }
+}

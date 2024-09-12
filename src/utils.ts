@@ -1,66 +1,50 @@
-import { unmarshalPublicKey } from '@libp2p/crypto/keys'
-import { isPeerId } from '@libp2p/interface'
+import { publicKeyFromProtobuf } from '@libp2p/crypto/keys'
+import { InvalidMultihashError } from '@libp2p/interface'
 import { logger } from '@libp2p/logger'
-import { peerIdFromBytes, peerIdFromKeys } from '@libp2p/peer-id'
 import * as cborg from 'cborg'
-import errCode from 'err-code'
 import { base36 } from 'multiformats/bases/base36'
-import { CID } from 'multiformats/cid'
+import { CID, type MultihashDigest } from 'multiformats/cid'
+import * as Digest from 'multiformats/hashes/digest'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
-import * as ERRORS from './errors.js'
+import { InvalidRecordDataError, InvalidValueError, SignatureVerificationError, UnsupportedValidityError } from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import type { IPNSRecord, IPNSRecordV2, IPNSRecordData } from './index.js'
-import type { PublicKey, PeerId } from '@libp2p/interface'
+import type { PublicKey } from '@libp2p/interface'
 
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
-const LIBP2P_CID_CODEC = 114
+const LIBP2P_CID_CODEC = 0x72
+const IDENTITY_CODEC = 0x0
+const SHA2_256_CODEC = 0x12
 
 /**
- * Extracts a public key from the passed PeerId, falling
- * back to the pubKey embedded in the ipns record
+ * Extracts a public key from the passed PeerId, falling back to the pubKey
+ * embedded in the ipns record
  */
-export const extractPublicKey = async (peerId: PeerId, record: IPNSRecord | IPNSRecordV2): Promise<PublicKey> => {
-  if (record == null || peerId == null) {
-    const error = new Error('one or more of the provided parameters are not defined')
-
-    log.error(error)
-    throw errCode(error, ERRORS.ERR_UNDEFINED_PARAMETER)
-  }
-
+export function extractPublicKeyFromIPNSRecord (record: IPNSRecord | IPNSRecordV2): PublicKey | undefined {
   let pubKey: PublicKey | undefined
 
   if (record.pubKey != null) {
     try {
-      pubKey = unmarshalPublicKey(record.pubKey)
+      pubKey = publicKeyFromProtobuf(record.pubKey)
     } catch (err) {
       log.error(err)
       throw err
     }
-
-    const otherId = await peerIdFromKeys(record.pubKey)
-
-    if (!otherId.equals(peerId)) {
-      throw errCode(new Error('Embedded public key did not match PeerID'), ERRORS.ERR_INVALID_EMBEDDED_KEY)
-    }
-  } else if (peerId.publicKey != null) {
-    pubKey = unmarshalPublicKey(peerId.publicKey)
   }
 
   if (pubKey != null) {
     return pubKey
   }
-
-  throw errCode(new Error('no public key is available'), ERRORS.ERR_UNDEFINED_PARAMETER)
 }
 
 /**
  * Utility for creating the record data for being signed
  */
-export const ipnsRecordDataForV1Sig = (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array): Uint8Array => {
+export function ipnsRecordDataForV1Sig (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array): Uint8Array {
   const validityTypeBuffer = uint8ArrayFromString(validityType)
 
   return uint8ArrayConcat([value, validity, validityTypeBuffer])
@@ -69,13 +53,13 @@ export const ipnsRecordDataForV1Sig = (value: Uint8Array, validityType: IpnsEntr
 /**
  * Utility for creating the record data for being signed
  */
-export const ipnsRecordDataForV2Sig = (data: Uint8Array): Uint8Array => {
+export function ipnsRecordDataForV2Sig (data: Uint8Array): Uint8Array {
   const entryData = uint8ArrayFromString('ipns-signature:')
 
   return uint8ArrayConcat([entryData, data])
 }
 
-export const marshal = (obj: IPNSRecord | IPNSRecordV2): Uint8Array => {
+export function marshalIPNSRecord (obj: IPNSRecord | IPNSRecordV2): Uint8Array {
   if ('signatureV1' in obj) {
     return IpnsEntry.encode({
       value: uint8ArrayFromString(obj.value),
@@ -97,7 +81,7 @@ export const marshal = (obj: IPNSRecord | IPNSRecordV2): Uint8Array => {
   }
 }
 
-export function unmarshal (buf: Uint8Array): IPNSRecord {
+export function unmarshalIPNSRecord (buf: Uint8Array): IPNSRecord {
   const message = IpnsEntry.decode(buf)
 
   // protobufjs returns bigints as numbers
@@ -114,11 +98,11 @@ export function unmarshal (buf: Uint8Array): IPNSRecord {
   // V1+V2 records for quite a while and we don't support V1-only records during
   // validation any more
   if (message.signatureV2 == null || message.data == null) {
-    throw errCode(new Error('missing data or signatureV2'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Missing data or signatureV2')
   }
 
   const data = parseCborData(message.data)
-  const value = normalizeValue(data.Value)
+  const value = normalizeByteValue(data.Value)
   const validity = uint8ArrayToString(data.Validity)
 
   if (message.value != null && message.signatureV1 != null) {
@@ -153,24 +137,30 @@ export function unmarshal (buf: Uint8Array): IPNSRecord {
   }
 }
 
-export const peerIdToRoutingKey = (peerId: PeerId): Uint8Array => {
+export function multihashToIPNSRoutingKey (digest: MultihashDigest<0x00 | 0x12>): Uint8Array {
   return uint8ArrayConcat([
     IPNS_PREFIX,
-    peerId.toBytes()
+    digest.bytes
   ])
 }
 
-export const peerIdFromRoutingKey = (key: Uint8Array): PeerId => {
-  return peerIdFromBytes(key.slice(IPNS_PREFIX.length))
+export function multihashFromIPNSRoutingKey (key: Uint8Array): MultihashDigest<0x00 | 0x12> {
+  const digest = Digest.decode(key.slice(IPNS_PREFIX.length))
+
+  if (!isCodec(digest, IDENTITY_CODEC) && !isCodec(digest, SHA2_256_CODEC)) {
+    throw new InvalidMultihashError('Multihash in IPNS key was not identity or sha2-256')
+  }
+
+  return digest
 }
 
-export const createCborData = (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array, sequence: bigint, ttl: bigint): Uint8Array => {
+export function createCborData (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array, sequence: bigint, ttl: bigint): Uint8Array {
   let ValidityType
 
   if (validityType === IpnsEntry.ValidityType.EOL) {
     ValidityType = 0
   } else {
-    throw errCode(new Error('Unknown validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
+    throw new UnsupportedValidityError('The validity type is unsupported')
   }
 
   const data = {
@@ -184,13 +174,13 @@ export const createCborData = (value: Uint8Array, validityType: IpnsEntry.Validi
   return cborg.encode(data)
 }
 
-export const parseCborData = (buf: Uint8Array): IPNSRecordData => {
+export function parseCborData (buf: Uint8Array): IPNSRecordData {
   const data = cborg.decode(buf)
 
   if (data.ValidityType === 0) {
     data.ValidityType = IpnsEntry.ValidityType.EOL
   } else {
-    throw errCode(new Error('Unknown validity type'), ERRORS.ERR_UNRECOGNIZED_VALIDITY)
+    throw new UnsupportedValidityError('The validity type is unsupported')
   }
 
   if (Number.isInteger(data.Sequence)) {
@@ -206,35 +196,40 @@ export const parseCborData = (buf: Uint8Array): IPNSRecordData => {
   return data
 }
 
+export function normalizeByteValue (value: Uint8Array): string {
+  const string = uint8ArrayToString(value).trim()
+
+  // if we have a path, check it is a valid path
+  if (string.startsWith('/')) {
+    return string
+  }
+
+  // try parsing what we have as CID bytes or a CID string
+  try {
+    return `/ipfs/${CID.decode(value).toV1().toString()}`
+  } catch {
+    // fall through
+  }
+
+  try {
+    return `/ipfs/${CID.parse(string).toV1().toString()}`
+  } catch {
+    // fall through
+  }
+
+  throw new InvalidValueError('Value must be a valid content path starting with /')
+}
+
 /**
  * Normalizes the given record value. It ensures it is a PeerID, a CID or a
  * string starting with '/'. PeerIDs become `/ipns/${cidV1Libp2pKey}`,
  * CIDs become `/ipfs/${cidAsV1}`.
  */
-export const normalizeValue = (value?: CID | PeerId | string | Uint8Array): string => {
+export function normalizeValue (value?: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string): string {
   if (value != null) {
-    // if we have a PeerId, turn it into an ipns path
-    if (isPeerId(value)) {
-      return `/ipns/${value.toCID().toString(base36)}`
-    }
-
-    // if the value is bytes, stringify it and see if we have a path
-    if (value instanceof Uint8Array) {
-      const string = uint8ArrayToString(value)
-
-      if (string.startsWith('/')) {
-        value = string
-      }
-    }
-
-    // if we have a path, check it is a valid path
-    const string = value.toString().trim()
-    if (string.startsWith('/') && string.length > 1) {
-      return string
-    }
+    const cid = asCID(value)
 
     // if we have a CID, turn it into an ipfs path
-    const cid = CID.asCID(value)
     if (cid != null) {
       // PeerID encoded as a CID
       if (cid.code === LIBP2P_CID_CODEC) {
@@ -244,45 +239,72 @@ export const normalizeValue = (value?: CID | PeerId | string | Uint8Array): stri
       return `/ipfs/${cid.toV1().toString()}`
     }
 
-    // try parsing what we have as CID bytes or a CID string
-    try {
-      if (value instanceof Uint8Array) {
-        return `/ipfs/${CID.decode(value).toV1().toString()}`
-      }
+    if (hasBytes(value)) {
+      return `/ipns/${base36.encode(value.bytes)}`
+    }
 
-      return `/ipfs/${CID.parse(string).toV1().toString()}`
-    } catch {
-      // fall through
+    // if we have a path, check it is a valid path
+    const string = value.toString().trim()
+
+    if (string.startsWith('/') && string.length > 1) {
+      return string
     }
   }
 
-  throw errCode(new Error('Value must be a valid content path starting with /'), ERRORS.ERR_INVALID_VALUE)
+  throw new InvalidValueError('Value must be a valid content path starting with /')
 }
 
-const validateCborDataMatchesPbData = (entry: IpnsEntry): void => {
+function validateCborDataMatchesPbData (entry: IpnsEntry): void {
   if (entry.data == null) {
-    throw errCode(new Error('Record data is missing'), ERRORS.ERR_INVALID_RECORD_DATA)
+    throw new InvalidRecordDataError('Record data is missing')
   }
 
   const data = parseCborData(entry.data)
 
   if (!uint8ArrayEquals(data.Value, entry.value ?? new Uint8Array(0))) {
-    throw errCode(new Error('Field "value" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Field "value" did not match between protobuf and CBOR')
   }
 
   if (!uint8ArrayEquals(data.Validity, entry.validity ?? new Uint8Array(0))) {
-    throw errCode(new Error('Field "validity" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Field "validity" did not match between protobuf and CBOR')
   }
 
   if (data.ValidityType !== entry.validityType) {
-    throw errCode(new Error('Field "validityType" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Field "validityType" did not match between protobuf and CBOR')
   }
 
   if (data.Sequence !== entry.sequence) {
-    throw errCode(new Error('Field "sequence" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Field "sequence" did not match between protobuf and CBOR')
   }
 
   if (data.TTL !== entry.ttl) {
-    throw errCode(new Error('Field "ttl" did not match between protobuf and CBOR'), ERRORS.ERR_SIGNATURE_VERIFICATION)
+    throw new SignatureVerificationError('Field "ttl" did not match between protobuf and CBOR')
   }
+}
+
+function hasBytes (obj?: any): obj is { bytes: Uint8Array } {
+  return obj.bytes instanceof Uint8Array
+}
+
+function hasToCID (obj?: any): obj is { toCID(): CID } {
+  return typeof obj?.toCID === 'function'
+}
+
+function asCID (obj?: any): CID | null {
+  if (hasToCID(obj)) {
+    return obj.toCID()
+  }
+
+  // try parsing as a CID string
+  try {
+    return CID.parse(obj)
+  } catch {
+    // fall through
+  }
+
+  return CID.asCID(obj)
+}
+
+export function isCodec <T extends number> (digest: MultihashDigest, codec: T): digest is MultihashDigest<T> {
+  return digest.code === codec
 }
