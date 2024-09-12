@@ -8,6 +8,7 @@ import { IpnsEntry } from './pb/ipns.js'
 import { createCborData, ipnsRecordDataForV1Sig, ipnsRecordDataForV2Sig, normalizeValue } from './utils.js'
 import type { PrivateKey, PublicKey } from '@libp2p/interface'
 import type { CID } from 'multiformats/cid'
+import type { MultihashDigest } from 'multiformats/hashes/interface'
 
 const log = logger('ipns')
 const DEFAULT_TTL_NS = 60 * 60 * 1e+9 // 1 Hour or 3600 Seconds
@@ -157,10 +158,10 @@ const defaultCreateOptions: CreateOptions = {
  * @param {number} lifetime - lifetime of the record (in milliseconds).
  * @param {CreateOptions} options - additional create options.
  */
-export async function createIPNSRecord (privateKey: PrivateKey, value: CID | PublicKey | string, seq: number | bigint, lifetime: number, options?: CreateV2OrV1Options): Promise<IPNSRecordV1V2>
-export async function createIPNSRecord (privateKey: PrivateKey, value: CID | PublicKey | string, seq: number | bigint, lifetime: number, options: CreateV2Options): Promise<IPNSRecordV2>
-export async function createIPNSRecord (privateKey: PrivateKey, value: CID | PublicKey | string, seq: number | bigint, lifetime: number, options: CreateOptions): Promise<IPNSRecordV1V2>
-export async function createIPNSRecord (privateKey: PrivateKey, value: CID | PublicKey | string, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> {
+export async function createIPNSRecord (privateKey: PrivateKey, value: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string, seq: number | bigint, lifetime: number, options?: CreateV2OrV1Options): Promise<IPNSRecordV1V2>
+export async function createIPNSRecord (privateKey: PrivateKey, value: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string, seq: number | bigint, lifetime: number, options: CreateV2Options): Promise<IPNSRecordV2>
+export async function createIPNSRecord (privateKey: PrivateKey, value: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string, seq: number | bigint, lifetime: number, options: CreateOptions): Promise<IPNSRecordV1V2>
+export async function createIPNSRecord (privateKey: PrivateKey, value: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string, seq: number | bigint, lifetime: number, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> {
   // Validity in ISOString with nanoseconds precision and validity type EOL
   const expirationDate = new NanoDate(Date.now() + Number(lifetime))
   const validityType = IpnsEntry.ValidityType.EOL
@@ -185,10 +186,10 @@ export async function createIPNSRecord (privateKey: PrivateKey, value: CID | Pub
  * @param {string} expiration - expiration datetime for record in the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * @param {CreateOptions} options - additional creation options.
  */
-export async function createIPNSRecordWithExpiration (privateKey: PrivateKey, value: CID | PublicKey | string, seq: number | bigint, expiration: string, options?: CreateV2OrV1Options): Promise<IPNSRecordV1V2>
-export async function createIPNSRecordWithExpiration (privateKey: PrivateKey, value: CID | PublicKey | string, seq: number | bigint, expiration: string, options: CreateV2Options): Promise<IPNSRecordV2>
-export async function createIPNSRecordWithExpiration (privateKey: PrivateKey, value: CID | PublicKey | string, seq: number | bigint, expiration: string, options: CreateOptions): Promise<IPNSRecordV1V2>
-export async function createIPNSRecordWithExpiration (privateKey: PrivateKey, value: CID | PublicKey | string, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> {
+export async function createIPNSRecordWithExpiration (privateKey: PrivateKey, value: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string, seq: number | bigint, expiration: string, options?: CreateV2OrV1Options): Promise<IPNSRecordV1V2>
+export async function createIPNSRecordWithExpiration (privateKey: PrivateKey, value: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string, seq: number | bigint, expiration: string, options: CreateV2Options): Promise<IPNSRecordV2>
+export async function createIPNSRecordWithExpiration (privateKey: PrivateKey, value: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string, seq: number | bigint, expiration: string, options: CreateOptions): Promise<IPNSRecordV1V2>
+export async function createIPNSRecordWithExpiration (privateKey: PrivateKey, value: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string, seq: number | bigint, expiration: string, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> {
   const expirationDate = NanoDate.fromString(expiration)
   const validityType = IpnsEntry.ValidityType.EOL
   const ttlNs = BigInt(options.ttlNs ?? DEFAULT_TTL_NS)
@@ -196,7 +197,7 @@ export async function createIPNSRecordWithExpiration (privateKey: PrivateKey, va
   return _create(privateKey, value, seq, validityType, expirationDate.toString(), ttlNs, options)
 }
 
-const _create = async (privateKey: PrivateKey, value: CID | PublicKey | string, seq: number | bigint, validityType: IpnsEntry.ValidityType, validity: string, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
+const _create = async (privateKey: PrivateKey, value: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string, seq: number | bigint, validityType: IpnsEntry.ValidityType, validity: string, ttl: bigint, options: CreateOptions = defaultCreateOptions): Promise<IPNSRecord> => {
   seq = BigInt(seq)
   const isoValidity = uint8ArrayFromString(validity)
   const normalizedValue = normalizeValue(value)
@@ -254,8 +255,6 @@ export { unmarshalIPNSRecord } from './utils.js'
 export { marshalIPNSRecord } from './utils.js'
 export { multihashToIPNSRoutingKey } from './utils.js'
 export { multihashFromIPNSRoutingKey } from './utils.js'
-export { publicKeyToIPNSRoutingKey } from './utils.js'
-export { publicKeyFromIPNSRoutingKey } from './utils.js'
 export { extractPublicKeyFromIPNSRecord } from './utils.js'
 
 /**

@@ -1,9 +1,10 @@
+import { publicKeyFromMultihash } from '@libp2p/crypto/keys'
 import { logger } from '@libp2p/logger'
 import NanoDate from 'timestamp-nano'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
 import { InvalidEmbeddedPublicKeyError, RecordExpiredError, RecordTooLargeError, SignatureVerificationError, UnsupportedValidityError } from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
-import { extractPublicKeyFromIPNSRecord, ipnsRecordDataForV2Sig, publicKeyFromIPNSRoutingKey, publicKeyToIPNSRoutingKey, unmarshalIPNSRecord } from './utils.js'
+import { extractPublicKeyFromIPNSRecord, ipnsRecordDataForV2Sig, isCodec, multihashFromIPNSRoutingKey, multihashToIPNSRoutingKey, unmarshalIPNSRecord } from './utils.js'
 import type { PublicKey } from '@libp2p/interface'
 
 const log = logger('ipns:validator')
@@ -58,7 +59,13 @@ export async function ipnsValidator (key: Uint8Array, marshalledData: Uint8Array
   }
 
   // try to extract public key from routing key
-  const routingPubKey = publicKeyFromIPNSRoutingKey(key)
+  const routingMultihash = multihashFromIPNSRoutingKey(key)
+  let routingPubKey: PublicKey | undefined
+
+  // identity hash
+  if (isCodec(routingMultihash, 0x0)) {
+    routingPubKey = publicKeyFromMultihash(routingMultihash)
+  }
 
   // extract public key from record
   const receivedRecord = unmarshalIPNSRecord(marshalledData)
@@ -68,7 +75,7 @@ export async function ipnsValidator (key: Uint8Array, marshalledData: Uint8Array
     throw new InvalidEmbeddedPublicKeyError('Could not extract public key from IPNS record or routing key')
   }
 
-  const routingKey = publicKeyToIPNSRoutingKey(recordPubKey)
+  const routingKey = multihashToIPNSRoutingKey(recordPubKey.toMultihash())
 
   if (!uint8ArrayEquals(key, routingKey)) {
     throw new InvalidEmbeddedPublicKeyError('Embedded public key did not match routing key')

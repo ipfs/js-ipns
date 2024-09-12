@@ -5,7 +5,7 @@ import { generateKeyPair, publicKeyToProtobuf } from '@libp2p/crypto/keys'
 import { expect } from 'aegir/chai'
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import { InvalidEmbeddedPublicKeyError, RecordTooLargeError, SignatureVerificationError } from '../src/errors.js'
-import { createIPNSRecord, marshalIPNSRecord, publicKeyToIPNSRoutingKey } from '../src/index.js'
+import { createIPNSRecord, marshalIPNSRecord, multihashToIPNSRoutingKey } from '../src/index.js'
 import { ipnsValidator } from '../src/validator.js'
 import type { PrivateKey } from '@libp2p/interface'
 
@@ -26,7 +26,7 @@ describe('validator', function () {
     const validity = 1000000
     const record = await createIPNSRecord(privateKey1, contentPath, sequence, validity, { v1Compatible: false })
     const marshalledData = marshalIPNSRecord(record)
-    const key = publicKeyToIPNSRoutingKey(privateKey1.publicKey)
+    const key = multihashToIPNSRoutingKey(privateKey1.publicKey.toMultihash())
 
     await ipnsValidator(key, marshalledData)
   })
@@ -36,7 +36,7 @@ describe('validator', function () {
     const validity = 1000000
     const record = await createIPNSRecord(privateKey1, contentPath, sequence, validity, { v1Compatible: true })
     const marshalledData = marshalIPNSRecord(record)
-    const key = publicKeyToIPNSRoutingKey(privateKey1.publicKey)
+    const key = multihashToIPNSRoutingKey(privateKey1.publicKey.toMultihash())
 
     await ipnsValidator(key, marshalledData)
   })
@@ -51,7 +51,7 @@ describe('validator', function () {
     record.value = uint8ArrayToString(randomBytes(record.value?.length ?? 0))
     const marshalledData = marshalIPNSRecord(record)
 
-    const key = publicKeyToIPNSRoutingKey(privateKey1.publicKey)
+    const key = multihashToIPNSRoutingKey(privateKey1.publicKey.toMultihash())
 
     await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected()
       .with.property('name', SignatureVerificationError.name)
@@ -64,7 +64,7 @@ describe('validator', function () {
     const record = await createIPNSRecord(privateKey1, contentPath, sequence, validity)
     const marshalledData = marshalIPNSRecord(record)
 
-    const key = publicKeyToIPNSRoutingKey(privateKey2.publicKey)
+    const key = multihashToIPNSRoutingKey(privateKey2.publicKey.toMultihash())
 
     await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected()
       .with.property('name', InvalidEmbeddedPublicKeyError.name)
@@ -78,7 +78,7 @@ describe('validator', function () {
     record.pubKey = publicKeyToProtobuf(privateKey2.publicKey)
     const marshalledData = marshalIPNSRecord(record)
 
-    const key = publicKeyToIPNSRoutingKey(privateKey1.publicKey)
+    const key = multihashToIPNSRoutingKey(privateKey1.publicKey.toMultihash())
 
     await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected()
       .with.property('name', InvalidEmbeddedPublicKeyError.name)

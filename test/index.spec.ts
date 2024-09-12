@@ -14,7 +14,7 @@ import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { InvalidEmbeddedPublicKeyError, InvalidValueError, RecordExpiredError, SignatureVerificationError } from '../src/errors.js'
 import { createIPNSRecord, createIPNSRecordWithExpiration } from '../src/index.js'
 import { IpnsEntry } from '../src/pb/ipns.js'
-import { extractPublicKeyFromIPNSRecord, parseCborData, createCborData, ipnsRecordDataForV2Sig, marshalIPNSRecord, unmarshalIPNSRecord, publicKeyToIPNSRoutingKey, multihashToIPNSRoutingKey, multihashFromIPNSRoutingKey } from '../src/utils.js'
+import { extractPublicKeyFromIPNSRecord, parseCborData, createCborData, ipnsRecordDataForV2Sig, marshalIPNSRecord, unmarshalIPNSRecord, multihashToIPNSRoutingKey, multihashFromIPNSRoutingKey } from '../src/utils.js'
 import { ipnsValidator } from '../src/validator.js'
 import { kuboRecord } from './fixtures/records.js'
 import type { PrivateKey } from '@libp2p/interface'
@@ -108,7 +108,7 @@ describe('ipns', function () {
     const record = await createIPNSRecordWithExpiration(privateKey, contentPath, sequence, expiration)
     const marshalledRecord = marshalIPNSRecord(record)
 
-    await ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), marshalledRecord)
+    await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalledRecord)
 
     const pb = IpnsEntry.decode(marshalledRecord)
     expect(pb).to.have.property('validity')
@@ -122,7 +122,7 @@ describe('ipns', function () {
     const record = await createIPNSRecordWithExpiration(privateKey, contentPath, sequence, expiration, { v1Compatible: false })
     const marshalledRecord = marshalIPNSRecord(record)
 
-    await ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), marshalledRecord)
+    await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalledRecord)
 
     const pb = IpnsEntry.decode(marshalIPNSRecord(record))
     expect(pb).to.not.have.property('validity')
@@ -141,7 +141,7 @@ describe('ipns', function () {
     })
     const marshalledRecord = marshalIPNSRecord(record)
 
-    await ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), marshalledRecord)
+    await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalledRecord)
 
     const pb = IpnsEntry.decode(marshalledRecord)
     const data = parseCborData(pb.data ?? new Uint8Array(0))
@@ -159,7 +159,7 @@ describe('ipns', function () {
     })
     const marshalledRecord = marshalIPNSRecord(record)
 
-    await ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), marshalledRecord)
+    await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalledRecord)
 
     const pb = IpnsEntry.decode(marshalledRecord)
     expect(pb).to.not.have.property('ttl')
@@ -173,7 +173,7 @@ describe('ipns', function () {
     const validity = 1000000
 
     const record = await createIPNSRecord(privateKey, contentPath, sequence, validity)
-    await ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), marshalIPNSRecord(record))
+    await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalIPNSRecord(record))
   })
 
   it('should create an ipns record (V2) and validate it correctly', async () => {
@@ -181,7 +181,7 @@ describe('ipns', function () {
     const validity = 1000000
 
     const record = await createIPNSRecord(privateKey, contentPath, sequence, validity, { v1Compatible: false })
-    await ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), marshalIPNSRecord(record))
+    await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalIPNSRecord(record))
   })
 
   it('should normalize value when creating an ipns record (arbitrary string path)', async () => {
@@ -281,7 +281,7 @@ describe('ipns', function () {
     // confirm a v1 exists
     expect(pb).to.have.property('signatureV1')
 
-    await expect(ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), IpnsEntry.encode(pb))).to.eventually.be.rejected()
+    await expect(ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), IpnsEntry.encode(pb))).to.eventually.be.rejected()
       .with.property('name', SignatureVerificationError.name)
   })
 
@@ -298,7 +298,7 @@ describe('ipns', function () {
     // confirm a v1 exists
     expect(pb).to.have.property('signatureV1')
 
-    await expect(ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), IpnsEntry.encode(pb))).to.eventually.be.rejected()
+    await expect(ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), IpnsEntry.encode(pb))).to.eventually.be.rejected()
       .with.property('name', SignatureVerificationError.name)
   })
 
@@ -311,7 +311,7 @@ describe('ipns', function () {
     // corrupt the record by changing the value to random bytes
     record.value = uint8ArrayToString(randomBytes(46))
 
-    await expect(ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), marshalIPNSRecord(record))).to.eventually.be.rejected()
+    await expect(ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalIPNSRecord(record))).to.eventually.be.rejected()
       .with.property('name', SignatureVerificationError.name)
   })
 
@@ -323,7 +323,7 @@ describe('ipns', function () {
 
     await new Promise(resolve => setTimeout(resolve, 1))
 
-    await expect(ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), marshalIPNSRecord(record))).to.eventually.be.rejected()
+    await expect(ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalIPNSRecord(record))).to.eventually.be.rejected()
       .with.property('name', RecordExpiredError.name)
   })
 
@@ -345,7 +345,7 @@ describe('ipns', function () {
     expect(createdRecord.signatureV2).to.equalBytes(unmarshalledData.signatureV2)
     expect(createdRecord.data).to.equalBytes(unmarshalledData.data)
 
-    await ipnsValidator(publicKeyToIPNSRoutingKey(privateKey.publicKey), marshalledData)
+    await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalledData)
   })
 
   it('should be able to turn routing key back into id', () => {
@@ -399,7 +399,7 @@ describe('ipns', function () {
     delete record.pubKey
 
     const marshalledData = marshalIPNSRecord(record)
-    const key = publicKeyToIPNSRoutingKey(privateKey.publicKey)
+    const key = multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash())
 
     await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected()
       .with.property('name', InvalidEmbeddedPublicKeyError.name)

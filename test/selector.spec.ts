@@ -2,7 +2,7 @@
 
 import { generateKeyPair } from '@libp2p/crypto/keys'
 import { expect } from 'aegir/chai'
-import { createIPNSRecord, marshalIPNSRecord, publicKeyToIPNSRoutingKey } from '../src/index.js'
+import { createIPNSRecord, marshalIPNSRecord, multihashToIPNSRoutingKey } from '../src/index.js'
 import { ipnsSelector } from '../src/selector.js'
 import type { PrivateKey } from '@libp2p/interface'
 
@@ -26,7 +26,7 @@ describe('selector', function () {
     const marshalledData = marshalIPNSRecord(record)
     const marshalledNewData = marshalIPNSRecord(newRecord)
 
-    const key = publicKeyToIPNSRoutingKey(privateKey.publicKey)
+    const key = multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash())
 
     let valid = ipnsSelector(key, [marshalledNewData, marshalledData])
     expect(valid).to.equal(0) // new data is the selected one
@@ -45,7 +45,7 @@ describe('selector', function () {
     const marshalledData = marshalIPNSRecord(record)
     const marshalledNewData = marshalIPNSRecord(newRecord)
 
-    const key = publicKeyToIPNSRoutingKey(privateKey.publicKey)
+    const key = multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash())
 
     let valid = ipnsSelector(key, [marshalledNewData, marshalledData])
     expect(valid).to.equal(0) // new data is the selected one

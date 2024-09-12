@@ -1,4 +1,4 @@
-import { publicKeyFromMultihash, publicKeyFromProtobuf } from '@libp2p/crypto/keys'
+import { publicKeyFromProtobuf } from '@libp2p/crypto/keys'
 import { InvalidMultihashError } from '@libp2p/interface'
 import { logger } from '@libp2p/logger'
 import * as cborg from 'cborg'
@@ -12,17 +12,19 @@ import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import { InvalidRecordDataError, InvalidValueError, SignatureVerificationError, UnsupportedValidityError } from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import type { IPNSRecord, IPNSRecordV2, IPNSRecordData } from './index.js'
-import type { PublicKey, Ed25519PublicKey, Secp256k1PublicKey } from '@libp2p/interface'
+import type { PublicKey } from '@libp2p/interface'
 
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')
-const LIBP2P_CID_CODEC = 114
+const LIBP2P_CID_CODEC = 0x72
+const IDENTITY_CODEC = 0x0
+const SHA2_256_CODEC = 0x12
 
 /**
  * Extracts a public key from the passed PeerId, falling back to the pubKey
  * embedded in the ipns record
  */
-export const extractPublicKeyFromIPNSRecord = (record: IPNSRecord | IPNSRecordV2): PublicKey | undefined => {
+export function extractPublicKeyFromIPNSRecord (record: IPNSRecord | IPNSRecordV2): PublicKey | undefined {
   let pubKey: PublicKey | undefined
 
   if (record.pubKey != null) {
@@ -42,7 +44,7 @@ export const extractPublicKeyFromIPNSRecord = (record: IPNSRecord | IPNSRecordV2
 /**
  * Utility for creating the record data for being signed
  */
-export const ipnsRecordDataForV1Sig = (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array): Uint8Array => {
+export function ipnsRecordDataForV1Sig (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array): Uint8Array {
   const validityTypeBuffer = uint8ArrayFromString(validityType)
 
   return uint8ArrayConcat([value, validity, validityTypeBuffer])
@@ -51,13 +53,13 @@ export const ipnsRecordDataForV1Sig = (value: Uint8Array, validityType: IpnsEntr
 /**
  * Utility for creating the record data for being signed
  */
-export const ipnsRecordDataForV2Sig = (data: Uint8Array): Uint8Array => {
+export function ipnsRecordDataForV2Sig (data: Uint8Array): Uint8Array {
   const entryData = uint8ArrayFromString('ipns-signature:')
 
   return uint8ArrayConcat([entryData, data])
 }
 
-export const marshalIPNSRecord = (obj: IPNSRecord | IPNSRecordV2): Uint8Array => {
+export function marshalIPNSRecord (obj: IPNSRecord | IPNSRecordV2): Uint8Array {
   if ('signatureV1' in obj) {
     return IpnsEntry.encode({
       value: uint8ArrayFromString(obj.value),
@@ -100,7 +102,7 @@ export function unmarshalIPNSRecord (buf: Uint8Array): IPNSRecord {
   }
 
   const data = parseCborData(message.data)
-  const value = normalizeValue(data.Value)
+  const value = normalizeByteValue(data.Value)
   const validity = uint8ArrayToString(data.Validity)
 
   if (message.value != null && message.signatureV1 != null) {
@@ -135,36 +137,24 @@ export function unmarshalIPNSRecord (buf: Uint8Array): IPNSRecord {
   }
 }
 
-export const publicKeyToIPNSRoutingKey = (publicKey: PublicKey): Uint8Array => {
-  return multihashToIPNSRoutingKey(publicKey.toMultihash())
-}
-
-export const multihashToIPNSRoutingKey = (digest: MultihashDigest<0x00 | 0x12>): Uint8Array => {
+export function multihashToIPNSRoutingKey (digest: MultihashDigest<0x00 | 0x12>): Uint8Array {
   return uint8ArrayConcat([
     IPNS_PREFIX,
     digest.bytes
   ])
 }
 
-export const publicKeyFromIPNSRoutingKey = (key: Uint8Array): Ed25519PublicKey | Secp256k1PublicKey | undefined => {
-  try {
-    // @ts-expect-error digest code may not be 0
-    return publicKeyFromMultihash(multihashFromIPNSRoutingKey(key))
-  } catch {}
-}
-
-export const multihashFromIPNSRoutingKey = (key: Uint8Array): MultihashDigest<0x00 | 0x12> => {
+export function multihashFromIPNSRoutingKey (key: Uint8Array): MultihashDigest<0x00 | 0x12> {
   const digest = Digest.decode(key.slice(IPNS_PREFIX.length))
 
-  if (digest.code !== 0x00 && digest.code !== 0x12) {
+  if (!isCodec(digest, IDENTITY_CODEC) && !isCodec(digest, SHA2_256_CODEC)) {
     throw new InvalidMultihashError('Multihash in IPNS key was not identity or sha2-256')
   }
 
-  // @ts-expect-error digest may not have correct code even though we just checked
   return digest
 }
 
-export const createCborData = (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array, sequence: bigint, ttl: bigint): Uint8Array => {
+export function createCborData (value: Uint8Array, validityType: IpnsEntry.ValidityType, validity: Uint8Array, sequence: bigint, ttl: bigint): Uint8Array {
   let ValidityType
 
   if (validityType === IpnsEntry.ValidityType.EOL) {
@@ -184,7 +174,7 @@ export const createCborData = (value: Uint8Array, validityType: IpnsEntry.Validi
   return cborg.encode(data)
 }
 
-export const parseCborData = (buf: Uint8Array): IPNSRecordData => {
+export function parseCborData (buf: Uint8Array): IPNSRecordData {
   const data = cborg.decode(buf)
 
   if (data.ValidityType === 0) {
@@ -206,35 +196,40 @@ export const parseCborData = (buf: Uint8Array): IPNSRecordData => {
   return data
 }
 
+export function normalizeByteValue (value: Uint8Array): string {
+  const string = uint8ArrayToString(value).trim()
+
+  // if we have a path, check it is a valid path
+  if (string.startsWith('/')) {
+    return string
+  }
+
+  // try parsing what we have as CID bytes or a CID string
+  try {
+    return `/ipfs/${CID.decode(value).toV1().toString()}`
+  } catch {
+    // fall through
+  }
+
+  try {
+    return `/ipfs/${CID.parse(string).toV1().toString()}`
+  } catch {
+    // fall through
+  }
+
+  throw new InvalidValueError('Value must be a valid content path starting with /')
+}
+
 /**
  * Normalizes the given record value. It ensures it is a PeerID, a CID or a
  * string starting with '/'. PeerIDs become `/ipns/${cidV1Libp2pKey}`,
  * CIDs become `/ipfs/${cidAsV1}`.
  */
-export const normalizeValue = (value?: CID | PublicKey | string | Uint8Array): string => {
+export function normalizeValue (value?: CID | PublicKey | MultihashDigest<0x00 | 0x12> | string): string {
   if (value != null) {
-    // if we have a PeerId, turn it into an ipns path
-    if (hasToCID(value)) {
-      return `/ipns/${value.toCID().toString(base36)}`
-    }
-
-    // if the value is bytes, stringify it and see if we have a path
-    if (value instanceof Uint8Array) {
-      const string = uint8ArrayToString(value)
-
-      if (string.startsWith('/')) {
-        value = string
-      }
-    }
-
-    // if we have a path, check it is a valid path
-    const string = value.toString().trim()
-    if (string.startsWith('/') && string.length > 1) {
-      return string
-    }
+    const cid = asCID(value)
 
     // if we have a CID, turn it into an ipfs path
-    const cid = CID.asCID(value)
     if (cid != null) {
       // PeerID encoded as a CID
       if (cid.code === LIBP2P_CID_CODEC) {
@@ -244,22 +239,22 @@ export const normalizeValue = (value?: CID | PublicKey | string | Uint8Array): s
       return `/ipfs/${cid.toV1().toString()}`
     }
 
-    // try parsing what we have as CID bytes or a CID string
-    try {
-      if (value instanceof Uint8Array) {
-        return `/ipfs/${CID.decode(value).toV1().toString()}`
-      }
+    if (hasBytes(value)) {
+      return `/ipns/${base36.encode(value.bytes)}`
+    }
 
-      return `/ipfs/${CID.parse(string).toV1().toString()}`
-    } catch {
-      // fall through
+    // if we have a path, check it is a valid path
+    const string = value.toString().trim()
+
+    if (string.startsWith('/') && string.length > 1) {
+      return string
     }
   }
 
   throw new InvalidValueError('Value must be a valid content path starting with /')
 }
 
-const validateCborDataMatchesPbData = (entry: IpnsEntry): void => {
+function validateCborDataMatchesPbData (entry: IpnsEntry): void {
   if (entry.data == null) {
     throw new InvalidRecordDataError('Record data is missing')
   }
@@ -287,6 +282,29 @@ const validateCborDataMatchesPbData = (entry: IpnsEntry): void => {
   }
 }
 
+function hasBytes (obj?: any): obj is { bytes: Uint8Array } {
+  return obj.bytes instanceof Uint8Array
+}
+
 function hasToCID (obj?: any): obj is { toCID(): CID } {
   return typeof obj?.toCID === 'function'
+}
+
+function asCID (obj?: any): CID | null {
+  if (hasToCID(obj)) {
+    return obj.toCID()
+  }
+
+  // try parsing as a CID string
+  try {
+    return CID.parse(obj)
+  } catch {
+    // fall through
+  }
+
+  return CID.asCID(obj)
+}
+
+export function isCodec <T extends number> (digest: MultihashDigest, codec: T): digest is MultihashDigest<T> {
+  return digest.code === codec
 }
