@@ -1,3 +1,9 @@
+## [9.1.2](https://github.com/ipfs/js-ipns/compare/v9.1.1...v9.1.2) (2024-09-12)
+
+### Bug Fixes
+
+* add tests for utils ([#323](https://github.com/ipfs/js-ipns/issues/323)) ([3ec7233](https://github.com/ipfs/js-ipns/commit/3ec72338513f61cda5ae6fbe381de8529278c7d4))
+
 ## [9.1.1](https://github.com/ipfs/js-ipns/compare/v9.1.0...v9.1.1) (2024-09-11)
 
 ### Dependencies
