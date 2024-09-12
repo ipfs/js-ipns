@@ -151,7 +151,7 @@
   "scripts": {
     "clean": "aegir clean",
     "lint": "aegir lint",
-    "dep-check": "aegir dep-check -i protons",
+    "dep-check": "aegir dep-check",
     "build": "aegir build",
     "test": "aegir test",
     "test:node": "aegir test -t node --cov",
