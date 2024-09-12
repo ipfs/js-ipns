@@ -1,3 +1,13 @@
+## [10.0.0](https://github.com/ipfs/js-ipns/compare/v9.1.2...v10.0.0) (2024-09-12)
+
+### ⚠ BREAKING CHANGES
+
+* uses libp2p@2.x.x deps, operates on PrivateKey/PublicKeys instead of PeerIds
+
+### Bug Fixes
+
+* update to libp2p@2.x.x deps ([#322](https://github.com/ipfs/js-ipns/issues/322)) ([316910c](https://github.com/ipfs/js-ipns/commit/316910cf83409bbcf7b681b82a3b3c4606908faf))
+
 ## [9.1.2](https://github.com/ipfs/js-ipns/compare/v9.1.1...v9.1.2) (2024-09-12)
 
 ### Bug Fixes
