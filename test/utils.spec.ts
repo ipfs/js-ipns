@@ -22,6 +22,16 @@ describe('utils', () => {
         output: '/ipns/k73ap3wtp70r7cd9ofyhwgogv1j96huvtvfnsof5spyfaaopkxmonumi4fckgguqr'
       },
 
+      // path input
+      '/ipfs/CID path': {
+        input: '/ipfs/QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq/docs/readme.md',
+        output: '/ipfs/QmWEekX7EZLUd9VXRNMRXW3LXe4F6x7mB8oPxY5XLptrBq/docs/readme.md'
+      },
+      '/ipns/CID path': {
+        input: '/ipns/k51qzi5uqu5djni72pr40dt64kxlh0zb8baat8h7dtdvkov66euc2lho0oidr3',
+        output: '/ipns/k51qzi5uqu5djni72pr40dt64kxlh0zb8baat8h7dtdvkov66euc2lho0oidr3'
+      },
+
       // peer id input
       'Ed25519 PeerId': {
         input: peerIdFromString('12D3KooWKBpVwnRACfEsk6QME7dA5CZnFYVHQ7Zc927BEzuUekQe'),
