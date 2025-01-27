@@ -48,13 +48,23 @@ import * as ipns from 'ipns'
 const ipnsRecord = await ipns.createIPNSRecord(privateKey, value, sequenceNumber, lifetime)
 ```
 
-### Validate record
+### Validate record against public key
 
 ```js
 import { validate } from 'ipns/validator'
 
-await validate(publicKey, marshalledData)
+await validate(publicKey, marshalledRecord)
 // if no error thrown, the record is valid
+```
+
+### Validate record against routing key
+
+This is useful when validating IPNS names that use RSA keys, whose public key is embedded in the record (rather than in the routing key as with Ed25519).
+
+```js
+import { ipnsValidator } from 'ipns/validator'
+
+await ipnsValidator(routingKey, marshalledRecord)
 ```
 
 ### Extract public key from record

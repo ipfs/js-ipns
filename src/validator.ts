@@ -18,11 +18,11 @@ const MAX_RECORD_SIZE = 1024 * 10
  * Validates the given IPNS Record against the given public key. We need a "raw"
  * record in order to be able to access to all of its fields.
  */
-export const validate = async (publicKey: PublicKey, buf: Uint8Array): Promise<void> => {
+export const validate = async (publicKey: PublicKey, marshalledRecord: Uint8Array): Promise<void> => {
   // unmarshal ensures that (1) SignatureV2 and Data are present, (2) that ValidityType
   // and Validity are of valid types and have a value, (3) that CBOR data matches protobuf
   // if it's a V1+V2 record.
-  const record = unmarshalIPNSRecord(buf)
+  const record = unmarshalIPNSRecord(marshalledRecord)
 
   // Validate Signature V2
   let isValid
@@ -53,13 +53,21 @@ export const validate = async (publicKey: PublicKey, buf: Uint8Array): Promise<v
   log('ipns record for %s is valid', record.value)
 }
 
-export async function ipnsValidator (key: Uint8Array, marshalledData: Uint8Array): Promise<void> {
-  if (marshalledData.byteLength > MAX_RECORD_SIZE) {
+/**
+ * Validate the given IPNS record against the given routing key.
+ *
+ * @see https://specs.ipfs.tech/ipns/ipns-record/#routing-record for the binary format of the routing key
+ *
+ * @param routingKey - The routing key in binary format: binary(ascii(IPNS_PREFIX) + multihash(public key))
+ * @param marshalledRecord - The marshalled record to validate.
+ */
+export async function ipnsValidator (routingKey: Uint8Array, marshalledRecord: Uint8Array): Promise<void> {
+  if (marshalledRecord.byteLength > MAX_RECORD_SIZE) {
     throw new RecordTooLargeError('The record is too large')
   }
 
   // try to extract public key from routing key
-  const routingMultihash = multihashFromIPNSRoutingKey(key)
+  const routingMultihash = multihashFromIPNSRoutingKey(routingKey)
   let routingPubKey: PublicKey | undefined
 
   // identity hash
@@ -68,19 +76,19 @@ export async function ipnsValidator (key: Uint8Array, marshalledData: Uint8Array
   }
 
   // extract public key from record
-  const receivedRecord = unmarshalIPNSRecord(marshalledData)
+  const receivedRecord = unmarshalIPNSRecord(marshalledRecord)
   const recordPubKey = extractPublicKeyFromIPNSRecord(receivedRecord) ?? routingPubKey
 
   if (recordPubKey == null) {
     throw new InvalidEmbeddedPublicKeyError('Could not extract public key from IPNS record or routing key')
   }
 
-  const routingKey = multihashToIPNSRoutingKey(recordPubKey.toMultihash())
+  const expectedRoutingKey = multihashToIPNSRoutingKey(recordPubKey.toMultihash())
 
-  if (!uint8ArrayEquals(key, routingKey)) {
+  if (!uint8ArrayEquals(expectedRoutingKey, routingKey)) {
     throw new InvalidEmbeddedPublicKeyError('Embedded public key did not match routing key')
   }
 
   // Record validation
-  await validate(recordPubKey, marshalledData)
+  await validate(recordPubKey, marshalledRecord)
 }
