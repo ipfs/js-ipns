@@ -3,7 +3,7 @@ import { IpnsEntry } from './pb/ipns.js'
 import { unmarshalIPNSRecord } from './utils.js'
 
 /**
- * Selects the most latest valid IPNS record from an array of marshalled IPNS records.
+ * Selects the latest valid IPNS record from an array of marshalled IPNS records.
  *
  * Records are sorted by:
  * 1. Sequence number (higher takes precedence)
@@ -13,7 +13,6 @@ import { unmarshalIPNSRecord } from './utils.js'
  * @param data - Array of marshalled IPNS records to select from
  * @returns The index of the most valid record from the input array
  */
-
 export function ipnsSelector (key: Uint8Array, data: Uint8Array[]): number {
   const entries = data.map((buf, index) => ({
     record: unmarshalIPNSRecord(buf),
