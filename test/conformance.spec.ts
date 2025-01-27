@@ -1,13 +1,13 @@
 /* eslint-env mocha */
 
-import { peerIdFromCID } from '@libp2p/peer-id'
+import { peerIdFromCID, peerIdFromString } from '@libp2p/peer-id'
 import { expect } from 'aegir/chai'
 import loadFixture from 'aegir/fixtures'
 import { base36 } from 'multiformats/bases/base36'
 import { CID } from 'multiformats/cid'
 import { SignatureVerificationError } from '../src/errors.js'
-import { marshalIPNSRecord, unmarshalIPNSRecord } from '../src/index.js'
-import { validate } from '../src/validator.js'
+import { marshalIPNSRecord, multihashToIPNSRoutingKey, unmarshalIPNSRecord } from '../src/index.js'
+import { ipnsValidator, validate } from '../src/validator.js'
 
 describe('conformance', function () {
   it('should reject a v1 only record', async () => {
@@ -32,6 +32,18 @@ describe('conformance', function () {
     await validate(publicKey, buf)
 
     expect(record.value).to.equal('/ipfs/bafkqaddwgevxmmraojswg33smq')
+  })
+
+  it('should validate an RSA record created with Nabu', async () => {
+    const buf = loadFixture('test/fixtures/k2k4r8orrik6wc7t78d8g505udi87kk36lplczjaw5g0enj8qkmph59e.nabu.ipns-record')
+    const record = unmarshalIPNSRecord(buf)
+    console.log(record.value)
+
+    const peerId = peerIdFromString('QmcoDbhCiVXGrWs6rwBvB59Gm44veo7Qxn2zmRnPw7BaCH')
+
+    await ipnsValidator(multihashToIPNSRoutingKey(peerId.toMultihash()), buf)
+
+    // expect(record.value).to.equal('/ipfs/bafkqaddwgevxmmraojswg33smq')
   })
 
   it('should reject a record with inconsistent value fields', async () => {
