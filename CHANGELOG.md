@@ -1,3 +1,9 @@
+## [10.0.1](https://github.com/ipfs/js-ipns/compare/v10.0.0...v10.0.1) (2025-02-11)
+
+### Documentation
+
+* update api docs ([#333](https://github.com/ipfs/js-ipns/issues/333)) ([b73dac4](https://github.com/ipfs/js-ipns/commit/b73dac4773730902ee87ba5f7be6dbc22b2453e0))
+
 ## [10.0.0](https://github.com/ipfs/js-ipns/compare/v9.1.2...v10.0.0) (2024-09-12)
 
 ### ⚠ BREAKING CHANGES
