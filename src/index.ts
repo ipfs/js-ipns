@@ -146,10 +146,10 @@ const defaultCreateOptions: CreateOptions = {
  * The IPNS Record validity should follow the [RFC3339]{@link https://www.ietf.org/rfc/rfc3339.txt} with nanoseconds precision.
  * Note: This function does not embed the public key. If you want to do that, use `EmbedPublicKey`.
  *
- * The passed value can be a CID, a PeerID or an arbitrary string path.
+ * The passed value can be a CID, a PublicKey or an arbitrary string path e.g. `/ipfs/...` or `/ipns/...`.
  *
  * * CIDs will be converted to v1 and stored in the record as a string similar to: `/ipfs/${cid}`
- * * PeerIDs will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
+ * * PublicKeys will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
  * * String paths will be stored in the record as-is, but they must start with `"/"`
  *
  * @param {PrivateKey} privateKey - the private key for signing the record.
@@ -174,10 +174,10 @@ export async function createIPNSRecord (privateKey: PrivateKey, value: CID | Pub
  * Same as create(), but instead of generating a new Date, it receives the intended expiration time
  * WARNING: nano precision is not standard, make sure the value in seconds is 9 orders of magnitude lesser than the one provided.
  *
- * The passed value can be a CID, a PeerID or an arbitrary string path.
+ * The passed value can be a CID, a PublicKey or an arbitrary string path e.g. `/ipfs/...` or `/ipns/...`.
  *
  * * CIDs will be converted to v1 and stored in the record as a string similar to: `/ipfs/${cid}`
- * * PeerIDs will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
+ * * PublicKeys will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
  * * String paths will be stored in the record as-is, but they must start with `"/"`
  *
  * @param {PrivateKey} privateKey - the private key for signing the record.

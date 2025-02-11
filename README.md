@@ -14,19 +14,11 @@
 - [Usage](#usage)
   - [Create record](#create-record)
   - [Validate record](#validate-record)
-  - [Embed public key to record](#embed-public-key-to-record)
   - [Extract public key from record](#extract-public-key-from-record)
   - [Marshal data with proto buffer](#marshal-data-with-proto-buffer)
   - [Unmarshal data from proto buffer](#unmarshal-data-from-proto-buffer)
-  - [Validator](#validator)
-- [API](#api)
-  - [Create record](#create-record-1)
-  - [Validate record](#validate-record-1)
-  - [Marshal data with proto buffer](#marshal-data-with-proto-buffer-1)
-  - [Unmarshal data from proto buffer](#unmarshal-data-from-proto-buffer-1)
-  - [Extract public key from record](#extract-public-key-from-record-1)
-  - [Namespace](#namespace)
 - [API Docs](#api-docs)
+  - [Namespace](#namespace)
 - [License](#license)
 - [Contribute](#contribute)
 
@@ -53,24 +45,26 @@ This module contains all the necessary code for creating, understanding and vali
 ```js
 import * as ipns from 'ipns'
 
-const ipnsRecord = await ipns.create(privateKey, value, sequenceNumber, lifetime)
+const ipnsRecord = await ipns.createIPNSRecord(privateKey, value, sequenceNumber, lifetime)
 ```
 
-### Validate record
+### Validate record against public key
 
 ```js
-import * as ipns from 'ipns'
+import { validate } from 'ipns/validator'
 
-await ipns.validate(publicKey, marshalledData)
+await validate(publicKey, marshalledRecord)
 // if no error thrown, the record is valid
 ```
 
-### Embed public key to record
+### Validate record against routing key
+
+This is useful when validating IPNS names that use RSA keys, whose public key is embedded in the record (rather than in the routing key as with Ed25519).
 
 ```js
-import * as ipns from 'ipns'
+import { ipnsValidator } from 'ipns/validator'
 
-const ipnsRecordWithEmbeddedPublicKey = await ipns.embedPublicKey(publicKey, ipnsRecord)
+await ipnsValidator(routingKey, marshalledRecord)
 ```
 
 ### Extract public key from record
@@ -78,7 +72,7 @@ const ipnsRecordWithEmbeddedPublicKey = await ipns.embedPublicKey(publicKey, ipn
 ```js
 import * as ipns from 'ipns'
 
-const publicKey = await ipns.extractPublicKey(peerId, ipnsRecord)
+const publicKey = await ipns.extractPublicKeyFromIPNSRecord(peerId, ipnsRecord)
 ```
 
 ### Marshal data with proto buffer
@@ -86,9 +80,9 @@ const publicKey = await ipns.extractPublicKey(peerId, ipnsRecord)
 ```js
 import * as ipns from 'ipns'
 
-const ipnsRecord = await ipns.create(privateKey, value, sequenceNumber, lifetime)
+const ipnsRecord = await ipns.createIPNSRecord(privateKey, value, sequenceNumber, lifetime)
 // ...
-const marshalledData = ipns.marshal(ipnsRecord)
+const marshalledData = ipns.marshalIPNSRecord(ipnsRecord)
 // ...
 ```
 
@@ -99,89 +93,16 @@ Returns the record data serialized.
 ```js
 import * as ipns from 'ipns'
 
-const ipnsRecord = ipns.unmarshal(storedData)
+const ipnsRecord = ipns.unmarshalIPNSRecord(storedData)
 ```
 
 Returns the `IPNSRecord` after being deserialized.
 
-### Validator
 
-```js
-import * as ipns from 'ipns'
+## API Docs
 
-const validator = ipns.validator
-```
+- <https://ipfs.github.io/js-ipns>
 
-Contains an object with `validate (marshalledData, key)` and `select (dataA, dataB)` functions.
-
-The `validate` async function aims to verify if an IPNS record is valid. First the record is unmarshalled, then the public key is obtained and finally the record is validated (`signatureV2` of CBOR `data` is verified).
-
-The `select` function is responsible for deciding which IPNS record is the best (newer) between two records. Both records are unmarshalled and their sequence numbers are compared. If the first record provided is the newer, the operation result will be `0`, otherwise the operation result will be `1`.
-
-## API
-
-### Create record
-
-```js
-
-ipns.create(privateKey, value, sequenceNumber, lifetime, options)
-```
-
-Create an IPNS record for being stored in a protocol buffer.
-
-- `privateKey` ([PrivateKey](https://libp2p.github.io/js-libp2p/interfaces/_libp2p_interface.keys.PrivateKey.html)): key to be used for cryptographic operations.
-- `value` (string): IPFS path of the object to be published.
-- `sequenceNumber` (Number): number representing the current version of the record.
-- `lifetime` (Number): lifetime of the record (in milliseconds).
-- `options` (CreateOptions): additional creation options.
-
-Returns a `Promise` that resolves to an object with a `IPNSRecord`.
-
-### Validate record
-
-```js
-ipns.validate(publicKey, ipnsRecord)
-```
-
-Validate an IPNS record previously stored in a protocol buffer.
-
-- `publicKey` ([PublicKey](https://libp2p.github.io/js-libp2p/interfaces/_libp2p_interface.keys.PublicKey.html)): key to be used for cryptographic operations.
-- `ipnsRecord` (`IPNSRecord`): IPNS record (obtained using the create function).
-
-Returns a `Promise`, which may be rejected if the validation was not successful.
-
-### Marshal data with proto buffer
-
-```js
-const marshalledData = ipns.marshal(ipnsRecord)
-```
-
-Returns the serialized IPNS record.
-
-- `ipnsRecord` (`IPNSRecord`): ipns record (obtained using the create function).
-
-### Unmarshal data from proto buffer
-
-```js
-const data = ipns.unmarshal(storedData)
-```
-
-Returns a `IPNSRecord` after being serialized.
-
-- `storedData` (Uint8Array): ipns record serialized.
-
-### Extract public key from record
-
-```js
-const publicKey = await ipns.extractPublicKey(peerId, ipnsRecord)
-```
-
-Extract a public key from an IPNS record.
-
-- `peerId` ([PeerId](https://libp2p.github.io/js-libp2p/types/_libp2p_interface.peer_id.PeerId.html)): peer identifier object.
-- `ipnsRecord` (`IPNSRecord`): ipns record (obtained using the create function).
-
-Returns a `Promise` which resolves to public key ([`PublicKey`](https://github.com/libp2p/js-libp2p-interfaces/blob/master/packages/interface-keys/src/index.ts) ): may be used for cryptographic operations.
 
 ### Namespace
 
@@ -199,9 +120,6 @@ ipns.namespaceLength
 // 6
 ```
 
-## API Docs
-
-- <https://ipfs.github.io/js-ipns>
 
 ## License
 
