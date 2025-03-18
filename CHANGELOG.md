@@ -1,3 +1,17 @@
+## [10.0.2](https://github.com/ipfs/js-ipns/compare/v10.0.1...v10.0.2) (2025-03-18)
+
+### Bug Fixes
+
+* align implicit default ttl with specs (1h→5m) ([#336](https://github.com/ipfs/js-ipns/issues/336)) ([5677cf0](https://github.com/ipfs/js-ipns/commit/5677cf0c396d64af2f165b929cbd81ddb96f37b0))
+
+### Trivial Changes
+
+* Create FUNDING.json for OP RPF ([#335](https://github.com/ipfs/js-ipns/issues/335)) ([de2e786](https://github.com/ipfs/js-ipns/commit/de2e78629ae114adf02e680dbff5c49b3c4dc3a7))
+
+### Dependencies
+
+* **dev:** bump aegir from 44.1.4 to 45.0.8 ([#332](https://github.com/ipfs/js-ipns/issues/332)) ([c2d611a](https://github.com/ipfs/js-ipns/commit/c2d611aa508c10539ac5f354c19b9a378e71e759))
+
 ## [10.0.1](https://github.com/ipfs/js-ipns/compare/v10.0.0...v10.0.1) (2025-02-11)
 
 ### Documentation
