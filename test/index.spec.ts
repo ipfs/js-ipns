@@ -31,7 +31,7 @@ describe('ipns', function () {
 
   it('should create an ipns record (V1+V2) correctly', async () => {
     const sequence = 0
-    const ttl = BigInt(60 * 60 * 1e+9)
+    const ttl = BigInt(5 * 60 * 1e+9)
     const validity = 1000000
 
     const record = await createIPNSRecord(privateKey, contentPath, sequence, validity)
@@ -67,7 +67,7 @@ describe('ipns', function () {
 
   it('should create an ipns record (V2) correctly', async () => {
     const sequence = 0
-    const ttl = BigInt(60 * 60 * 1e+9)
+    const ttl = BigInt(5 * 60 * 1e+9)
     const validity = 1000000
 
     const record = await createIPNSRecord(privateKey, contentPath, sequence, validity, { v1Compatible: false })

@@ -11,7 +11,7 @@ import type { CID } from 'multiformats/cid'
 import type { MultihashDigest } from 'multiformats/hashes/interface'
 
 const log = logger('ipns')
-const DEFAULT_TTL_NS = 60 * 60 * 1e+9 // 1 Hour or 3600 Seconds
+const DEFAULT_TTL_NS = 5 * 60 * 1e+9 // 5 Minutes or 300 Seconds, as suggested by https://specs.ipfs.tech/ipns/ipns-record/#ttl-uint64
 
 export const namespace = '/ipns/'
 export const namespaceLength = namespace.length
