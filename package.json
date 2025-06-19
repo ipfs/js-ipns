@@ -52,6 +52,10 @@
     "./validator": {
       "types": "./dist/src/validator.d.ts",
       "import": "./dist/src/validator.js"
+    },
+    "./pb": {
+      "types": "./dist/src/pb/ipns.d.ts",
+      "import": "./dist/src/pb/ipns.js"
     }
   },
   "eslintConfig": {
