@@ -7,7 +7,7 @@ import {
   RecordExpiredError,
   RecordTooLargeError,
   SignatureVerificationError,
-  UnsupportedValidityError,
+  UnsupportedValidityError
 } from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import {
@@ -16,10 +16,10 @@ import {
   isCodec,
   multihashFromIPNSRoutingKey,
   multihashToIPNSRoutingKey,
-  unmarshalIPNSRecord,
+  unmarshalIPNSRecord
 } from './utils.js'
-import type { PublicKey } from '@libp2p/interface'
 import type { IPNSRecord } from './index.js'
+import type { PublicKey } from '@libp2p/interface'
 
 const log = logger('ipns:validator')
 
@@ -106,7 +106,6 @@ export async function ipnsValidator (routingKey: Uint8Array, marshalledRecord: U
   // Record validation
   await validate(recordPubKey, marshalledRecord)
 }
-
 
 /**
  * Returns the number of milliseconds until the record expires.
