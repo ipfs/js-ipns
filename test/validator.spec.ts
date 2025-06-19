@@ -99,7 +99,7 @@ describe('validator', function () {
       expect(result).to.be.greaterThan(0)
     })
 
-    it.only('should throw RecordExpiredError for expired records', async () => {
+    it('should throw RecordExpiredError for expired records', async () => {
       const record = await createIPNSRecord(privateKey1, contentPath, 0, 0)
 
       expect(() => validFor(record)).to.throw(RecordExpiredError)
@@ -120,14 +120,11 @@ describe('validator', function () {
     })
 
     it('should return correct milliseconds until expiration', async () => {
-      const futureTime = Date.now() + 5000 // 5 seconds from now
-      const record = await createIPNSRecord(privateKey1, contentPath, 0, futureTime)
+      const record = await createIPNSRecord(privateKey1, contentPath, 0, 5000)
 
       const result = validFor(record)
 
-      // Should be approximately 5000ms (within 100ms tolerance for test execution time)
-      expect(result).to.be.within(5000, 5100)
-      expect(result).to.be.greaterThan(0)
+      expect(result).to.be.within(4900, 5000)
     })
   })
 })
