@@ -107,24 +107,29 @@ export async function ipnsValidator (routingKey: Uint8Array, marshalledRecord: U
   await validate(recordPubKey, marshalledRecord)
 }
 
+
 /**
- * Validates the EOL validity of the given IPNS record.
+ * Returns the number of milliseconds until the record expires.
+ * If the record is already expired, throws an error.
  *
  * @param record - The IPNS record to validate.
- * @returns True if the validity is valid, false otherwise.
+ * @returns The number of milliseconds until the record expires.
  */
-export async function isValidityValid (record: IPNSRecord): Promise<boolean> {
+export function validFor (record: IPNSRecord): number {
   if (record.validityType !== IpnsEntry.ValidityType.EOL) {
-    return false
+    throw new UnsupportedValidityError()
   }
 
   if (record.validity == null) {
-    return false
+    throw new UnsupportedValidityError()
   }
 
-  if (NanoDate.fromString(record.validity).toDate().getTime() < Date.now()) {
-    return false
+  const validUntil = NanoDate.fromString(record.validity).toDate().getTime()
+  const now = Date.now()
+
+  if (validUntil < now) {
+    throw new RecordExpiredError('The record has expired')
   }
 
-  return true
+  return validUntil - now
 }
