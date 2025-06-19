@@ -6,7 +6,7 @@ import { expect } from 'aegir/chai'
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import { InvalidEmbeddedPublicKeyError, RecordTooLargeError, SignatureVerificationError } from '../src/errors.js'
 import { createIPNSRecord, marshalIPNSRecord, multihashToIPNSRoutingKey } from '../src/index.js'
-import { ipnsValidator } from '../src/validator.js'
+import { ipnsValidator, isValidityValid } from '../src/validator.js'
 import type { PrivateKey } from '@libp2p/interface'
 
 describe('validator', function () {
@@ -90,5 +90,51 @@ describe('validator', function () {
 
     await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected()
       .with.property('name', RecordTooLargeError.name)
+  })
+
+  describe('isValidityValid', () => {
+    it('should return true for a valid EOL record with future expiration', async () => {
+      const sequence = 0
+      const validity = 1000000
+      const record = await createIPNSRecord(privateKey1, contentPath, sequence, validity, { v1Compatible: false })
+
+      const result = await isValidityValid(record)
+
+      expect(result).to.be.true
+    })
+
+
+    it('should return false for a record with null validity', async () => {
+      const record = await createIPNSRecord(privateKey1, contentPath, 0, 1000000, { v1Compatible: false })
+      // Manually override validity to null
+      record.validity = null as any
+
+      const result = await isValidityValid(record)
+
+      expect(result).to.be.false
+    })
+
+    it('should return false for an expired record', async () => {
+      const sequence = 0
+      const validity = 1000000
+      const record = await createIPNSRecord(privateKey1, contentPath, sequence, validity, { v1Compatible: false })
+
+      // Manually set validity to a past date
+      record.validity = '2020-01-01T00:00:00.000000000Z'
+
+      const result = await isValidityValid(record)
+
+      expect(result).to.be.false
+    })
+
+    it('should return true for a V1+V2 record with valid EOL validity', async () => {
+      const sequence = 0
+      const validity = 1000000
+      const record = await createIPNSRecord(privateKey1, contentPath, sequence, validity, { v1Compatible: true })
+
+      const result = await isValidityValid(record)
+
+      expect(result).to.be.true
+    })
   })
 })

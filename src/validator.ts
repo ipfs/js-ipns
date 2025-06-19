@@ -2,10 +2,24 @@ import { publicKeyFromMultihash } from '@libp2p/crypto/keys'
 import { logger } from '@libp2p/logger'
 import NanoDate from 'timestamp-nano'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
-import { InvalidEmbeddedPublicKeyError, RecordExpiredError, RecordTooLargeError, SignatureVerificationError, UnsupportedValidityError } from './errors.js'
+import {
+  InvalidEmbeddedPublicKeyError,
+  RecordExpiredError,
+  RecordTooLargeError,
+  SignatureVerificationError,
+  UnsupportedValidityError,
+} from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
-import { extractPublicKeyFromIPNSRecord, ipnsRecordDataForV2Sig, isCodec, multihashFromIPNSRoutingKey, multihashToIPNSRoutingKey, unmarshalIPNSRecord } from './utils.js'
+import {
+  extractPublicKeyFromIPNSRecord,
+  ipnsRecordDataForV2Sig,
+  isCodec,
+  multihashFromIPNSRoutingKey,
+  multihashToIPNSRoutingKey,
+  unmarshalIPNSRecord,
+} from './utils.js'
 import type { PublicKey } from '@libp2p/interface'
+import type { IPNSRecord } from './index.js'
 
 const log = logger('ipns:validator')
 
@@ -18,7 +32,7 @@ const MAX_RECORD_SIZE = 1024 * 10
  * Validates the given IPNS Record against the given public key. We need a "raw"
  * record in order to be able to access to all of its fields.
  */
-export const validate = async (publicKey: PublicKey, marshalledRecord: Uint8Array): Promise<void> => {
+export async function validate (publicKey: PublicKey, marshalledRecord: Uint8Array): Promise<void> {
   // unmarshal ensures that (1) SignatureV2 and Data are present, (2) that ValidityType
   // and Validity are of valid types and have a value, (3) that CBOR data matches protobuf
   // if it's a V1+V2 record.
@@ -91,4 +105,26 @@ export async function ipnsValidator (routingKey: Uint8Array, marshalledRecord: U
 
   // Record validation
   await validate(recordPubKey, marshalledRecord)
+}
+
+/**
+ * Validates the EOL validity of the given IPNS record.
+ *
+ * @param record - The IPNS record to validate.
+ * @returns True if the validity is valid, false otherwise.
+ */
+export async function isValidityValid (record: IPNSRecord): Promise<boolean> {
+  if (record.validityType !== IpnsEntry.ValidityType.EOL) {
+    return false
+  }
+
+  if (record.validity == null) {
+    return false
+  }
+
+  if (NanoDate.fromString(record.validity).toDate().getTime() < Date.now()) {
+    return false
+  }
+
+  return true
 }
