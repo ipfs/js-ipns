@@ -96,10 +96,10 @@ export async function ipnsValidator (routingKey: Uint8Array, marshalledRecord: U
 
 /**
  * Returns the number of milliseconds until the record expires.
- * If the record is already expired, throws an error.
+ * If the record is already expired, returns 0.
  *
  * @param record - The IPNS record to validate.
- * @returns The number of milliseconds until the record expires.
+ * @returns The number of milliseconds until the record expires, or 0 if the record is already expired.
  */
 export function validFor (record: IPNSRecord): number {
   if (record.validityType !== IpnsEntry.ValidityType.EOL) {
@@ -114,7 +114,7 @@ export function validFor (record: IPNSRecord): number {
   const now = Date.now()
 
   if (validUntil < now) {
-    throw new RecordExpiredError('The record has expired')
+    return 0
   }
 
   return validUntil - now

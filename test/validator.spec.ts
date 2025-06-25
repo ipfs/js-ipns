@@ -99,10 +99,10 @@ describe('validator', function () {
       expect(result).to.be.greaterThan(0)
     })
 
-    it('should throw RecordExpiredError for expired records', async () => {
+    it('should return 0 for expired records', async () => {
       const record = await createIPNSRecord(privateKey1, contentPath, 0, 0)
 
-      expect(() => validFor(record)).to.throw(RecordExpiredError)
+      expect(validFor(record)).to.equal(0)
     })
 
     it('should throw UnsupportedValidityError for non-EOL validity types', async () => {
