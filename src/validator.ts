@@ -2,22 +2,9 @@ import { publicKeyFromMultihash } from '@libp2p/crypto/keys'
 import { logger } from '@libp2p/logger'
 import NanoDate from 'timestamp-nano'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
-import {
-  InvalidEmbeddedPublicKeyError,
-  RecordExpiredError,
-  RecordTooLargeError,
-  SignatureVerificationError,
-  UnsupportedValidityError
-} from './errors.js'
+import { InvalidEmbeddedPublicKeyError, RecordExpiredError, RecordTooLargeError, SignatureVerificationError, UnsupportedValidityError } from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
-import {
-  extractPublicKeyFromIPNSRecord,
-  ipnsRecordDataForV2Sig,
-  isCodec,
-  multihashFromIPNSRoutingKey,
-  multihashToIPNSRoutingKey,
-  unmarshalIPNSRecord
-} from './utils.js'
+import { extractPublicKeyFromIPNSRecord, ipnsRecordDataForV2Sig, isCodec, multihashFromIPNSRoutingKey, multihashToIPNSRoutingKey, unmarshalIPNSRecord } from './utils.js'
 import type { IPNSRecord } from './index.js'
 import type { PublicKey } from '@libp2p/interface'
 
