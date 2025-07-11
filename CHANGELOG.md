@@ -1,3 +1,9 @@
+## [10.1.0](https://github.com/ipfs/js-ipns/compare/v10.0.2...v10.1.0) (2025-07-11)
+
+### Features
+
+* add validFor function to return the validity interval ([#388](https://github.com/ipfs/js-ipns/issues/388)) ([5b1c273](https://github.com/ipfs/js-ipns/commit/5b1c2731ac4ab989e4b6538de9d0097a97ff16bb))
+
 ## [10.0.2](https://github.com/ipfs/js-ipns/compare/v10.0.1...v10.0.2) (2025-03-18)
 
 ### Bug Fixes
