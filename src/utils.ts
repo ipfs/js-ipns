@@ -3,7 +3,7 @@ import { InvalidMultihashError } from '@libp2p/interface'
 import { logger } from '@libp2p/logger'
 import * as cborg from 'cborg'
 import { base36 } from 'multiformats/bases/base36'
-import { CID, type MultihashDigest } from 'multiformats/cid'
+import { CID } from 'multiformats/cid'
 import * as Digest from 'multiformats/hashes/digest'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
 import { equals as uint8ArrayEquals } from 'uint8arrays/equals'
@@ -13,6 +13,7 @@ import { InvalidRecordDataError, InvalidValueError, SignatureVerificationError, 
 import { IpnsEntry } from './pb/ipns.js'
 import type { IPNSRecord, IPNSRecordV2, IPNSRecordData } from './index.js'
 import type { PublicKey } from '@libp2p/interface'
+import type { MultihashDigest } from 'multiformats/cid'
 
 const log = logger('ipns:utils')
 const IPNS_PREFIX = uint8ArrayFromString('/ipns/')

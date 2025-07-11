@@ -12,6 +12,10 @@
   "bugs": {
     "url": "https://github.com/ipfs/js-ipns/issues"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "keywords": [
     "ipfs",
     "ipns"
@@ -53,15 +57,6 @@
       "types": "./dist/src/validator.d.ts",
       "import": "./dist/src/validator.js"
     }
-  },
-  "eslintConfig": {
-    "extends": "ipfs",
-    "parserOptions": {
-      "sourceType": "module"
-    },
-    "ignorePatterns": [
-      "src/pb/ipns.d.ts"
-    ]
   },
   "release": {
     "branches": [
@@ -145,7 +140,15 @@
       "@semantic-release/changelog",
       "@semantic-release/npm",
       "@semantic-release/github",
-      "@semantic-release/git"
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json"
+          ]
+        }
+      ]
     ]
   },
   "scripts": {
@@ -179,7 +182,7 @@
   },
   "devDependencies": {
     "@libp2p/peer-id": "^5.0.0",
-    "aegir": "^45.0.8",
+    "aegir": "^47.0.20",
     "protons": "^7.6.0"
   },
   "sideEffects": false

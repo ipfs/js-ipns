@@ -1,12 +1,76 @@
+/**
+ * @packageDocumentation
+ *
+ * Implements parsing and serialization of [IPNS Records](https://specs.ipfs.tech/ipns/ipns-record/).
+ *
+ * @example Create record
+ *
+ * ```js
+ * import * as ipns from 'ipns'
+ *
+ * const ipnsRecord = await ipns.createIPNSRecord(privateKey, value, sequenceNumber, lifetime)
+ * ```
+ *
+ * @example Validate record against public key
+ *
+ * ```js
+ * import { validate } from 'ipns/validator'
+ *
+ * await validate(publicKey, marshalledRecord)
+ * // if no error thrown, the record is valid
+ * ```
+ *
+ * @example Validate record against routing key
+ *
+ * This is useful when validating IPNS names that use RSA keys, whose public key is embedded in the record (rather than in the routing key as with Ed25519).
+ *
+ * ```js
+ * import { ipnsValidator } from 'ipns/validator'
+ *
+ * await ipnsValidator(routingKey, marshalledRecord)
+ * ```
+ *
+ * @example Extract public key from record
+ *
+ * ```js
+ * import * as ipns from 'ipns'
+ *
+ * const publicKey = await ipns.extractPublicKeyFromIPNSRecord(peerId, ipnsRecord)
+ * ```
+ *
+ * @example Marshal data with proto buffer
+ *
+ * ```js
+ * import * as ipns from 'ipns'
+ *
+ * const ipnsRecord = await ipns.createIPNSRecord(privateKey, value, sequenceNumber, lifetime)
+ * // ...
+ * const marshalledData = ipns.marshalIPNSRecord(ipnsRecord)
+ * // ...
+ * ```
+ *
+ * Returns the record data serialized.
+ *
+ * @example Unmarshal data from proto buffer
+ *
+ * ```js
+ * import * as ipns from 'ipns'
+ *
+ * const ipnsRecord = ipns.unmarshalIPNSRecord(storedData)
+ * ```
+ *
+ * Returns the `IPNSRecord` after being deserialized.
+ */
+
 import { publicKeyToProtobuf } from '@libp2p/crypto/keys'
 import { logger } from '@libp2p/logger'
-import { type Key } from 'interface-datastore/key'
 import NanoDate from 'timestamp-nano'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { SignatureCreationError } from './errors.js'
 import { IpnsEntry } from './pb/ipns.js'
 import { createCborData, ipnsRecordDataForV1Sig, ipnsRecordDataForV2Sig, normalizeValue } from './utils.js'
 import type { PrivateKey, PublicKey } from '@libp2p/interface'
+import type { Key } from 'interface-datastore/key'
 import type { CID } from 'multiformats/cid'
 import type { MultihashDigest } from 'multiformats/hashes/interface'
 
@@ -148,9 +212,9 @@ const defaultCreateOptions: CreateOptions = {
  *
  * The passed value can be a CID, a PublicKey or an arbitrary string path e.g. `/ipfs/...` or `/ipns/...`.
  *
- * * CIDs will be converted to v1 and stored in the record as a string similar to: `/ipfs/${cid}`
- * * PublicKeys will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
- * * String paths will be stored in the record as-is, but they must start with `"/"`
+ * CIDs will be converted to v1 and stored in the record as a string similar to: `/ipfs/${cid}`
+ * PublicKeys will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
+ * String paths will be stored in the record as-is, but they must start with `"/"`
  *
  * @param {PrivateKey} privateKey - the private key for signing the record.
  * @param {CID | PublicKey | string} value - content to be stored in the record.
@@ -176,9 +240,9 @@ export async function createIPNSRecord (privateKey: PrivateKey, value: CID | Pub
  *
  * The passed value can be a CID, a PublicKey or an arbitrary string path e.g. `/ipfs/...` or `/ipns/...`.
  *
- * * CIDs will be converted to v1 and stored in the record as a string similar to: `/ipfs/${cid}`
- * * PublicKeys will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
- * * String paths will be stored in the record as-is, but they must start with `"/"`
+ * CIDs will be converted to v1 and stored in the record as a string similar to: `/ipfs/${cid}`
+ * PublicKeys will create recursive records, eg. the record value will be `/ipns/${cidV1Libp2pKey}`
+ * String paths will be stored in the record as-is, but they must start with `"/"`
  *
  * @param {PrivateKey} privateKey - the private key for signing the record.
  * @param {CID | PublicKey | string} value - content to be stored in the record.
