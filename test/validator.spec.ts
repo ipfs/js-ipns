@@ -4,9 +4,9 @@ import { randomBytes } from '@libp2p/crypto'
 import { generateKeyPair, publicKeyToProtobuf } from '@libp2p/crypto/keys'
 import { expect } from 'aegir/chai'
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
-import { InvalidEmbeddedPublicKeyError, RecordTooLargeError, SignatureVerificationError } from '../src/errors.js'
+import { InvalidEmbeddedPublicKeyError, RecordTooLargeError, SignatureVerificationError, UnsupportedValidityError } from '../src/errors.js'
 import { createIPNSRecord, marshalIPNSRecord, multihashToIPNSRoutingKey } from '../src/index.js'
-import { ipnsValidator } from '../src/validator.js'
+import { ipnsValidator, validFor } from '../src/validator.js'
 import type { PrivateKey } from '@libp2p/interface'
 
 describe('validator', function () {
@@ -90,5 +90,41 @@ describe('validator', function () {
 
     await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected()
       .with.property('name', RecordTooLargeError.name)
+  })
+
+  describe('validFor', () => {
+    it('should return the number of milliseconds until the record expires', async () => {
+      const record = await createIPNSRecord(privateKey1, contentPath, 0, 1000000)
+      const result = validFor(record)
+      expect(result).to.be.greaterThan(0)
+    })
+
+    it('should return 0 for expired records', async () => {
+      const record = await createIPNSRecord(privateKey1, contentPath, 0, 0)
+
+      expect(validFor(record)).to.equal(0)
+    })
+
+    it('should throw UnsupportedValidityError for non-EOL validity types', async () => {
+      const record = await createIPNSRecord(privateKey1, contentPath, 0, 1000000)
+      record.validityType = 5 as any
+
+      expect(() => validFor(record)).to.throw(UnsupportedValidityError)
+    })
+
+    it('should throw UnsupportedValidityError for null validity', async () => {
+      const record = await createIPNSRecord(privateKey1, contentPath, 0, 1000000)
+      record.validityType = null as any
+
+      expect(() => validFor(record)).to.throw(UnsupportedValidityError)
+    })
+
+    it('should return correct milliseconds until expiration', async () => {
+      const record = await createIPNSRecord(privateKey1, contentPath, 0, 5000)
+
+      const result = validFor(record)
+
+      expect(result).to.be.within(4900, 5000)
+    })
   })
 })
