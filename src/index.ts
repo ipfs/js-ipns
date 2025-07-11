@@ -5,16 +5,27 @@
  *
  * @example Create record
  *
- * ```js
- * import * as ipns from 'ipns'
+ * ```TypeScript
+ * import { createIPNSRecord } from 'ipns'
+ * import { generateKeyPair } from '@libp2p/crypto/keys'
  *
- * const ipnsRecord = await ipns.createIPNSRecord(privateKey, value, sequenceNumber, lifetime)
+ * const privateKey = await generateKeyPair('Ed25519')
+ * const value = 'hello world'
+ * const sequenceNumber = 0
+ * const lifetime = 3_600_000 // ms, e.g. one hour
+ *
+ * const ipnsRecord = await createIPNSRecord(privateKey, value, sequenceNumber, lifetime)
  * ```
  *
  * @example Validate record against public key
  *
- * ```js
+ * ```TypeScript
  * import { validate } from 'ipns/validator'
+ * import { generateKeyPair } from '@libp2p/crypto/keys'
+ *
+ * const privateKey = await generateKeyPair('Ed25519')
+ * const publicKey = privateKey.publicKey
+ * const marshalledRecord = Uint8Array.from([0, 1, 2, 3])
  *
  * await validate(publicKey, marshalledRecord)
  * // if no error thrown, the record is valid
@@ -24,28 +35,40 @@
  *
  * This is useful when validating IPNS names that use RSA keys, whose public key is embedded in the record (rather than in the routing key as with Ed25519).
  *
- * ```js
+ * ```TypeScript
  * import { ipnsValidator } from 'ipns/validator'
+ * import { multihashToIPNSRoutingKey } from 'ipns'
+ * import { generateKeyPair } from '@libp2p/crypto/keys'
+ *
+ * const privateKey = await generateKeyPair('Ed25519')
+ * const routingKey = multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash())
+ * const marshalledRecord = Uint8Array.from([0, 1, 2, 3])
  *
  * await ipnsValidator(routingKey, marshalledRecord)
  * ```
  *
  * @example Extract public key from record
  *
- * ```js
- * import * as ipns from 'ipns'
+ * ```TypeScript
+ * import { extractPublicKeyFromIPNSRecord, createIPNSRecord } from 'ipns'
+ * import { generateKeyPair } from '@libp2p/crypto/keys'
  *
- * const publicKey = await ipns.extractPublicKeyFromIPNSRecord(peerId, ipnsRecord)
+ * const privateKey = await generateKeyPair('Ed25519')
+ * const record = await createIPNSRecord(privateKey, 'hello world', 0, 3_600_000)
+ *
+ * const publicKey = await extractPublicKeyFromIPNSRecord(record)
  * ```
  *
  * @example Marshal data with proto buffer
  *
- * ```js
- * import * as ipns from 'ipns'
+ * ```TypeScript
+ * import { createIPNSRecord, marshalIPNSRecord } from 'ipns'
+ * import { generateKeyPair } from '@libp2p/crypto/keys'
  *
- * const ipnsRecord = await ipns.createIPNSRecord(privateKey, value, sequenceNumber, lifetime)
+ * const privateKey = await generateKeyPair('Ed25519')
+ * const record = await createIPNSRecord(privateKey, 'hello world', 0, 3_600_000)
  * // ...
- * const marshalledData = ipns.marshalIPNSRecord(ipnsRecord)
+ * const marshalledData = marshalIPNSRecord(record)
  * // ...
  * ```
  *
@@ -53,10 +76,11 @@
  *
  * @example Unmarshal data from proto buffer
  *
- * ```js
- * import * as ipns from 'ipns'
+ * ```TypeScript
+ * import { unmarshalIPNSRecord } from 'ipns'
  *
- * const ipnsRecord = ipns.unmarshalIPNSRecord(storedData)
+ * const storedData = Uint8Array.from([0, 1, 2, 3, 4])
+ * const ipnsRecord = unmarshalIPNSRecord(storedData)
  * ```
  *
  * Returns the `IPNSRecord` after being deserialized.
