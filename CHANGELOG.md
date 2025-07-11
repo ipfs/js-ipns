@@ -1,3 +1,9 @@
+## [10.1.2](https://github.com/ipfs/js-ipns/compare/v10.1.1...v10.1.2) (2025-07-11)
+
+### Documentation
+
+* update readme examples ([#398](https://github.com/ipfs/js-ipns/issues/398)) ([8fec3ef](https://github.com/ipfs/js-ipns/commit/8fec3efa09606549bbbbf1f27c038bfdc3de26a2)), closes [#315](https://github.com/ipfs/js-ipns/issues/315) [#314](https://github.com/ipfs/js-ipns/issues/314)
+
 ## [10.1.1](https://github.com/ipfs/js-ipns/compare/v10.1.0...v10.1.1) (2025-07-11)
 
 ### Dependencies
