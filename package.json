@@ -171,10 +171,10 @@
   },
   "dependencies": {
     "@libp2p/crypto": "^5.0.0",
-    "@libp2p/interface": "^2.0.0",
-    "@libp2p/logger": "^5.0.0",
+    "@libp2p/interface": "^3.0.2",
+    "@libp2p/logger": "^6.0.4",
     "cborg": "^4.2.3",
-    "interface-datastore": "^8.3.0",
+    "interface-datastore": "^9.0.2",
     "multiformats": "^13.2.2",
     "protons-runtime": "^5.5.0",
     "timestamp-nano": "^1.0.1",
@@ -182,7 +182,7 @@
     "uint8arrays": "^5.1.0"
   },
   "devDependencies": {
-    "@libp2p/peer-id": "^5.0.0",
+    "@libp2p/peer-id": "^6.0.3",
     "aegir": "^47.0.20",
     "protons": "^7.6.0"
   },
