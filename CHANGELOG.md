@@ -1,3 +1,13 @@
+## [10.1.3](https://github.com/ipfs/js-ipns/compare/v10.1.2...v10.1.3) (2025-10-14)
+
+### Trivial Changes
+
+* add or force update .github/workflows/stale.yml ([#399](https://github.com/ipfs/js-ipns/issues/399)) ([2fd019a](https://github.com/ipfs/js-ipns/commit/2fd019acaa2122dc64c1a0a20e9eda3e6ebe8223))
+
+### Dependencies
+
+* bump the interplanetary-deps group across 1 directory with 4 updates ([#401](https://github.com/ipfs/js-ipns/issues/401)) ([7d7a2a8](https://github.com/ipfs/js-ipns/commit/7d7a2a8699bb938420076b4e4ac74ab9c13d8866))
+
 ## [10.1.2](https://github.com/ipfs/js-ipns/compare/v10.1.1...v10.1.2) (2025-07-11)
 
 ### Documentation
