@@ -183,7 +183,7 @@
   },
   "devDependencies": {
     "@libp2p/peer-id": "^6.0.3",
-    "aegir": "^47.0.20",
+    "aegir": "^47.0.26",
     "protons": "^7.6.0"
   },
   "sideEffects": false
