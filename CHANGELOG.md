@@ -1,3 +1,9 @@
+## [10.1.6](https://github.com/ipfs/js-ipns/compare/v10.1.5...v10.1.6) (2026-04-10)
+
+### Bug Fixes
+
+* import from .ts files ([#410](https://github.com/ipfs/js-ipns/issues/410)) ([e5a00fe](https://github.com/ipfs/js-ipns/commit/e5a00fec7a839c5f87d4eb1a216591ff9f085ab2))
+
 ## [10.1.5](https://github.com/ipfs/js-ipns/compare/v10.1.4...v10.1.5) (2026-04-10)
 
 ### Bug Fixes
