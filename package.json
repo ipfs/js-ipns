@@ -47,15 +47,18 @@
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
-      "import": "./dist/src/index.js"
+      "import": "./dist/src/index.js",
+      "module-sync": "./dist/src/index.js"
     },
     "./selector": {
       "types": "./dist/src/selector.d.ts",
-      "import": "./dist/src/selector.js"
+      "import": "./dist/src/selector.js",
+      "module-sync": "./dist/src/selector.js"
     },
     "./validator": {
       "types": "./dist/src/validator.d.ts",
-      "import": "./dist/src/validator.js"
+      "import": "./dist/src/validator.js",
+      "module-sync": "./dist/src/validator.js"
     }
   },
   "release": {
