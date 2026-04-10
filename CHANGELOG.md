@@ -1,3 +1,13 @@
+## [10.1.5](https://github.com/ipfs/js-ipns/compare/v10.1.4...v10.1.5) (2026-04-10)
+
+### Bug Fixes
+
+* add module-sync to support require ([#409](https://github.com/ipfs/js-ipns/issues/409)) ([2b6889e](https://github.com/ipfs/js-ipns/commit/2b6889eb91f84025dba69e3d6f2ebeafe8ff25c7))
+
+### Dependencies
+
+* bump protons from 7.7.0 to 8.1.1 ([#405](https://github.com/ipfs/js-ipns/issues/405)) ([e607f64](https://github.com/ipfs/js-ipns/commit/e607f647436357e9ae48d5b419132b0df7843551))
+
 ## [10.1.4](https://github.com/ipfs/js-ipns/compare/v10.1.3...v10.1.4) (2026-04-10)
 
 ### Dependencies
