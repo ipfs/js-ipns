@@ -176,7 +176,7 @@
     "cborg": "^5.1.0",
     "interface-datastore": "^9.0.2",
     "multiformats": "^13.2.2",
-    "protons-runtime": "^5.5.0",
+    "protons-runtime": "^6.0.1",
     "timestamp-nano": "^1.0.1",
     "uint8arraylist": "^2.4.8",
     "uint8arrays": "^5.1.0"
@@ -184,7 +184,7 @@
   "devDependencies": {
     "@libp2p/peer-id": "^6.0.3",
     "aegir": "^47.0.20",
-    "protons": "^7.6.0"
+    "protons": "^8.1.1"
   },
   "sideEffects": false
 }
