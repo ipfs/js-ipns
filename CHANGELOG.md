@@ -1,3 +1,9 @@
+## [10.1.4](https://github.com/ipfs/js-ipns/compare/v10.1.3...v10.1.4) (2026-04-10)
+
+### Dependencies
+
+* bump cborg from 4.5.8 to 5.1.0 ([#408](https://github.com/ipfs/js-ipns/issues/408)) ([f24a095](https://github.com/ipfs/js-ipns/commit/f24a0957e4eee280683f1ab12f914bef1db5d187))
+
 ## [10.1.3](https://github.com/ipfs/js-ipns/compare/v10.1.2...v10.1.3) (2025-10-14)
 
 ### Trivial Changes
