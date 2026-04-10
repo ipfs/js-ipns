@@ -90,9 +90,9 @@ import { publicKeyToProtobuf } from '@libp2p/crypto/keys'
 import { logger } from '@libp2p/logger'
 import NanoDate from 'timestamp-nano'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
-import { SignatureCreationError } from './errors.js'
-import { IpnsEntry } from './pb/ipns.js'
-import { createCborData, ipnsRecordDataForV1Sig, ipnsRecordDataForV2Sig, normalizeValue } from './utils.js'
+import { SignatureCreationError } from './errors.ts'
+import { IpnsEntry } from './pb/ipns.ts'
+import { createCborData, ipnsRecordDataForV1Sig, ipnsRecordDataForV2Sig, normalizeValue } from './utils.ts'
 import type { PrivateKey, PublicKey } from '@libp2p/interface'
 import type { Key } from 'interface-datastore/key'
 import type { CID } from 'multiformats/cid'
@@ -339,11 +339,11 @@ const _create = async (privateKey: PrivateKey, value: CID | PublicKey | Multihas
   }
 }
 
-export { unmarshalIPNSRecord } from './utils.js'
-export { marshalIPNSRecord } from './utils.js'
-export { multihashToIPNSRoutingKey } from './utils.js'
-export { multihashFromIPNSRoutingKey } from './utils.js'
-export { extractPublicKeyFromIPNSRecord } from './utils.js'
+export { unmarshalIPNSRecord } from './utils.ts'
+export { marshalIPNSRecord } from './utils.ts'
+export { multihashToIPNSRoutingKey } from './utils.ts'
+export { multihashFromIPNSRoutingKey } from './utils.ts'
+export { extractPublicKeyFromIPNSRecord } from './utils.ts'
 
 /**
  * Sign ipns record data using the legacy V1 signature scheme

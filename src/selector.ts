@@ -1,6 +1,6 @@
 import NanoDate from 'timestamp-nano'
-import { IpnsEntry } from './pb/ipns.js'
-import { unmarshalIPNSRecord } from './utils.js'
+import { IpnsEntry } from './pb/ipns.ts'
+import { unmarshalIPNSRecord } from './utils.ts'
 
 /**
  * Selects the latest valid IPNS record from an array of marshalled IPNS records.

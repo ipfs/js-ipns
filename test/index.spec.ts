@@ -16,7 +16,7 @@ import { createIPNSRecord, createIPNSRecordWithExpiration } from '../src/index.j
 import { IpnsEntry } from '../src/pb/ipns.js'
 import { extractPublicKeyFromIPNSRecord, parseCborData, createCborData, ipnsRecordDataForV2Sig, marshalIPNSRecord, unmarshalIPNSRecord, multihashToIPNSRoutingKey, multihashFromIPNSRoutingKey } from '../src/utils.js'
 import { ipnsValidator } from '../src/validator.js'
-import { kuboRecord } from './fixtures/records.js'
+import { kuboRecord } from './fixtures/records.ts'
 import type { PrivateKey } from '@libp2p/interface'
 
 describe('ipns', function () {
