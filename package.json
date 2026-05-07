@@ -182,7 +182,7 @@
     "protons-runtime": "^6.0.1",
     "timestamp-nano": "^1.0.1",
     "uint8arraylist": "^2.4.8",
-    "uint8arrays": "^5.1.0"
+    "uint8arrays": "^6.0.0"
   },
   "devDependencies": {
     "@libp2p/peer-id": "^6.0.3",
