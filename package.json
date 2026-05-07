@@ -178,7 +178,7 @@
     "@libp2p/logger": "^6.0.4",
     "cborg": "^5.1.0",
     "interface-datastore": "^9.0.2",
-    "multiformats": "^13.2.2",
+    "multiformats": "^14.0.0",
     "protons-runtime": "^6.0.1",
     "timestamp-nano": "^1.0.1",
     "uint8arraylist": "^2.4.8",
