@@ -1,3 +1,13 @@
+## [11.0.0](https://github.com/ipfs/js-ipns/compare/v10.1.6...v11.0.0) (2026-05-11)
+
+### ⚠ BREAKING CHANGES
+
+* update multiformats to 14.x.x (#421)
+
+### Dependencies
+
+* update multiformats to 14.x.x ([#421](https://github.com/ipfs/js-ipns/issues/421)) ([87ff8e4](https://github.com/ipfs/js-ipns/commit/87ff8e4dab6fd04cfbb111b86d9aa35edcf9fbe3))
+
 ## [10.1.6](https://github.com/ipfs/js-ipns/compare/v10.1.5...v10.1.6) (2026-04-10)
 
 ### Bug Fixes
