@@ -58,7 +58,7 @@ await validate(publicKey, marshalledRecord)
 
 This is useful when validating IPNS names that use RSA keys, whose public key is embedded in the record (rather than in the routing key as with Ed25519).
 
-```TypeScript
+```js
 import { ipnsValidator } from 'ipns/validator'
 import { multihashToIPNSRoutingKey } from 'ipns'
 import { generateKeyPair } from '@libp2p/crypto/keys'
