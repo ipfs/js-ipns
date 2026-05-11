@@ -1,13 +1,11 @@
-/* eslint-env mocha */
-
 import { peerIdFromCID } from '@libp2p/peer-id'
 import { expect } from 'aegir/chai'
 import loadFixture from 'aegir/fixtures'
 import { base36 } from 'multiformats/bases/base36'
 import { CID } from 'multiformats/cid'
-import { SignatureVerificationError } from '../src/errors.js'
-import { marshalIPNSRecord, unmarshalIPNSRecord } from '../src/index.js'
-import { validate } from '../src/validator.js'
+import { SignatureVerificationError } from '../src/errors.ts'
+import { marshalIPNSRecord, unmarshalIPNSRecord } from '../src/index.ts'
+import { validate } from '../src/validator.ts'
 
 describe('conformance', function () {
   it('should reject a v1 only record', async () => {

@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-
 import { randomBytes } from '@libp2p/crypto'
 import { generateKeyPair, publicKeyToProtobuf } from '@libp2p/crypto/keys'
 import { peerIdFromPrivateKey } from '@libp2p/peer-id'
@@ -11,11 +9,11 @@ import { CID } from 'multiformats/cid'
 import * as Digest from 'multiformats/hashes/digest'
 import { toString as uint8ArrayToString } from 'uint8arrays'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
-import { InvalidEmbeddedPublicKeyError, InvalidValueError, RecordExpiredError, SignatureVerificationError } from '../src/errors.js'
-import { createIPNSRecord, createIPNSRecordWithExpiration } from '../src/index.js'
-import { IpnsEntry } from '../src/pb/ipns.js'
-import { extractPublicKeyFromIPNSRecord, parseCborData, createCborData, ipnsRecordDataForV2Sig, marshalIPNSRecord, unmarshalIPNSRecord, multihashToIPNSRoutingKey, multihashFromIPNSRoutingKey } from '../src/utils.js'
-import { ipnsValidator } from '../src/validator.js'
+import { InvalidEmbeddedPublicKeyError, InvalidValueError, RecordExpiredError, SignatureVerificationError } from '../src/errors.ts'
+import { createIPNSRecord, createIPNSRecordWithExpiration } from '../src/index.ts'
+import { IpnsEntry } from '../src/pb/ipns.ts'
+import { extractPublicKeyFromIPNSRecord, parseCborData, createCborData, ipnsRecordDataForV2Sig, marshalIPNSRecord, unmarshalIPNSRecord, multihashToIPNSRoutingKey, multihashFromIPNSRoutingKey } from '../src/utils.ts'
+import { ipnsValidator } from '../src/validator.ts'
 import { kuboRecord } from './fixtures/records.ts'
 import type { PrivateKey } from '@libp2p/interface'
 
@@ -108,6 +106,7 @@ describe('ipns', function () {
     const record = await createIPNSRecordWithExpiration(privateKey, contentPath, sequence, expiration)
     const marshalledRecord = marshalIPNSRecord(record)
 
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalledRecord)
 
     const pb = IpnsEntry.decode(marshalledRecord)
@@ -122,6 +121,7 @@ describe('ipns', function () {
     const record = await createIPNSRecordWithExpiration(privateKey, contentPath, sequence, expiration, { v1Compatible: false })
     const marshalledRecord = marshalIPNSRecord(record)
 
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalledRecord)
 
     const pb = IpnsEntry.decode(marshalIPNSRecord(record))
@@ -141,6 +141,7 @@ describe('ipns', function () {
     })
     const marshalledRecord = marshalIPNSRecord(record)
 
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalledRecord)
 
     const pb = IpnsEntry.decode(marshalledRecord)
@@ -159,6 +160,7 @@ describe('ipns', function () {
     })
     const marshalledRecord = marshalIPNSRecord(record)
 
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalledRecord)
 
     const pb = IpnsEntry.decode(marshalledRecord)
@@ -173,6 +175,7 @@ describe('ipns', function () {
     const validity = 1000000
 
     const record = await createIPNSRecord(privateKey, contentPath, sequence, validity)
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalIPNSRecord(record))
   })
 
@@ -181,6 +184,7 @@ describe('ipns', function () {
     const validity = 1000000
 
     const record = await createIPNSRecord(privateKey, contentPath, sequence, validity, { v1Compatible: false })
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalIPNSRecord(record))
   })
 
@@ -209,6 +213,7 @@ describe('ipns', function () {
     const otherKey = await generateKeyPair('Ed25519')
     const peerId = peerIdFromPrivateKey(otherKey)
     const expectedValue = `/ipns/${peerId.toCID().toString(base36)}`
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     const record = await createIPNSRecord(privateKey, peerId.toCID(), 0, 1000000)
     expect(record.value).to.equal(expectedValue)
   })
@@ -281,6 +286,7 @@ describe('ipns', function () {
     // confirm a v1 exists
     expect(pb).to.have.property('signatureV1')
 
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await expect(ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), IpnsEntry.encode(pb))).to.eventually.be.rejected()
       .with.property('name', SignatureVerificationError.name)
   })
@@ -298,6 +304,7 @@ describe('ipns', function () {
     // confirm a v1 exists
     expect(pb).to.have.property('signatureV1')
 
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await expect(ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), IpnsEntry.encode(pb))).to.eventually.be.rejected()
       .with.property('name', SignatureVerificationError.name)
   })
@@ -311,6 +318,7 @@ describe('ipns', function () {
     // corrupt the record by changing the value to random bytes
     record.value = uint8ArrayToString(randomBytes(46))
 
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await expect(ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalIPNSRecord(record))).to.eventually.be.rejected()
       .with.property('name', SignatureVerificationError.name)
   })
@@ -323,6 +331,7 @@ describe('ipns', function () {
 
     await new Promise(resolve => setTimeout(resolve, 1))
 
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await expect(ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalIPNSRecord(record))).to.eventually.be.rejected()
       .with.property('name', RecordExpiredError.name)
   })
@@ -345,6 +354,7 @@ describe('ipns', function () {
     expect(createdRecord.signatureV2).to.equalBytes(unmarshalledData.signatureV2)
     expect(createdRecord.data).to.equalBytes(unmarshalledData.data)
 
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     await ipnsValidator(multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash()), marshalledData)
   })
 
@@ -399,6 +409,7 @@ describe('ipns', function () {
     delete record.pubKey
 
     const marshalledData = marshalIPNSRecord(record)
+    // @ts-expect-error @libp2p/crypto needs a new multiformats
     const key = multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash())
 
     await expect(ipnsValidator(key, marshalledData)).to.eventually.be.rejected()

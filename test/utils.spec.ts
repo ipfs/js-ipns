@@ -2,7 +2,7 @@ import { peerIdFromString } from '@libp2p/peer-id'
 import { expect } from 'aegir/chai'
 import { CID } from 'multiformats/cid'
 import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
-import { normalizeValue, multihashFromIPNSRoutingKey, multihashToIPNSRoutingKey, normalizeByteValue } from '../src/utils.js'
+import { normalizeValue, multihashFromIPNSRoutingKey, multihashToIPNSRoutingKey, normalizeByteValue } from '../src/utils.ts'
 import type { PeerId } from '@libp2p/interface'
 
 describe('utils', () => {
@@ -109,6 +109,7 @@ describe('utils', () => {
 
     Object.entries(cases).forEach(([name, input]) => {
       it(`should round trip a ${name} key`, async () => {
+        // @ts-expect-error @libp2p/crypto needs a new multiformats
         const key = multihashToIPNSRoutingKey(input.toMultihash())
         const output = multihashFromIPNSRoutingKey(key)
 
