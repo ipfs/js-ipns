@@ -1,3 +1,9 @@
+## [11.0.1](https://github.com/ipfs/js-ipns/compare/v11.0.0...v11.0.1) (2026-07-31)
+
+### Dependencies
+
+* bump cborg from 5.1.11 to 6.1.1 ([#423](https://github.com/ipfs/js-ipns/issues/423)) ([07110a9](https://github.com/ipfs/js-ipns/commit/07110a92449458b2ab6428f72e6f975d91853a6a))
+
 ## [11.0.0](https://github.com/ipfs/js-ipns/compare/v10.1.6...v11.0.0) (2026-05-11)
 
 ### ⚠ BREAKING CHANGES
