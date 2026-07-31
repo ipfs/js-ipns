@@ -24,7 +24,6 @@ describe('selector', function () {
     const marshalledData = marshalIPNSRecord(record)
     const marshalledNewData = marshalIPNSRecord(newRecord)
 
-    // @ts-expect-error @libp2p/crypto needs a new multiformats
     const key = multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash())
 
     let valid = ipnsSelector(key, [marshalledNewData, marshalledData])
@@ -44,7 +43,6 @@ describe('selector', function () {
     const marshalledData = marshalIPNSRecord(record)
     const marshalledNewData = marshalIPNSRecord(newRecord)
 
-    // @ts-expect-error @libp2p/crypto needs a new multiformats
     const key = multihashToIPNSRoutingKey(privateKey.publicKey.toMultihash())
 
     let valid = ipnsSelector(key, [marshalledNewData, marshalledData])

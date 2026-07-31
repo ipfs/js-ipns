@@ -109,7 +109,6 @@ describe('utils', () => {
 
     Object.entries(cases).forEach(([name, input]) => {
       it(`should round trip a ${name} key`, async () => {
-        // @ts-expect-error @libp2p/crypto needs a new multiformats
         const key = multihashToIPNSRoutingKey(input.toMultihash())
         const output = multihashFromIPNSRoutingKey(key)
 

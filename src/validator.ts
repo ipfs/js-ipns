@@ -84,7 +84,6 @@ export async function ipnsValidator (routingKey: Uint8Array, marshalledRecord: U
     throw new InvalidEmbeddedPublicKeyError('Could not extract public key from IPNS record or routing key')
   }
 
-  // @ts-expect-error @libp2p/crypto needs a new multiformats
   const expectedRoutingKey = multihashToIPNSRoutingKey(recordPubKey.toMultihash())
 
   if (!uint8ArrayEquals(expectedRoutingKey, routingKey)) {
